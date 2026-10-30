@@ -14,7 +14,8 @@ const POSITIONS: ConnectedPosition[] = [
   { originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom', offsetY: -6 },
 ];
 
-// Bouton « effet » d'un bâtiment spécial : un clic affiche ou masque une bulle qui décrit l'effet.
+// Bouton « effet » d'un bâtiment spécial : une bulle décrit l'effet. À la souris elle suit le survol et un clic
+// l'épingle ; au doigt, un tap l'affiche ou la masque (un tap émet aussi les événements pointer, d'où le filtre).
 // La bulle est rendue dans l'overlay du CDK (fin du <body>) : elle passe au-dessus des cartes voisines
 // sans hériter de leur opacité. Elle se ferme au clic ailleurs ou avec Échap ; le clic ne remonte pas jusqu'à la carte.
 @Component({
@@ -29,6 +30,8 @@ const POSITIONS: ConnectedPosition[] = [
       #origin="cdkOverlayOrigin"
       [attr.aria-expanded]="open()"
       aria-label="Show the building effect"
+      (pointerenter)="show($event)"
+      (pointerleave)="hide($event)"
       (click)="toggle($event)"
     >
       <app-icon name="sparkle" [size]="13" />Effect
@@ -60,10 +63,30 @@ export class EffectTooltipComponent implements OnDestroy {
   readonly positions = POSITIONS;
   open = computed(() => openTooltip() === this);
   text = computed(() => buildingEffectText(this.effect(), this.day(), this.cityService.defaultValues().effect_rules));
+  // Ouverte par un clic : reste affichée quand la souris quitte le bouton
+  private pinned = false;
+
+  show(event: PointerEvent) {
+    if (event.pointerType === 'mouse' && !this.open()) {
+      this.pinned = false;
+      openTooltip.set(this);
+    }
+  }
+
+  hide(event: PointerEvent) {
+    if (event.pointerType === 'mouse' && !this.pinned) {
+      this.close();
+    }
+  }
 
   toggle(event: Event) {
     event.stopPropagation();
-    openTooltip.set(this.open() ? null : this);
+    if (this.open() && this.pinned) {
+      this.close();
+    } else {
+      this.pinned = true;
+      openTooltip.set(this);
+    }
   }
 
   close() {
