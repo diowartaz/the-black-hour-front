@@ -15,6 +15,8 @@ const ICONS = {
   book: '<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5M22 9v6"/>',
   bookmark: '<path d="M4 19.5V5a2 2 0 0 1 2-2h14v18H6.5a2.5 2.5 0 0 1 0-5H20"/><path d="M10 3v8l2.5-2 2.5 2V3"/>',
   cards: '<rect x="3" y="7" width="12" height="15" rx="2"/><path d="M8 3.5h11a2 2 0 0 1 2 2V18"/>',
+  cart: '<path d="M3 4h2.5l2.2 11h10.6l2-8H6.3"/><circle cx="9.5" cy="19.5" r="1.5"/><circle cx="16.5" cy="19.5" r="1.5"/>',
+  tag: '<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.3"/>',
   recycle: '<path d="M4 12a8 8 0 0 1 13.7-5.6L20 9M20 4v5h-5M20 12a8 8 0 0 1-13.7 5.6L4 15M4 20v-5h5"/>',
   settings:
     '<circle cx="12" cy="12" r="3"/><path d="M12 2l1.8 2.6 3.1-.7.7 3.1L20.2 9 19 12l1.2 3-2.6 2-.7 3.1-3.1-.7L12 22l-1.8-2.6-3.1.7-.7-3.1L3.8 15 5 12 3.8 9l2.6-2 .7-3.1 3.1.7z"/>',
@@ -38,6 +40,7 @@ const ICONS = {
   bolt: '<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
   trend: '<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>',
   search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
+  sliders: '<path d="M4 7h9M19 7h1M4 17h1M11 17h9"/><circle cx="16" cy="7" r="3"/><circle cx="8" cy="17" r="3"/>',
   crown: '<path d="M3 8l4 4 5-7 5 7 4-4-2 11H5z"/>',
   sparkle: '<path d="M12 2l2 6 6 2-6 2-2 6-2-6-6-2 6-2zM19 15l1 3 3 1-3 1-1 3-1-3-3-1 3-1z"/>',
   logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',

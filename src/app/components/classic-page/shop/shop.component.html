@@ -23,11 +23,6 @@
         <app-icon name="shield-plus" [size]="16" />Bonuses
       </button>
     </div>
-    <div class="balance" aria-label="Your coins">
-      <span class="balance-icon"><app-icon name="money" [size]="18" /></span>
-      <span class="balance-amount">{{ money() }}</span>
-      <span class="balance-unit">coins</span>
-    </div>
 
     @if (tab() === 'boosters') {
       <div class="cards">
@@ -53,14 +48,17 @@
               [disabled]="cityService.openBoosterLoading() || cityService.stats().money < booster.price"
               (click)="openBooster(booster)"
             >
-              <app-icon name="money" [size]="16" />{{ booster.price }} · Open
+              <app-icon name="money" [size]="16" />{{ booster.price | formatNumber }} · Open
             </button>
           </article>
         }
       </div>
       <div class="collection-summary">
         <span>Collection {{ ownedCount() }}/{{ cityService.catalogBuildings().length }}</span>
-        <span>Duplicates {{ duplicates() }} <small>(selling and trading coming soon)</small></span>
+        <span>Duplicates {{ duplicates() }}</span>
+        <button type="button" class="text-btn" (click)="goToMarket()">
+          <app-icon name="money" [size]="16" />Black Market
+        </button>
         <button type="button" class="text-btn" (click)="goToDeck()">
           <app-icon name="cards" [size]="16" />Edit deck
         </button>
@@ -95,7 +93,7 @@
                   (click)="buyItem(item.value.id)"
                   [disabled]="cityService.buyBonusLoading() || !item.value.enoughLvlMax || !item.value.enoughMoney"
                 >
-                  <app-icon name="money" [size]="16" />{{ item.value.nextPrice }} · Buy
+                  <app-icon name="money" [size]="16" />{{ item.value.nextPrice | formatNumber }} · Buy
                 </button>
               </div>
             } @else {

@@ -90,26 +90,26 @@ describe('xp', () => {
 });
 
 describe('bonuses', () => {
-  const defaultValues = { ...createDefaultDefaultValuesModel(), BONUS_PRICE_EXPONENT: 1.5 };
+  const defaultValues = { ...createDefaultDefaultValuesModel(), BONUS_PRICE_GROWTH: 1.5 };
   const references: Record<number, BonusWithoutLvl> = {
     1: { id: 1, name: 'Money Maker', description: '', icon: '', price: 500, lvl_max: 20, value: 0.05 },
     2: { id: 2, name: 'Defenser', description: '', icon: '', price: 1000, lvl_max: 2, value: 1 },
   };
 
-  it('calcule le prix comme l’API (prix × n ^ exposant, arrondi à la dizaine)', () => {
+  it('calcule le prix comme l’API (prix × croissance ^ niveau, arrondi à la dizaine)', () => {
     expect(bonusPrice(references[1], 0, defaultValues)).toBe(500);
-    // 500 × 2 ^ 1,5 ≈ 1414 ; 500 × 4 ^ 1,5 = 4000
-    expect(bonusPrice(references[1], 1, defaultValues)).toBe(1410);
-    expect(bonusPrice(references[1], 3, defaultValues)).toBe(4000);
+    // 500 × 1,5 = 750 ; 500 × 1,5 ^ 3 = 1687,5
+    expect(bonusPrice(references[1], 1, defaultValues)).toBe(750);
+    expect(bonusPrice(references[1], 3, defaultValues)).toBe(1690);
   });
 
   it('associe chaque bonus à son niveau par id', () => {
-    const stats = { ...createDefaultStatsModel(), money: 2600, bonuses: { 1: 2, 2: 2 } };
+    const stats = { ...createDefaultStatsModel(), money: 1130, bonuses: { 1: 2, 2: 2 } };
     const bonuses = computeBonuses(stats, defaultValues, references);
 
     expect(bonuses[1].lvl).toBe(2);
-    // 500 × 3 ^ 1,5 ≈ 2598
-    expect(bonuses[1].nextPrice).toBe(2600);
+    // 500 × 1,5 ^ 2 = 1125
+    expect(bonuses[1].nextPrice).toBe(1130);
     expect(bonuses[1].enoughMoney).toBeTrue();
     expect(bonuses[2].enoughLvlMax).toBeFalse();
     expect(bonuses[2].enoughMoney).toBeFalse();

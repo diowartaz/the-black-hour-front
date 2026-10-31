@@ -7,15 +7,13 @@ import { RoutesEnum } from 'src/app/models/router';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { CityService } from 'src/app/services/city/city.service';
 import { IconComponent, IconName } from 'src/app/shared/components/icon/icon.component';
-import { formatCompact } from 'src/app/shared/utils/format';
+import { formatNumber } from 'src/app/shared/utils/format';
 
 interface TopBarLink {
   label: string;
   icon: IconName;
   link: string[];
   queryParams?: Params;
-  // Rangé dans le menu « ⋯ » sur petit écran
-  collapsible: boolean;
 }
 
 // Sous le bouton « ⋯ », aligné à droite, ou au-dessus s'il n'y a pas la place
@@ -35,43 +33,35 @@ const MENU_POSITIONS: ConnectedPosition[] = [
 })
 export class HeaderLoggedInComponent {
   public readonly cityService = inject(CityService);
-  public readonly router = inject(Router);
+  private readonly router = inject(Router);
   public readonly authService = inject(AuthService);
-  public readonly RoutesEnum = RoutesEnum;
   readonly menuPositions = MENU_POSITIONS;
 
-  data = computed(() => {
-    const money = this.cityService.stats().money;
-    return { money: formatCompact(money), exactMoney: money.toLocaleString('fr-FR') };
-  });
+  money = computed(() => formatNumber(this.cityService.stats().money));
 
   links = computed<TopBarLink[]>(() => {
-    const leaderboard: TopBarLink = {
-      label: 'Leaderboard',
-      icon: 'trophy',
-      link: ['/', RoutesEnum.LEADERBOARD],
-      collapsible: false,
-    };
+    const leaderboard: TopBarLink = { label: 'Leaderboard', icon: 'trophy', link: ['/', RoutesEnum.LEADERBOARD] };
+    const guide: TopBarLink = { label: 'Guide', icon: 'bookmark', link: ['/', RoutesEnum.WIKI] };
     if (!this.authService.isConnected()) {
-      return [leaderboard, { label: 'Guide', icon: 'bookmark', link: ['/', RoutesEnum.WIKI], collapsible: false }];
+      return [leaderboard, guide];
     }
     return [
-      { label: 'Deck', icon: 'cards', link: ['/', RoutesEnum.DECK], collapsible: false },
-      { label: 'Guild', icon: 'shield', link: ['/', RoutesEnum.GUILD], collapsible: true },
-      { label: 'Invite friends', icon: 'user-plus', link: ['/', RoutesEnum.REFERRAL], collapsible: true },
+      { label: 'Shop', icon: 'sparkle', link: ['/', RoutesEnum.SHOP] },
+      { label: 'Deck', icon: 'cards', link: ['/', RoutesEnum.DECK] },
+      { label: 'Black Market', icon: 'money', link: ['/', RoutesEnum.MARKET] },
+      { label: 'Guild', icon: 'shield', link: ['/', RoutesEnum.GUILD] },
+      { label: 'Invite friends', icon: 'user-plus', link: ['/', RoutesEnum.REFERRAL] },
       {
         label: 'Profile',
         icon: 'friends',
         link: ['/', RoutesEnum.PROFIL],
         queryParams: { user_id: this.authService.userId() },
-        collapsible: true,
       },
       leaderboard,
-      { label: 'Guide', icon: 'bookmark', link: ['/', RoutesEnum.WIKI], collapsible: true },
-      { label: 'Settings', icon: 'settings', link: ['/', RoutesEnum.SETTINGS], collapsible: true },
+      guide,
+      { label: 'Settings', icon: 'settings', link: ['/', RoutesEnum.SETTINGS] },
     ];
   });
-  menuLinks = computed(() => this.links().filter((link) => link.collapsible));
 
   menuOpen = signal(false);
 
@@ -85,7 +75,7 @@ export class HeaderLoggedInComponent {
   // Le bouton « ⋯ » s'allume quand la page affichée est rangée dans le menu
   menuLinkActive = computed(() => {
     this.url();
-    return this.menuLinks().some((link) =>
+    return this.links().some((link) =>
       this.router.isActive(this.router.createUrlTree(link.link, { queryParams: link.queryParams }), {
         paths: 'subset',
         queryParams: 'subset',

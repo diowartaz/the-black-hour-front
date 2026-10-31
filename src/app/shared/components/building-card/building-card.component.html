@@ -12,7 +12,7 @@
     <span class="name">{{ building().name }}</span>
     @if (locked()) {
       <app-icon name="lock" [size]="14" />
-    } @else if (count() > 1) {
+    } @else if (count() > 1 || showCount()) {
       <span class="count">×{{ count() }}</span>
     }
   </div>
@@ -23,7 +23,7 @@
     @if (building().effect; as effect) {
       <app-effect-tooltip [effect]="effect" />
     } @else {
-      <span class="def"><app-icon name="shield" [size]="13" />{{ building().defense }}</span>
+      <span class="def"><app-icon name="shield" [size]="13" />{{ building().defense | formatNumber }}</span>
     }
     <span><app-icon name="trend" [size]="13" />{{ building().lvl_max }} lvl</span>
     <span><app-icon name="clock" [size]="13" />{{ time() }}</span>

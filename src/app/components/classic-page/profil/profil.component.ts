@@ -1,4 +1,3 @@
-import { DecimalPipe } from '@angular/common';
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -12,10 +11,11 @@ import { ProfilModel } from 'src/app/models/game';
 import { RoutesEnum } from 'src/app/models/router';
 import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { XPToLVLandXP } from 'src/app/shared/utils/xp';
+import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
 
 @Component({
   selector: 'app-profil',
-  imports: [GameComponent, MatProgressSpinnerModule, ClassicPageComponent, IconComponent, RouterLink, DecimalPipe],
+  imports: [FormatNumberPipe, GameComponent, MatProgressSpinnerModule, ClassicPageComponent, IconComponent, RouterLink],
   templateUrl: './profil.component.html',
   styleUrls: ['./profil.component.scss'],
 })

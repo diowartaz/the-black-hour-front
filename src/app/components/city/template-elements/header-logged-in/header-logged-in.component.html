@@ -1,76 +1,51 @@
 <div class="top-bar">
   @if (authService.isConnected()) {
-    <button
-      type="button"
-      class="coins"
-      [attr.aria-label]="data().exactMoney + ' coins, open the shop'"
-      [title]="data().exactMoney"
-      (click)="router.navigate([RoutesEnum.SHOP])"
-    >
-      <span class="coins-plus"><app-icon name="plus" [size]="18" /></span>
-      <span class="coins-amount">{{ data().money }}</span>
-      <app-icon class="coins-icon" name="money" [size]="18" />
-      @if (cityService.nbBuyableBonuses() > 0) {
-        <span class="coins-badge">{{
-          cityService.nbBuyableBonuses() > 9 ? '9+' : cityService.nbBuyableBonuses()
-        }}</span>
-      }
-    </button>
+    <div class="balance" [attr.aria-label]="money() + ' coins'">
+      <span class="balance-icon"><app-icon name="money" [size]="18" /></span>
+      <span class="balance-amount">{{ money() }}</span>
+      <span class="balance-unit">coins</span>
+    </div>
     @if (authService.tempAccount()) {
       <span class="no-cloud-save">no cloud<br />save</span>
     }
   }
   <div class="spacer"></div>
-  @for (link of links(); track link.label) {
-    <a
-      class="icon-btn"
-      [class.collapsible]="link.collapsible"
-      [attr.aria-label]="link.label"
-      [routerLink]="link.link"
-      [queryParams]="link.queryParams"
-      routerLinkActive="active"
-    >
-      <app-icon [name]="link.icon" />
-    </a>
-  }
-  @if (menuLinks().length) {
-    <button
-      #moreButton
-      type="button"
-      class="icon-btn more-btn"
-      [class.active]="menuOpen() || menuLinkActive()"
-      aria-label="More"
-      aria-haspopup="menu"
-      [attr.aria-expanded]="menuOpen()"
-      cdkOverlayOrigin
-      #moreOrigin="cdkOverlayOrigin"
-      (click)="toggleMenu()"
-    >
-      <app-icon name="more" />
-    </button>
-    <ng-template
-      cdkConnectedOverlay
-      [cdkConnectedOverlayOrigin]="moreOrigin"
-      [cdkConnectedOverlayOpen]="menuOpen()"
-      [cdkConnectedOverlayPositions]="menuPositions"
-      (overlayOutsideClick)="closeMenuOutside($event, moreButton)"
-      (detach)="closeMenu()"
-    >
-      <nav class="more-menu" role="menu">
-        @for (link of menuLinks(); track link.label) {
-          <a
-            class="more-item"
-            role="menuitem"
-            [routerLink]="link.link"
-            [queryParams]="link.queryParams"
-            routerLinkActive="active"
-            (click)="closeMenu()"
-          >
-            <app-icon [name]="link.icon" />
-            {{ link.label }}
-          </a>
-        }
-      </nav>
-    </ng-template>
-  }
+  <button
+    #moreButton
+    type="button"
+    class="icon-btn more-btn"
+    [class.active]="menuOpen() || menuLinkActive()"
+    aria-label="More"
+    aria-haspopup="menu"
+    [attr.aria-expanded]="menuOpen()"
+    cdkOverlayOrigin
+    #moreOrigin="cdkOverlayOrigin"
+    (click)="toggleMenu()"
+  >
+    <app-icon name="more" />
+  </button>
+  <ng-template
+    cdkConnectedOverlay
+    [cdkConnectedOverlayOrigin]="moreOrigin"
+    [cdkConnectedOverlayOpen]="menuOpen()"
+    [cdkConnectedOverlayPositions]="menuPositions"
+    (overlayOutsideClick)="closeMenuOutside($event, moreButton)"
+    (detach)="closeMenu()"
+  >
+    <nav class="more-menu" role="menu">
+      @for (link of links(); track link.label) {
+        <a
+          class="more-item"
+          role="menuitem"
+          [routerLink]="link.link"
+          [queryParams]="link.queryParams"
+          routerLinkActive="active"
+          (click)="closeMenu()"
+        >
+          <app-icon [name]="link.icon" />
+          {{ link.label }}
+        </a>
+      }
+    </nav>
+  </ng-template>
 </div>

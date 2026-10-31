@@ -94,6 +94,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: RoutesEnum.MARKET,
+    loadComponent: () => import('./components/classic-page/market/market.component').then((m) => m.MarketComponent),
+    canActivate: [authGuard],
+  },
+  {
     path: RoutesEnum.PLAY,
     loadComponent: () => import('./components/city/city.component').then((m) => m.CityComponent),
     canActivate: [authGuard, gameLoadedGuard, stateGuard],

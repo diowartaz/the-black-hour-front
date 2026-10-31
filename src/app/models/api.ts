@@ -379,6 +379,77 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/market": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** État du marché pour le joueur connecté : meilleures offres, ses offres et ses ventes */
+        get: operations["MarketController_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/market/listings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Met en vente un exemplaire d'un plan et paie la taxe
+         *     (422 MARKET_LOCKED, INVALID_LISTING, NOT_ENOUGH_COPIES, NOT_ENOUGH_MONEY)
+         */
+        post: operations["MarketController_createListing"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/market/listings/{listingId}/buy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Achète une offre précise (409 LISTING_NOT_AVAILABLE si elle est déjà partie, 422 MARKET_LOCKED, NOT_ENOUGH_MONEY) */
+        post: operations["MarketController_buy"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/market/listings/{listingId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Retire une offre du joueur et lui rend le plan, sans rembourser la taxe (409 LISTING_NOT_AVAILABLE) */
+        delete: operations["MarketController_withdraw"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/city": {
         parameters: {
             query?: never;
@@ -804,6 +875,52 @@ export interface components {
             /** @description Pseudo exact du joueur invité (à la casse près) */
             username: string;
         };
+        MarketOfferResponse: {
+            listingId: string;
+            buildingId: number;
+            price: number;
+        };
+        MarketListingResponse: {
+            listingId: string;
+            buildingId: number;
+            price: number;
+            /** Format: date-time */
+            listedAt: string;
+        };
+        MarketSaleResponse: {
+            buildingId: number;
+            price: number;
+            /** Format: date-time */
+            soldAt: string;
+        };
+        MarketResponse: {
+            /** @description Le joueur a assez de parties terminées : sinon les listes sont vides et les actions refusées */
+            unlocked: boolean;
+            gamesPlayed: number;
+            requiredGames: number;
+            /** @description Exemplaires à posséder pour pouvoir en vendre un */
+            minCopiesToSell: number;
+            /** @description Part du prix payée à la mise en vente, arrondie au supérieur */
+            taxRate: number;
+            /** @description Offre la moins chère de chaque plan disponible, hors offres du joueur */
+            offers: components["schemas"]["MarketOfferResponse"][];
+            /** @description Offres en cours du joueur */
+            myListings: components["schemas"]["MarketListingResponse"][];
+            /** @description Dernières ventes du joueur */
+            sales: components["schemas"]["MarketSaleResponse"][];
+        };
+        CreateListingDto: {
+            /** @description Plan à vendre : il faut en posséder au moins rules.MARKET_MIN_COPIES_TO_SELL exemplaires */
+            buildingId: number;
+            /** @description Prix de vente : la taxe de mise en vente en est déduite d'avance, sur l'argent du vendeur */
+            price: number;
+        };
+        MarketActionResponse: {
+            /** @description Joueur après l'action : monnaie et collection à jour */
+            player: components["schemas"]["PlayerResponse"];
+            market: components["schemas"]["MarketResponse"];
+        };
+        Function: Record<string, never>;
         InventoryResponse: {
             wood: number;
             metal: number;
@@ -1825,6 +1942,90 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["GuildOverviewResponse"];
+                };
+            };
+        };
+    };
+    MarketController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MarketResponse"];
+                };
+            };
+        };
+    };
+    MarketController_createListing: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateListingDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MarketActionResponse"];
+                };
+            };
+        };
+    };
+    MarketController_buy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                listingId: components["schemas"]["Function"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MarketActionResponse"];
+                };
+            };
+        };
+    };
+    MarketController_withdraw: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                listingId: components["schemas"]["Function"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MarketActionResponse"];
                 };
             };
         };

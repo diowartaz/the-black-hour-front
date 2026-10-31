@@ -62,9 +62,6 @@ export class CityService {
   bonuses = computed<Record<number, AdvancedBonus>>(() =>
     computeBonuses(this.stats(), this.defaultValues(), this.referencesBonuses()),
   );
-  nbBuyableBonuses = computed<number>(
-    () => Object.values(this.bonuses()).filter((bonus) => bonus.enoughMoney && bonus.enoughLvlMax).length,
-  );
 
   buildings = computed<BuildingModel[]>(() => this.city().buildings);
   advancedBuildings = computed<AdvancedBuildingModel[]>(() =>

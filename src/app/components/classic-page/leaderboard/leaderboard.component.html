@@ -60,10 +60,12 @@
           <span class="rank">{{ user.rank }}</span>
           <span class="name">{{ user.username_truncated }}</span>
           @if (ranked()) {
-            <span class="value"><app-icon name="ranked" [size]="14" />{{ user.ranked_points }}</span>
+            <span class="value"><app-icon name="ranked" [size]="14" />{{ user.ranked_points | formatNumber }}</span>
           } @else {
             <span class="value"><app-icon name="calendar" [size]="14" />{{ user.personal_best_day }}</span>
-            <span class="value zb"><app-icon name="zombie" [size]="14" />{{ user.personal_best_zb }}</span>
+            <span class="value zb"
+              ><app-icon name="zombie" [size]="14" />{{ user.personal_best_zb | formatNumber }}</span
+            >
           }
           <span class="meter"><span [style.width.%]="ratioOf(user)"></span></span>
         </button>

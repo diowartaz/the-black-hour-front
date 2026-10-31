@@ -34,7 +34,8 @@
           <div class="stat-tile" style="--c: var(--cyan)">
             <div class="icon-tile"><app-icon name="ranked" [size]="22" /></div>
             <div class="tile-text">
-              <span class="stat-label">Ranked points</span><span class="stat-value">{{ profil.ranked_points }}</span>
+              <span class="stat-label">Ranked points</span
+              ><span class="stat-value">{{ profil.ranked_points | formatNumber }}</span>
             </div>
           </div>
           <div class="stat-tile" style="--c: var(--pink)">
@@ -46,7 +47,8 @@
           <div class="stat-tile" style="--c: var(--danger)">
             <div class="icon-tile"><app-icon name="zombie" [size]="22" /></div>
             <div class="tile-text">
-              <span class="stat-label">Zombies</span><span class="stat-value">{{ profil.personal_best_zb }}</span>
+              <span class="stat-label">Zombies</span
+              ><span class="stat-value">{{ profil.personal_best_zb | formatNumber }}</span>
             </div>
           </div>
         </div>
@@ -59,14 +61,14 @@
             <div class="icon-tile"><app-icon name="money" [size]="22" /></div>
             <div class="tile-text">
               <span class="stat-label">Earned today</span>
-              <span class="stat-value">{{ profil.today.coins | number }}</span>
+              <span class="stat-value">{{ profil.today.coins | formatNumber }}</span>
             </div>
           </div>
           <div class="stat-tile" style="--c: var(--yellow)">
             <div class="icon-tile"><app-icon name="shield" [size]="22" /></div>
             <div class="tile-text">
               <span class="stat-label">Guild pot share</span>
-              <span class="stat-value">+{{ profil.today.contribution | number: '1.0-2' }}</span>
+              <span class="stat-value">+{{ profil.today.contribution | formatNumber }}</span>
             </div>
           </div>
         </div>

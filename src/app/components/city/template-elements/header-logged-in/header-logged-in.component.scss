@@ -7,67 +7,45 @@
     flex: 1;
   }
 
-  .coins {
-    position: relative;
+  // Solde : pastille dorée, visible sur tous les écrans
+  .balance {
     display: flex;
     align-items: center;
     gap: 8px;
     height: 44px;
-    padding: 0 12px 0 4px;
+    padding: 0 14px 0 4px;
     border-radius: var(--radius-l);
     background: var(--surface);
     border: 1px solid color-mix(in srgb, var(--yellow) 45%, transparent);
-    box-shadow: 0 0 16px color-mix(in srgb, var(--yellow) 25%, transparent);
+    box-shadow: 0 0 16px color-mix(in srgb, var(--yellow) 20%, transparent);
     color: var(--yellow);
 
-    .coins-plus {
+    .balance-icon {
       width: 36px;
       height: 36px;
       border-radius: var(--radius-m);
-      background: var(--pink);
-      color: var(--text-strong);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 14px var(--pink);
+      background: color-mix(in srgb, var(--yellow) 14%, transparent);
     }
-    .coins-amount {
+    .balance-amount {
       font-family: var(--font-display);
       font-weight: 900;
       font-size: 18px;
       text-shadow: 0 0 10px color-mix(in srgb, var(--yellow) 60%, transparent);
     }
-    .coins-badge {
-      position: absolute;
-      top: -8px;
-      right: -8px;
-      min-width: 22px;
-      height: 22px;
-      padding: 0 4px;
-      border-radius: var(--radius-m);
-      background: var(--green);
-      color: var(--green-dark);
+    .balance-unit {
+      font-size: 12px;
       font-weight: 700;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 10px var(--green);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-mute);
     }
   }
 
-  // Bouton « ⋯ » : seulement sur petit écran, où il remplace les liens repliables
   .more-btn {
-    display: none;
     cursor: pointer;
-  }
-  @media (max-width: 559px) {
-    .collapsible {
-      display: none;
-    }
-    .more-btn {
-      display: flex;
-    }
   }
 
   .no-cloud-save {
@@ -89,18 +67,18 @@
       width: 38px;
       height: 38px;
     }
-    .coins {
+    .balance {
       height: 40px;
       gap: 6px;
       padding-right: 10px;
-      .coins-plus {
+      .balance-icon {
         width: 32px;
         height: 32px;
       }
-      .coins-amount {
+      .balance-amount {
         font-size: 16px;
       }
-      .coins-icon {
+      .balance-unit {
         display: none;
       }
     }
@@ -117,18 +95,18 @@
       width: 34px;
       height: 34px;
     }
-    .coins {
+    .balance {
       min-width: 0;
       height: 36px;
       gap: 4px;
       padding: 0 8px 0 3px;
       border-radius: var(--radius-m);
-      .coins-plus {
+      .balance-icon {
         width: 28px;
         height: 28px;
         border-radius: var(--radius-s);
       }
-      .coins-amount {
+      .balance-amount {
         font-size: 14px;
       }
     }

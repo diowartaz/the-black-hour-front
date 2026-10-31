@@ -6,7 +6,7 @@
         @if (overview.lastPayout > 0) {
           <p class="payout neon-card">
             <app-icon name="money" [size]="18" />
-            Received today from your guild: <strong>+{{ overview.lastPayout | number }} coins</strong>
+            Received today from your guild: <strong>+{{ overview.lastPayout | formatNumber }} coins</strong>
           </p>
         }
 
@@ -23,7 +23,7 @@
               pot. After midnight (Paris time), each member who finished a game that day receives the whole pot.
             </p>
             <p class="pot">
-              Next payout per eligible member: <strong>{{ guild.pot | number }}</strong>
+              Next payout per eligible member: <strong>{{ guild.pot | formatNumber }}</strong>
               <app-icon name="money" [size]="16" />
             </p>
           </section>
@@ -43,7 +43,7 @@
                     {{ member.eligible ? 'Eligible' : 'No game yet' }}
                   </span>
                   <span class="contribution">
-                    +{{ member.contribution | number: '1.0-2' }}<app-icon name="money" [size]="14" />
+                    +{{ member.contribution | formatNumber }}<app-icon name="money" [size]="14" />
                   </span>
                   @if (guild.isLeader && !member.isLeader) {
                     <button
@@ -178,7 +178,7 @@
                       {{ summary.memberCount }}/{{ summary.maxMembers }} · led by {{ summary.leaderUsername }}
                     </span>
                     <span class="contribution today-pot">
-                      Today's pot: {{ summary.pot | number }}<app-icon name="money" [size]="14" />
+                      Today's pot: {{ summary.pot | formatNumber }}<app-icon name="money" [size]="14" />
                     </span>
                     <div class="row-actions">
                       <button

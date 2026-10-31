@@ -99,53 +99,13 @@
           <app-icon name="sparkle" [size]="16" />Get more plans
         </button>
       </div>
-      <input
-        type="search"
-        class="search"
-        placeholder="Search name or effect"
-        aria-label="Search plans"
-        [value]="search()"
-        (input)="search.set($any($event.target).value)"
+      <app-plan-filters
+        [(search)]="search"
+        [(rarity)]="rarityFilter"
+        [(item)]="itemFilter"
+        [(kind)]="kindFilter"
+        [count]="collection().length"
       />
-      <div class="filters" role="group" aria-label="Filter by kind">
-        @for (kind of kinds; track kind) {
-          <button
-            type="button"
-            class="filter"
-            [style.--c]="kind === 'special' ? 'var(--yellow)' : null"
-            [class.active]="kindFilter() === kind"
-            (click)="setKindFilter(kind)"
-          >
-            {{ kind }}
-          </button>
-        }
-      </div>
-      <div class="filters" role="group" aria-label="Filter by rarity">
-        <button type="button" class="filter" [class.active]="rarityFilter() === 'all'" (click)="setRarityFilter('all')">
-          All
-        </button>
-        @for (rarity of rarities; track rarity) {
-          <button
-            type="button"
-            class="filter"
-            [style.--c]="rarity | rarityToColor"
-            [class.active]="rarityFilter() === rarity"
-            (click)="setRarityFilter(rarity)"
-          >
-            {{ rarity }}
-          </button>
-        }
-      </div>
-      <div class="filters" role="group" aria-label="Filter by resource">
-        <button type="button" class="filter" [class.active]="itemFilter() === 'all'" (click)="setItemFilter('all')">
-          Any resource
-        </button>
-        @for (item of items; track item) {
-          <button type="button" class="filter" [class.active]="itemFilter() === item" (click)="setItemFilter(item)">
-            {{ item }}
-          </button>
-        }
-      </div>
 
       <div class="cards">
         @for (building of collection(); track building.id) {

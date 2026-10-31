@@ -1,9 +1,45 @@
-import { CatalogBuildingModel, ItemModel, Rarity } from 'src/app/models/game';
+import { BuildingEffectModel, CatalogBuildingModel, ItemModel, Rarity } from 'src/app/models/game';
 
 export const ITEMS: ItemModel[] = ['wood', 'metal', 'stone', 'screw', 'patch'];
 
 // De la plus rare à la plus commune
 export const RARITIES_DESC: Rarity[] = ['legendary', 'epic', 'rare', 'common'];
+
+// Spécial = plan à effet
+export const PLAN_KINDS = ['all', 'normal', 'special'] as const;
+export type PlanKind = (typeof PLAN_KINDS)[number];
+
+export interface PlanFilters {
+  search: string;
+  rarity: Rarity | 'all';
+  item: ItemModel | 'all';
+  kind: PlanKind;
+}
+
+// Minuscules sans accents, pour une recherche tolérante
+function normalize(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '');
+}
+
+// Filtres de la collection et du Black Market ; la recherche porte sur le nom ou le texte de l'effet
+export function filterPlans(
+  buildings: CatalogBuildingModel[],
+  filters: PlanFilters,
+  effectText: (effect: BuildingEffectModel) => string,
+): CatalogBuildingModel[] {
+  const query = normalize(filters.search.trim());
+  return buildings
+    .filter((b) => filters.rarity === 'all' || b.rarity === filters.rarity)
+    .filter((b) => filters.item === 'all' || (b.inventory[filters.item] ?? 0) > 0)
+    .filter((b) => filters.kind === 'all' || !!b.effect === (filters.kind === 'special'))
+    .filter(
+      (b) =>
+        !query || normalize(b.name).includes(query) || (!!b.effect && normalize(effectText(b.effect)).includes(query)),
+    );
+}
 
 const rarityRank = (rarity: Rarity): number => {
   const index = RARITIES_DESC.indexOf(rarity);

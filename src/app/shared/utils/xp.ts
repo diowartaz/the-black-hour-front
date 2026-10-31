@@ -1,4 +1,5 @@
 import { XPToLVL } from '../../models/game';
+import { formatNumber } from './format';
 
 export function XPToLVLandXP(xp: number): XPToLVL {
   const lvl = xpToLvl(xp);
@@ -6,7 +7,7 @@ export function XPToLVLandXP(xp: number): XPToLVL {
   const xpToNextLvl = lvlToXp(lvl + 1) - lvlToXp(lvl);
   return {
     lvl: lvl.toString(),
-    xpString: `${remainder}/${xpToNextLvl} xp`,
+    xpString: `${formatNumber(remainder)}/${formatNumber(xpToNextLvl)} xp`,
     ratio: Math.floor((remainder / xpToNextLvl) * 100),
   };
 }

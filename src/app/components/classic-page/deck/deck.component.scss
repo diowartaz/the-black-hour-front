@@ -207,50 +207,6 @@ h2 {
   gap: 10px;
 }
 
-.search {
-  width: min(320px, 100%);
-  height: 32px;
-  padding: 0 12px;
-  border-radius: var(--radius-m);
-  border: 1px solid color-mix(in srgb, var(--cyan) 45%, transparent);
-  background: none;
-  color: var(--text);
-  font-family: var(--font-body);
-  font-size: 14px;
-  &::placeholder {
-    color: var(--text-mute);
-  }
-  &:focus {
-    outline: none;
-    border-color: var(--cyan);
-    box-shadow: 0 0 12px color-mix(in srgb, var(--cyan) 40%, transparent);
-  }
-}
-
-.filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.filter {
-  --c: var(--cyan);
-  height: 30px;
-  padding: 0 12px;
-  border-radius: var(--radius-pill);
-  border: 1px solid color-mix(in srgb, var(--c) 45%, transparent);
-  background: none;
-  color: var(--text-dim);
-  font-family: var(--font-body);
-  font-weight: 700;
-  font-size: 13px;
-  text-transform: capitalize;
-  &.active {
-    color: var(--text-dark);
-    background: var(--c);
-  }
-}
-
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));

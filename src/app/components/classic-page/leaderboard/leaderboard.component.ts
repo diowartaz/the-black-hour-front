@@ -6,12 +6,14 @@ import { RoutesEnum } from 'src/app/models/router';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { LeaderboardService } from 'src/app/services/leaderboard/leaderboard.service';
 import { IconComponent } from 'src/app/shared/components/icon/icon.component';
+import { formatNumber } from 'src/app/shared/utils/format';
 import { pageWindow } from 'src/app/shared/utils/pagination';
 import { ClassicPageComponent } from '../classic-page.component';
+import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
 
 @Component({
   selector: 'app-leaderboard',
-  imports: [ClassicPageComponent, IconComponent],
+  imports: [FormatNumberPipe, ClassicPageComponent, IconComponent],
   templateUrl: './leaderboard.component.html',
   styleUrls: ['./leaderboard.component.scss'],
 })
@@ -77,8 +79,8 @@ export class LeaderboardComponent {
 
   scoreOf(user: LeaderboardElement): string {
     return this.ranked()
-      ? `${user.ranked_points} pts`
-      : `${user.personal_best_day} d · ${user.personal_best_zb.toLocaleString('fr-FR')}`;
+      ? `${formatNumber(user.ranked_points)} pts`
+      : `${user.personal_best_day} d · ${formatNumber(user.personal_best_zb)}`;
   }
 
   ratioOf(user: LeaderboardElement): number {

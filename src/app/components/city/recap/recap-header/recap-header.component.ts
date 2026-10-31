@@ -1,10 +1,11 @@
 import { Component, computed, inject } from '@angular/core';
 import { CityService } from 'src/app/services/city/city.service';
 import { IconComponent } from 'src/app/shared/components/icon/icon.component';
+import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
 
 @Component({
   selector: 'app-recap-header',
-  imports: [IconComponent],
+  imports: [FormatNumberPipe, IconComponent],
   templateUrl: './recap-header.component.html',
   styleUrls: ['./recap-header.component.scss'],
 })

@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -8,6 +8,7 @@ import { RoutesEnum } from 'src/app/models/router';
 import { GuildService } from 'src/app/services/guild/guild.service';
 import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { ClassicPageComponent } from '../classic-page.component';
+import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
 
 // Bornes du nom, reprises de l'API (GUILD_NAME_MIN_LENGTH / GUILD_NAME_MAX_LENGTH)
 const NAME_MIN_LENGTH = 3;
@@ -16,13 +17,13 @@ const NAME_MAX_LENGTH = 24;
 @Component({
   selector: 'app-guild',
   imports: [
+    FormatNumberPipe,
     ClassicPageComponent,
     IconComponent,
     ReactiveFormsModule,
     MatProgressSpinnerModule,
     RouterLink,
     DatePipe,
-    DecimalPipe,
   ],
   templateUrl: './guild.component.html',
   styleUrls: ['./guild.component.scss'],

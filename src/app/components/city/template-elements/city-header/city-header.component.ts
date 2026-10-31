@@ -3,10 +3,11 @@ import { UserState } from 'src/app/models/router';
 import { CityService } from 'src/app/services/city/city.service';
 import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { formatCountdown } from 'src/app/shared/utils/time';
+import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
 
 @Component({
   selector: 'app-city-header',
-  imports: [IconComponent],
+  imports: [FormatNumberPipe, IconComponent],
   templateUrl: './city-header.component.html',
   styleUrls: ['./city-header.component.scss'],
 })

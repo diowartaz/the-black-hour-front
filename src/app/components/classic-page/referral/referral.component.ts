@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -10,10 +10,18 @@ import { ReferralService } from 'src/app/services/referral/referral.service';
 import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { invitationLink, normalizeReferralCode, pendingReferralCode } from 'src/app/shared/utils/referral';
 import { ClassicPageComponent } from '../classic-page.component';
+import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
 
 @Component({
   selector: 'app-referral',
-  imports: [ClassicPageComponent, IconComponent, ReactiveFormsModule, MatProgressSpinnerModule, DatePipe, DecimalPipe],
+  imports: [
+    FormatNumberPipe,
+    ClassicPageComponent,
+    IconComponent,
+    ReactiveFormsModule,
+    MatProgressSpinnerModule,
+    DatePipe,
+  ],
   templateUrl: './referral.component.html',
   styleUrls: ['./referral.component.scss'],
 })

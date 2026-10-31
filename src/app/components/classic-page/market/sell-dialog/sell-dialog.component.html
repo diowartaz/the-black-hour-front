@@ -1,0 +1,46 @@
+<div class="backdrop" (click)="closed.emit()">
+  <div
+    class="sheet"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="'Sell ' + building().name"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="sheet-head">
+      <h2>Sell {{ building().name }}</h2>
+      <button type="button" class="close" aria-label="Close" (click)="closed.emit()">
+        <app-icon name="close" [size]="20" />
+      </button>
+    </div>
+
+    <section>
+      <div class="tile">
+        <app-building-card [building]="building()" [count]="count()" [inDeck]="inDeck()" />
+      </div>
+      <p class="lowest">
+        @if (lowestPrice(); as lowest) {
+          Lowest offer: <strong>{{ lowest | formatNumber }}</strong> coins
+        } @else {
+          No other offer for this plan
+        }
+      </p>
+      <input
+        type="number"
+        class="price"
+        min="1"
+        step="1"
+        placeholder="Your price"
+        aria-label="Your price in coins"
+        [value]="price()"
+        (input)="setPrice($any($event.target).value)"
+      />
+      <span class="tax">Tax: {{ tax() | formatNumber }} coins, not refunded</span>
+    </section>
+
+    <div class="sheet-actions">
+      <button type="button" class="mini-cta" [disabled]="!canList()" (click)="list()">
+        <app-icon name="check" [size]="16" />List for sale
+      </button>
+    </div>
+  </div>
+</div>

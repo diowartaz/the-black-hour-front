@@ -214,6 +214,30 @@ export interface BoosterCardModel {
   is_new: boolean;
 }
 
+export interface MarketListingModel {
+  listingId: string;
+  buildingId: number;
+  price: number;
+}
+
+export interface MarketSaleModel {
+  buildingId: number;
+  price: number;
+  soldAt: string;
+}
+
+export interface MarketModel {
+  unlocked: boolean;
+  gamesPlayed: number;
+  requiredGames: number;
+  minCopiesToSell: number;
+  taxRate: number;
+  // Offre la moins chère de chaque plan, hors offres du joueur
+  offers: MarketListingModel[];
+  myListings: MarketListingModel[];
+  sales: MarketSaleModel[];
+}
+
 export interface AdvancedBuildingModel {
   id: number;
   defense: number;
@@ -319,7 +343,7 @@ export interface DefaultValuesModel {
   randomPercentageDefBuilding: number;
   bonuses: Record<string, BonusWithoutLvl>;
   SKILL_TIME_MULTIPLIER: number;
-  BONUS_PRICE_EXPONENT: number;
+  BONUS_PRICE_GROWTH: number;
   ZOMBIE_COEF_MIN: number;
   ZOMBIE_COEF_MAX: number;
   ARCHITECT_DISCOVERY_CHOICES: number;
@@ -351,7 +375,7 @@ export function createDefaultDefaultValuesModel(): DefaultValuesModel {
     randomPercentageDefBuilding: 20,
     bonuses: {},
     SKILL_TIME_MULTIPLIER: 1.5,
-    BONUS_PRICE_EXPONENT: 1.5,
+    BONUS_PRICE_GROWTH: 1.5,
     ZOMBIE_COEF_MIN: 2,
     ZOMBIE_COEF_MAX: 4,
     ARCHITECT_DISCOVERY_CHOICES: 2,

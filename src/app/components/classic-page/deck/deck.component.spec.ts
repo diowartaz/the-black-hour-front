@@ -121,11 +121,11 @@ describe('DeckComponent', () => {
 
   it('filtre la collection entre plans normaux et spéciaux', () => {
     const deck = fixture.componentInstance;
-    deck.setKindFilter('special');
+    deck.kindFilter.set('special');
     expect(collectionNames()).toEqual(['Night Totem']);
-    deck.setKindFilter('normal');
+    deck.kindFilter.set('normal');
     expect(collectionNames()).toEqual(['Scrap Wall']);
-    deck.setKindFilter('all');
+    deck.kindFilter.set('all');
     expect(collectionNames().length).toBe(2);
   });
 

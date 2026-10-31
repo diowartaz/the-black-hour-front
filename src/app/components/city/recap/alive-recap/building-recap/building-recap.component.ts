@@ -6,10 +6,17 @@ import { EffectTooltipComponent } from 'src/app/shared/components/effect-tooltip
 import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { RarityToColorPipe } from 'src/app/shared/pipes/rarity-to-color.pipe';
 import { BuildingRecapInventoryComponent } from './building-recap-inventory/building-recap-inventory.component';
+import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
 
 @Component({
   selector: 'app-building-recap',
-  imports: [RarityToColorPipe, IconComponent, EffectTooltipComponent, BuildingRecapInventoryComponent],
+  imports: [
+    FormatNumberPipe,
+    RarityToColorPipe,
+    IconComponent,
+    EffectTooltipComponent,
+    BuildingRecapInventoryComponent,
+  ],
   templateUrl: './building-recap.component.html',
   styleUrls: ['./building-recap.component.scss'],
 })

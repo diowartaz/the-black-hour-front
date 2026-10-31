@@ -16,6 +16,7 @@ import {
   LeaderboardBoard,
   LeaderboardPage,
   LeaderboardPosition,
+  MarketModel,
   ProfilModel,
   ReferralModel,
   GuildOverviewModel,
@@ -71,6 +72,17 @@ export interface BoosterOpening {
   stats: StatsModel;
   cards: BoosterCardModel[];
 }
+
+// Résultat d'une action au Black Market : monnaie et collection du joueur, marché à jour
+export interface MarketUpdate {
+  stats: StatsModel;
+  market: MarketModel;
+}
+
+const toMarketUpdate = (response: Schemas['MarketActionResponse']): MarketUpdate => ({
+  stats: toStatsModel(response.player),
+  market: response.market,
+});
 
 // Résultat d'une action de journée : la ville et ce que les bâtiments spéciaux ont fait pendant l'action
 export interface ActionResult {
@@ -187,6 +199,28 @@ export class GameApiService {
     return this.httpClient
       .post<Schemas['BoosterOpeningResponse']>(this.API_URL + `me/boosters/${id}/open`, {})
       .pipe(map((response) => ({ stats: toStatsModel(response.player), cards: toBoosterCards(response.cards) })));
+  }
+
+  getMarket(): Observable<MarketModel> {
+    return this.httpClient.get<Schemas['MarketResponse']>(this.API_URL + 'market');
+  }
+
+  createMarketListing(buildingId: number, price: number): Observable<MarketUpdate> {
+    return this.httpClient
+      .post<Schemas['MarketActionResponse']>(this.API_URL + 'market/listings', { buildingId, price })
+      .pipe(map(toMarketUpdate));
+  }
+
+  buyMarketListing(listingId: string): Observable<MarketUpdate> {
+    return this.httpClient
+      .post<Schemas['MarketActionResponse']>(this.API_URL + `market/listings/${listingId}/buy`, {})
+      .pipe(map(toMarketUpdate));
+  }
+
+  withdrawMarketListing(listingId: string): Observable<MarketUpdate> {
+    return this.httpClient
+      .delete<Schemas['MarketActionResponse']>(this.API_URL + `market/listings/${listingId}`)
+      .pipe(map(toMarketUpdate));
   }
 
   getLeaderboard(board: LeaderboardBoard, page: number): Observable<LeaderboardPage> {

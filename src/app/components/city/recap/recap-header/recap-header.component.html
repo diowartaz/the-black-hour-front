@@ -10,13 +10,13 @@
     <div class="side" style="--c: var(--cyan)">
       <div class="icon-tile"><app-icon name="shield" [size]="28" /></div>
       <span class="side-label">Your defense</span>
-      <span class="side-value">{{ defense() }}</span>
+      <span class="side-value">{{ defense() | formatNumber }}</span>
     </div>
     <div class="vs">VS</div>
     <div class="side" style="--c: var(--danger)">
       <div class="icon-tile"><app-icon name="zombie" [size]="28" /></div>
       <span class="side-label">Zombies</span>
-      <span class="side-value">{{ attackers() }}</span>
+      <span class="side-value">{{ attackers() | formatNumber }}</span>
     </div>
   </div>
 
@@ -24,7 +24,7 @@
     <div class="balance-head">
       <span>Balance of power</span>
       <span [class.positive]="margin() >= 0" [class.negative]="margin() < 0">
-        {{ margin() >= 0 ? '+' : '' }}{{ margin() }} margin
+        {{ margin() >= 0 ? '+' : '' }}{{ margin() | formatNumber }} margin
       </span>
     </div>
     <div class="balance-bar">

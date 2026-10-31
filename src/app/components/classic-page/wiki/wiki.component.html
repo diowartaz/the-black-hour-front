@@ -170,8 +170,9 @@
           >
         </p>
         <div class="inline-div">
-          <app-icon class="ic pink" name="sparkle" [size]="18" /><strong>Special buildings</strong> give no defense but
-          have an effect: tap them to read it. What they did shows up in a pop-up after your action, and in the
+          <app-icon class="ic pink" name="sparkle" [size]="18" /><strong>Special buildings</strong> have no fixed
+          defense but have an effect: tap them to read it. Any defense they give benefits from your Efficient defenser
+          bonus. What they did shows up in a pop-up after your action, and in the
           <strong>Overnight</strong> part of the attack recap.
         </div>
 
@@ -254,7 +255,27 @@
           deck will ask for: digs give each resource 20% of the time.
         </div>
         <div class="inline-div">Your deck is locked in when you create a city: changes apply to your next city.</div>
-        <div class="inline-div">Duplicates are kept in your collection, but have no use yet.</div>
+        <div class="inline-div">A deck only uses one copy of a plan: sell your duplicates on the Black Market.</div>
+      </section>
+
+      <section>
+        <h2><app-icon class="ic yellow" name="money" [size]="18" /> Black Market</h2>
+        <p>
+          The Black Market opens after <strong>5 finished games</strong>. Players trade plans there, one copy at a time,
+          without knowing who they deal with.
+        </p>
+        <div class="inline-div">
+          <strong>Buying:</strong> only the cheapest offer of each plan is shown. When it is bought, the next one takes
+          its place. You always pay the price you see: if someone else was faster, nothing is charged.
+        </div>
+        <div class="inline-div">
+          <strong>Selling:</strong> you need at least <strong>2 copies</strong> of a plan, so you always keep one. You
+          set the price and pay a <strong>5% tax</strong> when listing. The tax is never refunded.
+        </div>
+        <div class="inline-div">
+          The plan leaves your collection as soon as it is listed. You get the coins when it sells, even if you are
+          offline, and you can withdraw an unsold plan at any time.
+        </div>
       </section>
 
       <section>
@@ -265,7 +286,7 @@
           <tr>
             <th>Rarity</th>
             <th>Basic · 500</th>
-            <th>Premium · 1,500</th>
+            <th>Premium · 1&nbsp;500</th>
           </tr>
           <tr>
             <td>Common</td>
@@ -287,7 +308,7 @@
         <p><strong>Permanent bonuses</strong></p>
         <p>
           Bonuses are <strong>automatically applied</strong> to all your future games, ranked included. The price of
-          level N is the level 1 price × N<sup>1.5</sup>. The badge on your coins shows how many bonuses you can buy.
+          level N is the level 1 price × N<sup>1.5</sup>.
         </p>
         <table>
           <tr>
@@ -303,16 +324,10 @@
             <td>360</td>
           </tr>
           <tr>
-            <td><app-icon class="ic yellow" name="shield-plus" [size]="18" />Efficient defenser 1</td>
-            <td>+2% defense for each building</td>
+            <td><app-icon class="ic yellow" name="shield-plus" [size]="18" />Efficient defenser</td>
+            <td>+2% defense for all buildings, special buildings included</td>
             <td>10</td>
             <td>450</td>
-          </tr>
-          <tr>
-            <td><app-icon class="ic yellow" name="shield-plus" [size]="18" />Efficient defenser 2</td>
-            <td>+1 defense for each building level</td>
-            <td>5</td>
-            <td>600</td>
           </tr>
           <tr>
             <td><app-icon class="ic orange" name="build" [size]="18" />Efficient builder 1</td>
@@ -356,12 +371,12 @@
       <section>
         <h2><app-icon class="ic yellow" name="trophy" [size]="18" /> Rewards and XP</h2>
         <div class="inline-div">
-          <app-icon class="ic yellow" name="money" [size]="18" />You start with <strong>1,000 coins</strong>.
+          <app-icon class="ic yellow" name="money" [size]="18" />You start with <strong>1&nbsp;000 coins</strong>.
         </div>
         <div class="inline-div">
           When your city falls, each night survived pays: the 1st night 34 coins, the 2nd 38, the 3rd 42… (30 + 4 per
-          night). That's <strong>520 coins</strong> for 10 nights, <strong>1,440</strong> for 20 and
-          <strong>2,760</strong> for 30.
+          night). That's <strong>520 coins</strong> for 10 nights, <strong>1&nbsp;440</strong> for 20 and
+          <strong>2&nbsp;760</strong> for 30.
         </div>
         <table>
           <tr>
@@ -534,7 +549,7 @@
         </div>
         <div class="inline-div">
           <app-icon class="ic yellow" name="sparkle" [size]="18" />They get a welcome gift of
-          <strong>2,500 coins</strong>.
+          <strong>2&nbsp;500 coins</strong>.
         </div>
         <div class="inline-div">
           You can have up to <strong>3 referees</strong>, and remove one to free a spot. A sponsor's account must be

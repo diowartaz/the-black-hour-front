@@ -26,7 +26,7 @@
         <section class="neon-card">
           <h3 class="label">Today's pot</h3>
           <p class="pot">
-            <strong>{{ guild.pot | number }}</strong
+            <strong>{{ guild.pot | formatNumber }}</strong
             ><app-icon name="money" [size]="18" />
             <span class="hint">per eligible member</span>
           </p>
@@ -51,7 +51,7 @@
                   {{ member.eligible ? 'Eligible' : 'No game yet' }}
                 </span>
                 <span class="contribution">
-                  +{{ member.contribution | number: '1.0-2' }}<app-icon name="money" [size]="14" />
+                  +{{ member.contribution | formatNumber }}<app-icon name="money" [size]="14" />
                 </span>
               </li>
             }

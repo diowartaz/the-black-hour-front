@@ -9,12 +9,14 @@ import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { BonusToColorPipe, BonusToIconPipe } from 'src/app/shared/pipes/bonus-to-icon.pipe';
 import { RarityToColorPipe } from 'src/app/shared/pipes/rarity-to-color.pipe';
 import { BoosterOpeningComponent } from './booster-opening/booster-opening.component';
+import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
 
 type ShopTab = 'boosters' | 'bonuses';
 
 @Component({
   selector: 'app-shop',
   imports: [
+    FormatNumberPipe,
     KeyValuePipe,
     ClassicPageComponent,
     IconComponent,
@@ -34,8 +36,6 @@ export class ShopComponent {
   // Booster en cours d'ouverture (révélation affichée tant que lastBoosterCards est renseigné)
   openedBooster = signal<BoosterModel | null>(null);
 
-  // Même format que le compteur de la barre du haut
-  money = computed(() => this.cityService.stats().money.toLocaleString('fr-FR'));
   ownedCount = computed(() => Object.values(this.cityService.collection()).filter((count) => count > 0).length);
   duplicates = computed(() =>
     Object.values(this.cityService.collection()).reduce((sum, count) => sum + Math.max(0, count - 1), 0),
@@ -68,5 +68,9 @@ export class ShopComponent {
 
   goToDeck() {
     this.router.navigate([RoutesEnum.DECK]);
+  }
+
+  goToMarket() {
+    this.router.navigate([RoutesEnum.MARKET]);
   }
 }

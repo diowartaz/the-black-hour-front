@@ -11,7 +11,7 @@
       @if (building.effect; as effect) {
         <app-effect-tooltip [effect]="effect" [day]="cityService.city().day" />
       } @else {
-        <span class="def"><app-icon name="shield" [size]="13" />{{ building.defense }}</span>
+        <span class="def"><app-icon name="shield" [size]="13" />{{ building.defense | formatNumber }}</span>
         <span
           class="percentdef"
           [class.percentdef-green]="building.defense_ratio_percentage >= 0"

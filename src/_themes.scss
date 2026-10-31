@@ -2,8 +2,9 @@
 // Chaque thème redéfinit les jetons de styles.scss sur :root[data-theme='…'] ; le thème
 // « Néon Arcade » reste celui par défaut tant qu'aucun n'a été choisi.
 
-// Grain de pellicule (bruit SVG)
-$grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.32 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+// Grain de pellicule (bruit SVG). Il recouvre aussi le contenu (--page-overlay) : à garder
+// discret, comme les vignettes et scanlines, sous peine d'assombrir tout l'écran.
+$grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 
 @keyframes crtFlicker {
   0%,
@@ -38,39 +39,39 @@ $grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width=
 // 1. QUARANTAINE — zone contaminée : kaki, vert toxique, jaune danger
 // =====================================================================
 :root[data-theme='quarantine'] {
-  --bg: #0a0c08;
-  --surface: rgba(22, 26, 17, 0.88);
-  --surface-2: rgba(24, 28, 19, 0.94);
-  --surface-solid: #171b12;
-  --surface-nav: rgba(11, 13, 9, 0.97);
-  --line: rgba(176, 186, 140, 0.18);
-  --line-strong: rgba(176, 186, 140, 0.36);
+  --bg: #1a1f14;
+  --surface: rgba(46, 54, 36, 0.9);
+  --surface-2: rgba(50, 58, 39, 0.95);
+  --surface-solid: #323a27;
+  --surface-nav: rgba(28, 33, 21, 0.97);
+  --line: rgba(176, 186, 140, 0.38);
+  --line-strong: rgba(176, 186, 140, 0.6);
 
-  --text: #e3e6d3;
-  --text-dim: #c1c6aa;
-  --text-mute: #8a9076;
+  --text: #f4f6e8;
+  --text-dim: #e0e4cc;
+  --text-mute: #c3caab;
   --text-dark: #0b0d08;
   --text-strong: #f2f5e3;
   --text-on-gold: #171200;
   --cta-text: #121704;
 
-  --pink: #a8e22a;
-  --pink-light: #cdf575;
-  --cyan: #7fb3a2;
-  --cyan-light: #a8d3c5;
-  --cyan-pale: #d0e8e0;
-  --yellow: #f0bf2a;
-  --yellow-light: #f6d76c;
-  --green: #6cb84a;
+  --pink: #b4ee36;
+  --pink-light: #d6f885;
+  --cyan: #a0dcc8;
+  --cyan-light: #c0e8db;
+  --cyan-pale: #def2eb;
+  --yellow: #ffd34a;
+  --yellow-light: #fbe28f;
+  --green: #8fe066;
   --green-dark: #0e1907;
-  --orange: #d4722a;
-  --orange-light: #e8a16b;
-  --violet: #78689a;
-  --violet-light: #a596c2;
-  --violet-pale: #c6bcda;
-  --danger: #e2452e;
-  --danger-light: #f07c69;
-  --silver: #b6baa6;
+  --orange: #f0964e;
+  --orange-light: #f5bc90;
+  --violet: #b0a0d2;
+  --violet-light: #cdc0e4;
+  --violet-pale: #e2daf0;
+  --danger: #f5705a;
+  --danger-light: #f89e8e;
+  --silver: #d6dac6;
 
   --font-display: 'Black Ops One', sans-serif;
   --font-body: 'Barlow Condensed', sans-serif;
@@ -87,9 +88,9 @@ $grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width=
   --radius-pill: 4px;
 
   --page-bg:
-    radial-gradient(ellipse at 50% -10%, color-mix(in srgb, var(--pink) 14%, transparent), transparent 55%),
-    radial-gradient(circle at 100% 100%, color-mix(in srgb, var(--yellow) 7%, transparent), transparent 45%), var(--bg);
-  --page-overlay: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.55) 100%), #{$grain};
+    radial-gradient(ellipse at 50% -10%, color-mix(in srgb, var(--pink) 20%, transparent), transparent 55%),
+    radial-gradient(circle at 100% 100%, color-mix(in srgb, var(--yellow) 11%, transparent), transparent 45%), var(--bg);
+  --page-overlay: radial-gradient(ellipse at center, transparent 75%, rgba(0, 0, 0, 0.15) 100%), #{$grain};
 
   font-synthesis: none;
 
@@ -128,39 +129,39 @@ $grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width=
 // 2. HÉMORRAGIE — horreur : noir sang, os, rouille, grain et vignette
 // =====================================================================
 :root[data-theme='blood'] {
-  --bg: #090606;
-  --surface: rgba(26, 15, 14, 0.88);
-  --surface-2: rgba(29, 17, 16, 0.94);
-  --surface-solid: #1b100f;
-  --surface-nav: rgba(12, 7, 7, 0.97);
-  --line: rgba(205, 170, 150, 0.15);
-  --line-strong: rgba(205, 170, 150, 0.32);
+  --bg: #1f1211;
+  --surface: rgba(58, 36, 33, 0.9);
+  --surface-2: rgba(62, 39, 36, 0.95);
+  --surface-solid: #3e2724;
+  --surface-nav: rgba(31, 18, 17, 0.97);
+  --line: rgba(205, 170, 150, 0.36);
+  --line-strong: rgba(205, 170, 150, 0.58);
 
-  --text: #ebe0d0;
-  --text-dim: #c9bba8;
-  --text-mute: #8f8172;
+  --text: #f8f0e4;
+  --text-dim: #e6dac8;
+  --text-mute: #cbbcaa;
   --text-dark: #120a08;
   --text-strong: #f7eee0;
   --text-on-gold: #1a0f02;
   --cta-text: #f7eee0;
 
-  --pink: #c2141c;
-  --pink-light: #e65a5e;
-  --cyan: #8a9ea8;
-  --cyan-light: #b3c4cc;
-  --cyan-pale: #dbe4e8;
-  --yellow: #d6a23f;
-  --yellow-light: #e7c47b;
-  --green: #8da84a;
+  --pink: #ee4a50;
+  --pink-light: #f68e8f;
+  --cyan: #b4cad4;
+  --cyan-light: #cfdee5;
+  --cyan-pale: #e8eff2;
+  --yellow: #f0c35c;
+  --yellow-light: #f5d99c;
+  --green: #b8d668;
   --green-dark: #121a07;
-  --orange: #c95f2a;
-  --orange-light: #e0976b;
-  --violet: #7c3a6c;
-  --violet-light: #a8699a;
-  --violet-pale: #c9a1be;
-  --danger: #ee3a32;
-  --danger-light: #f57a70;
-  --silver: #c2b8ab;
+  --orange: #ea8a52;
+  --orange-light: #f2b692;
+  --violet: #c67ab4;
+  --violet-light: #d8a2cb;
+  --violet-pale: #e8cce1;
+  --danger: #fa6a60;
+  --danger-light: #fb9c94;
+  --silver: #ded5c9;
 
   --font-display: 'Oswald', sans-serif;
   --font-body: 'Barlow Condensed', sans-serif;
@@ -177,9 +178,9 @@ $grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width=
   --radius-pill: 4px;
 
   --page-bg:
-    radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--pink) 20%, transparent), transparent 50%),
-    radial-gradient(circle at 0% 100%, color-mix(in srgb, var(--pink) 10%, transparent), transparent 40%), var(--bg);
-  --page-overlay: radial-gradient(ellipse at center, transparent 45%, rgba(20, 0, 0, 0.7) 100%), #{$grain};
+    radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--pink) 24%, transparent), transparent 50%),
+    radial-gradient(circle at 0% 100%, color-mix(in srgb, var(--pink) 14%, transparent), transparent 40%), var(--bg);
+  --page-overlay: radial-gradient(ellipse at center, transparent 75%, rgba(20, 0, 0, 0.18) 100%), #{$grain};
 
   .neon-title {
     font-weight: 400;
@@ -213,17 +214,17 @@ $grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width=
 // 3. SIGNAL — terminal d'urgence : écran CRT ambre, scanlines, alerte
 // =====================================================================
 :root[data-theme='signal'] {
-  --bg: #0b0804;
-  --surface: rgba(26, 19, 9, 0.88);
-  --surface-2: rgba(24, 18, 8, 0.94);
-  --surface-solid: #1a1308;
-  --surface-nav: rgba(12, 9, 4, 0.97);
-  --line: rgba(255, 176, 0, 0.2);
-  --line-strong: rgba(255, 176, 0, 0.42);
+  --bg: #1d1709;
+  --surface: rgba(58, 44, 22, 0.9);
+  --surface-2: rgba(56, 42, 20, 0.95);
+  --surface-solid: #3a2c16;
+  --surface-nav: rgba(31, 24, 11, 0.97);
+  --line: rgba(255, 176, 0, 0.38);
+  --line-strong: rgba(255, 176, 0, 0.62);
 
-  --text: #ffdca6;
-  --text-dim: #e6c48f;
-  --text-mute: #9e8460;
+  --text: #ffeac6;
+  --text-dim: #f5dbb0;
+  --text-mute: #d6ba8e;
   --text-dark: #120c02;
   --text-strong: #fff0d2;
   --text-on-gold: #160f00;
@@ -238,13 +239,13 @@ $grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width=
   --yellow-light: #ffe598;
   --green: #a1d65c;
   --green-dark: #0d1605;
-  --orange: #ff6d1f;
-  --orange-light: #ffa56d;
+  --orange: #ff8038;
+  --orange-light: #ffb07f;
   --violet: #a08ad0;
   --violet-light: #bfaee2;
   --violet-pale: #ddd2f2;
-  --danger: #ff3b2b;
-  --danger-light: #ff7b6e;
+  --danger: #ff5a48;
+  --danger-light: #ff9184;
   --silver: #cfc2a8;
 
   --font-display: 'VT323', monospace;
@@ -262,10 +263,10 @@ $grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width=
   --radius-pill: 2px;
 
   --page-bg:
-    radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--pink) 9%, transparent), transparent 70%), var(--bg);
+    radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--pink) 14%, transparent), transparent 70%), var(--bg);
   --page-overlay:
-    radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.65) 100%),
-    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px);
+    radial-gradient(ellipse at center, transparent 75%, rgba(0, 0, 0, 0.15) 100%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.05) 0 1px, transparent 1px 3px);
   --page-overlay-anim: crtFlicker 6s infinite;
 
   font-synthesis: none;

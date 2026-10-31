@@ -13,7 +13,7 @@
         <span class="stat-label">Def</span>
         @let night = cityService.nightDefenseNow();
         <span class="stat-value"
-          >{{ cityService.city().defense }}
+          >{{ cityService.city().defense | formatNumber }}
           @if (night.max > 0) {
             <span class="night" title="Extra defense for tonight only"
               >+{{ night.min === night.max ? night.min : night.min + '–' + night.max }}</span
@@ -26,7 +26,9 @@
         <span
           class="stat-value"
           [class.danger]="cityService.city().nb_zb_next_attack_max > cityService.city().defense + night.min"
-          >{{ cityService.city().nb_zb_next_attack_min }}–{{ cityService.city().nb_zb_next_attack_max }}</span
+          >{{ cityService.city().nb_zb_next_attack_min | formatNumber }}–{{
+            cityService.city().nb_zb_next_attack_max | formatNumber
+          }}</span
         >
       </div>
     </div>

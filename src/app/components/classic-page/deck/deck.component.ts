@@ -5,6 +5,7 @@ import { RoutesEnum } from 'src/app/models/router';
 import { CityService } from 'src/app/services/city/city.service';
 import { BuildingCardComponent } from 'src/app/shared/components/building-card/building-card.component';
 import { IconComponent } from 'src/app/shared/components/icon/icon.component';
+import { PlanFiltersComponent } from 'src/app/shared/components/plan-filters/plan-filters.component';
 import { ResourceSharesComponent } from 'src/app/shared/components/resource-shares/resource-shares.component';
 import { RarityToColorPipe } from 'src/app/shared/pipes/rarity-to-color.pipe';
 import { buildingEffectText } from 'src/app/shared/utils/building-effects';
@@ -13,15 +14,22 @@ import {
   buildingsOf,
   byRarityDesc,
   deckProblems,
-  ITEMS,
-  RARITIES_DESC,
+  filterPlans,
+  PlanKind,
 } from 'src/app/shared/utils/deck';
 import { ClassicPageComponent } from '../classic-page.component';
 
 // Éditeur de deck : le brouillon est local jusqu'à l'enregistrement
 @Component({
   selector: 'app-deck',
-  imports: [ClassicPageComponent, IconComponent, BuildingCardComponent, ResourceSharesComponent, RarityToColorPipe],
+  imports: [
+    ClassicPageComponent,
+    IconComponent,
+    BuildingCardComponent,
+    PlanFiltersComponent,
+    ResourceSharesComponent,
+    RarityToColorPipe,
+  ],
   templateUrl: './deck.component.html',
   styleUrls: ['./deck.component.scss'],
   host: {
@@ -33,17 +41,11 @@ export class DeckComponent {
   readonly cityService = inject(CityService);
   private readonly router = inject(Router);
 
-  readonly rarities = RARITIES_DESC;
-  readonly items = ITEMS;
-
   // Repart du deck enregistré à chaque fois que celui-ci change (chargement, enregistrement)
   draft = linkedSignal(() => this.cityService.deck());
   rarityFilter = signal<Rarity | 'all'>('all');
   itemFilter = signal<ItemModel | 'all'>('all');
-  // Spécial = plan à effet
-  readonly kinds = ['all', 'normal', 'special'] as const;
-  kindFilter = signal<'all' | 'normal' | 'special'>('all');
-  // Recherche dans le nom ou le texte de l'effet
+  kindFilter = signal<PlanKind>('all');
   search = signal('');
   // Emplacement survolé : sa carte complète s'affiche en bulle, ancrée à droite dans la moitié droite de l'écran
   previewId = signal<number | null>(null);
@@ -68,21 +70,18 @@ export class DeckComponent {
   ownedCount = computed(() => this.cityService.catalogBuildings().filter((b) => this.owned(b.id) > 0).length);
 
   // Plans possédés d'abord, puis par rareté décroissante et par nom
-  collection = computed(() => {
-    const query = normalize(this.search().trim());
-    return this.cityService
-      .catalogBuildings()
-      .filter((b) => this.rarityFilter() === 'all' || b.rarity === this.rarityFilter())
-      .filter((b) => this.itemFilter() === 'all' || (b.inventory[this.itemFilter()] ?? 0) > 0)
-      .filter((b) => this.kindFilter() === 'all' || !!b.effect === (this.kindFilter() === 'special'))
-      .filter(
-        (b) =>
-          !query ||
-          normalize(b.name).includes(query) ||
-          (!!b.effect && normalize(this.effectText(b.effect)).includes(query)),
-      )
-      .sort((a, b) => Number(this.owned(b.id) > 0) - Number(this.owned(a.id) > 0) || byRarityDesc(a, b));
-  });
+  collection = computed(() =>
+    filterPlans(
+      this.cityService.catalogBuildings(),
+      {
+        search: this.search(),
+        rarity: this.rarityFilter(),
+        item: this.itemFilter(),
+        kind: this.kindFilter(),
+      },
+      (effect) => this.effectText(effect),
+    ).sort((a, b) => Number(this.owned(b.id) > 0) - Number(this.owned(a.id) > 0) || byRarityDesc(a, b)),
+  );
 
   owned(id: number): number {
     return this.cityService.collection()[id] ?? 0;
@@ -141,18 +140,6 @@ export class DeckComponent {
     return buildingEffectText(effect, undefined, this.cityService.defaultValues().effect_rules);
   }
 
-  setRarityFilter(value: string): void {
-    this.rarityFilter.set(value as Rarity | 'all');
-  }
-
-  setItemFilter(value: string): void {
-    this.itemFilter.set(value as ItemModel | 'all');
-  }
-
-  setKindFilter(value: 'all' | 'normal' | 'special'): void {
-    this.kindFilter.set(value);
-  }
-
   autocomplete(): void {
     this.draft.set(this.autocompleted());
   }
@@ -172,12 +159,4 @@ export class DeckComponent {
   goToShop(): void {
     this.router.navigate([RoutesEnum.SHOP]);
   }
-}
-
-// Minuscules sans accents, pour une recherche tolérante
-function normalize(text: string): string {
-  return text
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '');
 }

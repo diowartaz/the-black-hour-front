@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -11,11 +11,12 @@ import { GameApiService } from 'src/app/services/game-api/game-api.service';
 import { GuildService } from 'src/app/services/guild/guild.service';
 import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { ClassicPageComponent } from '../classic-page.component';
+import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
 
 // Fiche publique d'une guilde (/guild/:id), consultable sans en être membre ni connecté
 @Component({
   selector: 'app-guild-view',
-  imports: [ClassicPageComponent, IconComponent, MatProgressSpinnerModule, RouterLink, DatePipe, DecimalPipe],
+  imports: [FormatNumberPipe, ClassicPageComponent, IconComponent, MatProgressSpinnerModule, RouterLink, DatePipe],
   templateUrl: './guild-view.component.html',
   styleUrls: ['./guild-view.component.scss'],
 })

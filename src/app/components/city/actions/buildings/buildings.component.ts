@@ -6,10 +6,18 @@ import { EffectTooltipComponent } from 'src/app/shared/components/effect-tooltip
 import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { ResourceGemComponent } from 'src/app/shared/components/resource-gem/resource-gem.component';
 import { RarityToColorPipe } from 'src/app/shared/pipes/rarity-to-color.pipe';
+import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
 
 @Component({
   selector: 'app-buildings',
-  imports: [KeyValuePipe, IconComponent, EffectTooltipComponent, ResourceGemComponent, RarityToColorPipe],
+  imports: [
+    FormatNumberPipe,
+    KeyValuePipe,
+    IconComponent,
+    EffectTooltipComponent,
+    ResourceGemComponent,
+    RarityToColorPipe,
+  ],
   templateUrl: './buildings.component.html',
   styleUrls: ['./buildings.component.scss'],
 })

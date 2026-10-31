@@ -1,0 +1,173 @@
+<app-classic-page [title]="'Black Market'" [subtitle]="'Trade plans with other players'" [glow]="'var(--yellow)'">
+  <ng-container icon><app-icon name="money" [size]="32" /></ng-container>
+  <ng-container content>
+    @if (market(); as market) {
+      @if (!market.unlocked) {
+        <section class="neon-card locked">
+          <app-icon name="lock" [size]="32" />
+          <h2>The Black Market is locked</h2>
+          <p>Finish {{ gamesLeft() }} more game{{ gamesLeft() > 1 ? 's' : '' }} to unlock it.</p>
+          <span class="neon-chip" style="--c: var(--yellow)"
+            >{{ market.gamesPlayed }}/{{ market.requiredGames }} games</span
+          >
+        </section>
+      } @else {
+        <div class="tabs" role="tablist" aria-label="Black Market section" [class.right]="tab() === 'sell'">
+          <button
+            type="button"
+            role="tab"
+            class="tab"
+            [class.active]="tab() === 'buy'"
+            [attr.aria-selected]="tab() === 'buy'"
+            (click)="tab.set('buy')"
+          >
+            <app-icon name="cart" [size]="16" />Buy
+          </button>
+          <button
+            type="button"
+            role="tab"
+            class="tab"
+            [class.active]="tab() === 'sell'"
+            [attr.aria-selected]="tab() === 'sell'"
+            (click)="tab.set('sell')"
+          >
+            <app-icon name="tag" [size]="16" />Sell
+          </button>
+        </div>
+
+        <app-plan-filters
+          [(search)]="search"
+          [(rarity)]="rarityFilter"
+          [(item)]="itemFilter"
+          [(kind)]="kindFilter"
+          [count]="visiblePlans().length"
+          [extraFilters]="tab() === 'buy' && showUnavailable() ? 1 : 0"
+          (cleared)="showUnavailable.set(false)"
+        >
+          <div class="options" filtersEnd>
+            <span class="select-wrap">
+              <select aria-label="Sort plans" [value]="sort()" (change)="setSort($any($event.target).value)">
+                @for (option of sorts; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+              <app-icon class="chevron" name="chevron-right" [size]="14" />
+            </span>
+            <span>{{ visiblePlans().length }} plan{{ visiblePlans().length === 1 ? '' : 's' }}</span>
+          </div>
+          @if (tab() === 'buy') {
+            <label class="toggle">
+              <input
+                type="checkbox"
+                [checked]="showUnavailable()"
+                (change)="showUnavailable.set($any($event.target).checked)"
+              />
+              Show plans without offers
+            </label>
+          }
+        </app-plan-filters>
+
+        @if (tab() === 'buy') {
+          <div class="cards">
+            @for (building of buyPlans(); track building.id) {
+              <article class="market-card" [class.unavailable]="!offerOf(building.id)">
+                <app-building-card
+                  [building]="building"
+                  [count]="owned(building.id)"
+                  [showCount]="true"
+                  [inDeck]="inDeck(building.id)"
+                  [compact]="true"
+                >
+                  @if (offerOf(building.id); as offer) {
+                    <button
+                      type="button"
+                      class="buy-btn"
+                      [disabled]="marketService.actionLoading() || !canAfford(offer.price)"
+                      (click)="marketService.buy(offer.listingId)"
+                    >
+                      <app-icon name="money" [size]="16" />{{ offer.price | formatNumber }} · Buy
+                    </button>
+                  } @else {
+                    <span class="no-offer">No offer</span>
+                  }
+                </app-building-card>
+              </article>
+            } @empty {
+              <div class="empty-state">No plan on sale matches these filters</div>
+            }
+          </div>
+        } @else {
+          <div class="cards">
+            @for (building of sellPlans(); track building.id) {
+              <article class="market-card">
+                <app-building-card
+                  [building]="building"
+                  [count]="owned(building.id)"
+                  [inDeck]="inDeck(building.id)"
+                  [compact]="true"
+                >
+                  <button
+                    type="button"
+                    class="sell-btn"
+                    [attr.aria-label]="'Sell ' + building.name"
+                    (click)="selectedId.set(building.id)"
+                  >
+                    Sell
+                  </button>
+                </app-building-card>
+              </article>
+            } @empty {
+              <div class="empty-state">You need at least {{ market.minCopiesToSell }} copies of a plan to sell one</div>
+            }
+          </div>
+
+          @if (selected(); as building) {
+            <app-sell-dialog
+              [building]="building"
+              [count]="owned(building.id)"
+              [inDeck]="inDeck(building.id)"
+              [lowestPrice]="offerOf(building.id)?.price"
+              [taxRate]="market.taxRate"
+              (closed)="selectedId.set(null)"
+            />
+          }
+
+          <section class="rows">
+            <h2>My listings</h2>
+            @for (listing of market.myListings; track listing.listingId) {
+              <div class="row">
+                <span class="row-name">{{ buildingOf(listing.buildingId)?.name }}</span>
+                <span class="row-price"><app-icon name="money" [size]="14" />{{ listing.price | formatNumber }}</span>
+                <button
+                  type="button"
+                  class="text-btn"
+                  [disabled]="marketService.actionLoading()"
+                  (click)="marketService.withdraw(listing.listingId)"
+                >
+                  Withdraw
+                </button>
+              </div>
+            } @empty {
+              <div class="empty-state">You have no plan on sale</div>
+            }
+          </section>
+
+          <section class="rows">
+            <h2>Sales history</h2>
+            @for (sale of market.sales; track $index) {
+              <div class="row">
+                <span class="row-name">{{ buildingOf(sale.buildingId)?.name }}</span>
+                <span class="row-price"><app-icon name="money" [size]="14" />{{ sale.price | formatNumber }}</span>
+                <span class="row-date">{{ sale.soldAt | date: 'mediumDate' }}</span>
+              </div>
+            } @empty {
+              <div class="empty-state">No sale yet</div>
+            }
+          </section>
+        }
+      }
+    } @else {
+      <mat-spinner class="spinner" [diameter]="40" />
+    }
+  </ng-container>
+</app-classic-page>

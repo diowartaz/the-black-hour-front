@@ -18,26 +18,26 @@
         <div class="reward">
           <span class="reward-label">Base</span>
           <span class="reward-value"
-            ><app-icon name="money" [size]="16" />{{ cityService.city().attackRecap.base_money }}</span
+            ><app-icon name="money" [size]="16" />{{ cityService.city().attackRecap.base_money | formatNumber }}</span
           >
         </div>
         <div class="reward">
           <span class="reward-label">Ranked</span>
           <span class="reward-value"
-            ><app-icon name="money" [size]="16" />{{ cityService.city().attackRecap.ranked_money }}</span
+            ><app-icon name="money" [size]="16" />{{ cityService.city().attackRecap.ranked_money | formatNumber }}</span
           >
         </div>
         <div class="reward">
           <span class="reward-label">Bonus</span>
           <span class="reward-value"
-            ><app-icon name="money" [size]="16" />{{ cityService.city().attackRecap.bonus_money }}</span
+            ><app-icon name="money" [size]="16" />{{ cityService.city().attackRecap.bonus_money | formatNumber }}</span
           >
         </div>
       </div>
       <div class="total">
         <span>Total</span>
         <span class="total-value"
-          ><app-icon name="money" [size]="20" />{{ cityService.city().attackRecap.total_money }}</span
+          ><app-icon name="money" [size]="20" />{{ cityService.city().attackRecap.total_money | formatNumber }}</span
         >
       </div>
     </section>

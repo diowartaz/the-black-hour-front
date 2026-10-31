@@ -7,8 +7,8 @@
           <h3 class="label">Your invite code</h3>
           <p class="hint">
             Each friend who picks you as sponsor earns you <strong>{{ dividendPercent() }}%</strong> of their
-            end-of-game coins, forever. They get <strong>{{ referral.welcomeGift | number }} coins</strong> when they
-            pick their first sponsor.
+            end-of-game coins, forever. They get <strong>{{ referral.welcomeGift | formatNumber }} coins</strong> when
+            they pick their first sponsor.
           </p>
           <div class="code" aria-label="Your invite code">{{ referral.code }}</div>
           <input class="link" type="text" readonly [value]="link()" aria-label="Invite link" />
@@ -43,7 +43,9 @@
                     {{ referee.username }}
                   </button>
                   <span class="since">since {{ referee.since | date: 'mediumDate' }}</span>
-                  <span class="earnings"> +{{ referee.earnings | number }}<app-icon name="money" [size]="14" /> </span>
+                  <span class="earnings">
+                    +{{ referee.earnings | formatNumber }}<app-icon name="money" [size]="14" />
+                  </span>
                   <button
                     type="button"
                     class="icon-btn remove"
@@ -57,7 +59,7 @@
               }
             </ul>
             <p class="total">
-              Total earned: <strong>{{ totalEarnings() | number }}</strong> <app-icon name="money" [size]="14" />
+              Total earned: <strong>{{ totalEarnings() | formatNumber }}</strong> <app-icon name="money" [size]="14" />
             </p>
           }
         </section>
@@ -72,12 +74,12 @@
               <span class="since">since {{ sponsor.since | date: 'mediumDate' }}</span>
             </p>
             @if (referralService.lastGift() > 0) {
-              <p class="gift">+{{ referralService.lastGift() | number }} coins received!</p>
+              <p class="gift">+{{ referralService.lastGift() | formatNumber }} coins received!</p>
             }
           } @else {
             <p class="hint">
               @if (!referral.welcomeGiftReceived) {
-                Enter a friend's code to get <strong>{{ referral.welcomeGift | number }} coins</strong>.
+                Enter a friend's code to get <strong>{{ referral.welcomeGift | formatNumber }} coins</strong>.
               }
               Your sponsor's account must be older than yours, and you can't change sponsor afterwards.
             </p>

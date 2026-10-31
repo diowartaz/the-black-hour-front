@@ -1,0 +1,131 @@
+<div class="top-row">
+  <div class="search-row">
+    <input
+      type="search"
+      class="search"
+      placeholder="Search name or effect"
+      aria-label="Search plans"
+      [value]="search()"
+      (input)="search.set($any($event.target).value)"
+    />
+    <button type="button" class="open-btn" aria-haspopup="dialog" (click)="open.set(true)">
+      <app-icon name="sliders" [size]="16" />Filters
+      @if (activeCount()) {
+        <span class="badge">{{ activeCount() }}</span>
+      }
+    </button>
+  </div>
+  <ng-content select="[filtersEnd]" />
+</div>
+
+@if (kind() !== 'all' || rarity() !== 'all' || item() !== 'all') {
+  <div class="filters" role="group" aria-label="Active filters">
+    @if (kind() !== 'all') {
+      <button
+        type="button"
+        class="filter active"
+        [style.--c]="kind() === 'special' ? 'var(--yellow)' : null"
+        [attr.aria-label]="'Remove filter ' + kind()"
+        (click)="kind.set('all')"
+      >
+        {{ kind() }}<app-icon name="close" [size]="12" />
+      </button>
+    }
+    @if (rarity() !== 'all') {
+      <button
+        type="button"
+        class="filter active"
+        [style.--c]="rarity() | rarityToColor"
+        [attr.aria-label]="'Remove filter ' + rarity()"
+        (click)="rarity.set('all')"
+      >
+        {{ rarity() }}<app-icon name="close" [size]="12" />
+      </button>
+    }
+    @if (item() !== 'all') {
+      <button
+        type="button"
+        class="filter active"
+        [attr.aria-label]="'Remove filter ' + item()"
+        (click)="item.set('all')"
+      >
+        {{ item() }}<app-icon name="close" [size]="12" />
+      </button>
+    }
+  </div>
+}
+
+@if (open()) {
+  <div class="backdrop" (click)="open.set(false)">
+    <div class="sheet" role="dialog" aria-modal="true" aria-label="Filters" (click)="$event.stopPropagation()">
+      <div class="sheet-head">
+        <h2>Filters</h2>
+        <button type="button" class="close" aria-label="Close" (click)="open.set(false)">
+          <app-icon name="close" [size]="20" />
+        </button>
+      </div>
+
+      <section>
+        <h3>Kind</h3>
+        <div class="filters" role="group" aria-label="Filter by kind">
+          @for (option of kinds; track option) {
+            <button
+              type="button"
+              class="filter"
+              [style.--c]="option === 'special' ? 'var(--yellow)' : null"
+              [class.active]="kind() === option"
+              [attr.aria-pressed]="kind() === option"
+              (click)="toggle(kind, option)"
+            >
+              {{ option }}
+            </button>
+          }
+        </div>
+      </section>
+
+      <section>
+        <h3>Rarity</h3>
+        <div class="filters" role="group" aria-label="Filter by rarity">
+          @for (option of rarities; track option) {
+            <button
+              type="button"
+              class="filter"
+              [style.--c]="option | rarityToColor"
+              [class.active]="rarity() === option"
+              [attr.aria-pressed]="rarity() === option"
+              (click)="toggle(rarity, option)"
+            >
+              {{ option }}
+            </button>
+          }
+        </div>
+      </section>
+
+      <section>
+        <h3>Resource</h3>
+        <div class="filters" role="group" aria-label="Filter by resource">
+          @for (option of items; track option) {
+            <button
+              type="button"
+              class="filter"
+              [class.active]="item() === option"
+              [attr.aria-pressed]="item() === option"
+              (click)="toggle(item, option)"
+            >
+              {{ option }}
+            </button>
+          }
+        </div>
+      </section>
+
+      <ng-content />
+
+      <div class="sheet-actions">
+        <button type="button" class="reset" (click)="reset()">Reset</button>
+        <button type="button" class="show" (click)="open.set(false)">
+          Show {{ count() }} plan{{ count() === 1 ? '' : 's' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

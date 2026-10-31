@@ -1,6 +1,9 @@
-const compactFormat = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 });
+const fullFormat = new Intl.NumberFormat('en', { maximumFractionDigits: 2 });
 
-/** Nombre court pour les espaces étroits : 950, 1.2K, 10K, 1.5M */
-export function formatCompact(value: number): string {
-  return compactFormat.format(value);
+// Espace insécable : un nombre n'est jamais coupé en fin de ligne (l'espace fine ne se voit pas en Orbitron)
+const GROUP_SEPARATOR = ' ';
+
+/** Nombre complet : 950, 2 575, 23 400, 4 565 787 867, 12.5 */
+export function formatNumber(value: number): string {
+  return fullFormat.format(value).replaceAll(',', GROUP_SEPARATOR);
 }
