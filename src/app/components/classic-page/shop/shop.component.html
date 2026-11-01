@@ -25,44 +25,53 @@
     </div>
 
     @if (tab() === 'boosters') {
-      <div class="cards">
-        @for (booster of cityService.boosters(); track booster.id) {
-          <article class="booster">
-            <div class="booster-head">
-              <div class="icon-tile"><app-icon name="cards" [size]="28" /></div>
-              <div>
-                <h3>{{ booster.name }}</h3>
-                <p>{{ booster.cards }} random plans, duplicates possible</p>
-              </div>
+      @for (booster of cityService.boosters(); track booster.id) {
+        <article class="pack-panel">
+          <div class="hero">
+            <div class="halo"></div>
+            <div class="pack back-left"></div>
+            <div class="pack back-right"></div>
+            <div class="pack front">
+              <app-icon name="cards" [size]="42" />
+              <h3>{{ booster.name }}</h3>
+              <span>Booster</span>
             </div>
-            <div class="odds">
-              @for (odds of oddsOf(booster); track odds.rarity) {
-                <span class="neon-chip" [style.--c]="odds.rarity | rarityToColor"
-                  >{{ odds.rarity }} {{ odds.percent }}%</span
-                >
-              }
+          </div>
+          <p class="rule">
+            {{ booster.minCards }} to {{ booster.maxCards }} plans, {{ booster.minCopies }} to
+            {{ booster.maxCopies }} copies each
+          </p>
+          <div class="odds-bar">
+            @for (odds of oddsOf(booster); track odds.rarity) {
+              <i [style.flex]="odds.percent" [style.--c]="odds.rarity | rarityToColor"></i>
+            }
+          </div>
+          <div class="odds-legend">
+            @for (odds of oddsOf(booster); track odds.rarity) {
+              <span [style.--c]="odds.rarity | rarityToColor">{{ odds.rarity }} {{ odds.percent }}%</span>
+            }
+          </div>
+          <div class="pack-foot">
+            <div class="pack-links">
+              <button type="button" (click)="goToDeck()">
+                <app-icon name="cards" [size]="16" />Plans
+                <b>{{ ownedCount() }}/{{ cityService.catalogBuildings().length }}</b>
+              </button>
+              <button type="button" (click)="goToMarket()">
+                <app-icon name="money" [size]="16" />Duplicates <b>{{ duplicates() }}</b>
+              </button>
             </div>
             <button
               type="button"
-              class="buy-btn"
+              class="buy-btn open-btn"
               [disabled]="cityService.openBoosterLoading() || cityService.stats().money < booster.price"
               (click)="openBooster(booster)"
             >
-              <app-icon name="money" [size]="16" />{{ booster.price | formatNumber }} · Open
+              <app-icon name="money" [size]="18" />{{ booster.price | formatNumber }} · Open
             </button>
-          </article>
-        }
-      </div>
-      <div class="collection-summary">
-        <span>Collection {{ ownedCount() }}/{{ cityService.catalogBuildings().length }}</span>
-        <span>Duplicates {{ duplicates() }}</span>
-        <button type="button" class="text-btn" (click)="goToMarket()">
-          <app-icon name="money" [size]="16" />Black Market
-        </button>
-        <button type="button" class="text-btn" (click)="goToDeck()">
-          <app-icon name="cards" [size]="16" />Edit deck
-        </button>
-      </div>
+          </div>
+        </article>
+      }
     } @else {
       <div class="cards">
         @for (item of cityService.bonuses() | keyvalue; track item.key) {

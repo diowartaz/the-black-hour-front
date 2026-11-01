@@ -11,6 +11,7 @@ export function createDefaultStatsModel(): StatsModel {
     bonuses: Object.fromEntries(Array.from({ length: 20 }, (_, i) => [i + 1, 0])),
     ranked_points: 500,
     collection: {},
+    building_ranks: {},
     deck: [],
   };
 }
@@ -24,6 +25,8 @@ export interface StatsModel {
   ranked_points: number;
   // Plans possédés : nombre d'exemplaires par id de bâtiment
   collection: Record<number, number>;
+  // Rang par id de plan : un plan absent est au rang 1
+  building_ranks: Record<number, number>;
   // Ids des plans du deck joué à chaque partie
   deck: number[];
 }
@@ -146,6 +149,7 @@ export interface SpeedsModel {
 export function createDefaultBuildingModel(): BuildingModel {
   return {
     id: 1,
+    rank: 0,
     defense: 50,
     time: 3600,
     lvl: 2,
@@ -178,6 +182,8 @@ export interface BuildingModel {
   name: string;
   inventory: Record<string, number>;
   rarity: Rarity;
+  // Rang du plan, figé à la création de la ville : la défense et l'effet sont déjà à sa valeur
+  rank: number;
   selected: boolean;
   defense_ratio_percentage: number;
   // Offre de l'architecte : bâtiment terminé revenu dans la pioche (lvl_max inclut déjà les niveaux gagnés)
@@ -205,12 +211,16 @@ export interface BoosterModel {
   id: number;
   name: string;
   price: number;
-  cards: number;
+  minCards: number;
+  maxCards: number;
+  minCopies: number;
+  maxCopies: number;
   odds: Record<BoosterRarity, number>;
 }
 
 export interface BoosterCardModel {
   building_id: number;
+  copies: number;
   is_new: boolean;
 }
 
@@ -248,6 +258,7 @@ export interface AdvancedBuildingModel {
   inventory: Record<string, number>;
   timeString: string;
   rarity: Rarity;
+  rank: number;
   selected: boolean;
   enoughRessources: boolean;
   enoughLvlMax: boolean;
@@ -350,6 +361,15 @@ export interface DefaultValuesModel {
   DECK_SIZE: number;
   // Paramètres secondaires des bâtiments spéciaux (la valeur par niveau est dans l'effet)
   effect_rules: EffectRulesModel;
+  rank_rules: RankRulesModel;
+}
+
+export interface RankRulesModel {
+  max_rank: number;
+  // Part de la valeur de base ajoutée par rang
+  rank_bonus: number;
+  // Exemplaires consommés pour passer du rang n (index) au rang n + 1, en plus de la carte gardée
+  upgrade_copies: Record<BoosterRarity, number[]>;
 }
 
 export interface EffectRulesModel {
@@ -387,6 +407,15 @@ export function createDefaultDefaultValuesModel(): DefaultValuesModel {
       carrion_surplus_step: 25,
       carrion_max_steps: 8,
       vault_max_defense_per_level: 30,
+    },
+    rank_rules: {
+      max_rank: 10,
+      rank_bonus: 0.2,
+      upgrade_copies: {
+        common: [5, 8, 11, 17, 25, 38, 57, 85, 130, 190],
+        rare: [3, 5, 7, 10, 15, 23, 35, 50, 77, 115],
+        epic: [2, 3, 5, 7, 10, 15, 23, 34, 51, 77],
+      },
     },
   };
 }

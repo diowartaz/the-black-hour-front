@@ -1,9 +1,10 @@
 import { Component, computed, inject, linkedSignal, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { BuildingEffectModel, ItemModel, Rarity } from 'src/app/models/game';
+import { BuildingEffectModel, CatalogBuildingModel, ItemModel, Rarity } from 'src/app/models/game';
 import { RoutesEnum } from 'src/app/models/router';
 import { CityService } from 'src/app/services/city/city.service';
 import { BuildingCardComponent } from 'src/app/shared/components/building-card/building-card.component';
+import { BuildingEmblemComponent } from 'src/app/shared/components/building-emblem/building-emblem.component';
 import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { PlanFiltersComponent } from 'src/app/shared/components/plan-filters/plan-filters.component';
 import { ResourceSharesComponent } from 'src/app/shared/components/resource-shares/resource-shares.component';
@@ -17,7 +18,9 @@ import {
   filterPlans,
   PlanKind,
 } from 'src/app/shared/utils/deck';
+import { canUpgrade, cardRank, rankedEffect } from 'src/app/shared/utils/ranks';
 import { ClassicPageComponent } from '../classic-page.component';
+import { UpgradeDialogComponent } from './upgrade-dialog/upgrade-dialog.component';
 
 // Éditeur de deck : le brouillon est local jusqu'à l'enregistrement
 @Component({
@@ -26,9 +29,11 @@ import { ClassicPageComponent } from '../classic-page.component';
     ClassicPageComponent,
     IconComponent,
     BuildingCardComponent,
+    BuildingEmblemComponent,
     PlanFiltersComponent,
     ResourceSharesComponent,
     RarityToColorPipe,
+    UpgradeDialogComponent,
   ],
   templateUrl: './deck.component.html',
   styleUrls: ['./deck.component.scss'],
@@ -47,6 +52,8 @@ export class DeckComponent {
   itemFilter = signal<ItemModel | 'all'>('all');
   kindFilter = signal<PlanKind>('all');
   search = signal('');
+  upgradableOnly = signal(false);
+  upgradingId = signal<number | null>(null);
   // Emplacement survolé : sa carte complète s'affiche en bulle, ancrée à droite dans la moitié droite de l'écran
   previewId = signal<number | null>(null);
   previewAlign = signal<'left' | 'right'>('left');
@@ -57,10 +64,13 @@ export class DeckComponent {
   draftBuildings = computed(() => buildingsOf(this.draft(), this.cityService.catalogBuildings()).sort(byRarityDesc));
   emptySlots = computed(() => Array.from({ length: Math.max(0, this.size() - this.draft().length) }));
   problems = computed(() => deckProblems(this.draft(), this.cityService.collection(), this.rules()));
-  dirty = computed(() => {
+  // Plans ajoutés et retirés par rapport au deck enregistré
+  changes = computed(() => {
     const saved = new Set(this.cityService.deck());
-    return this.draft().length !== saved.size || this.draft().some((id) => !saved.has(id));
+    const draft = new Set(this.draft());
+    return [...draft].filter((id) => !saved.has(id)).length + [...saved].filter((id) => !draft.has(id)).length;
   });
+  dirty = computed(() => this.changes() > 0);
 
   autocompleted = computed(() =>
     autocompleteDeck(this.draft(), this.cityService.collection(), this.cityService.catalogBuildings(), this.size()),
@@ -80,11 +90,25 @@ export class DeckComponent {
         kind: this.kindFilter(),
       },
       (effect) => this.effectText(effect),
-    ).sort((a, b) => Number(this.owned(b.id) > 0) - Number(this.owned(a.id) > 0) || byRarityDesc(a, b)),
+    )
+      .filter((b) => !this.upgradableOnly() || this.canUpgrade(b))
+      .sort((a, b) => Number(this.owned(b.id) > 0) - Number(this.owned(a.id) > 0) || byRarityDesc(a, b)),
   );
+
+  upgrading = computed(() => this.cityService.catalogBuildings().find((b) => b.id === this.upgradingId()) ?? null);
+
+  private rankRules = computed(() => this.cityService.defaultValues().rank_rules);
 
   owned(id: number): number {
     return this.cityService.collection()[id] ?? 0;
+  }
+
+  rank(id: number): number {
+    return cardRank(this.cityService.buildingRanks(), id);
+  }
+
+  canUpgrade(building: CatalogBuildingModel): boolean {
+    return canUpgrade(this.owned(building.id), building.rarity, this.rank(building.id), this.rankRules());
   }
 
   inDraft(id: number): boolean {
@@ -97,6 +121,25 @@ export class DeckComponent {
     } else if (this.owned(id) > 0 && this.draft().length < this.size()) {
       this.draft.update((ids) => [...ids, id]);
     }
+  }
+
+  // Ne réagit qu'au focus de la carte elle-même, pas à celui de ses boutons
+  toggleFromKeyboard(id: number, event: Event): void {
+    if (event.target === event.currentTarget) {
+      event.preventDefault();
+      this.toggle(id);
+    }
+  }
+
+  // Le clic ne remonte pas à la carte : améliorer ne touche pas au deck
+  openUpgrade(id: number, event: Event): void {
+    event.stopPropagation();
+    this.upgradingId.set(id);
+  }
+
+  // Ouvre directement la mise en vente de ce plan (voir MarketComponent)
+  sellCopy(id: number): void {
+    this.router.navigate([RoutesEnum.MARKET], { state: { sellBuildingId: id } });
   }
 
   // Survol à la souris uniquement : un toucher émet aussi un pointerenter, qui ouvrirait la bulle
@@ -136,8 +179,12 @@ export class DeckComponent {
   }
 
   // Le bouton « Effect » de la carte n'est pas cliquable dans la bulle : l'effet y est écrit en clair
-  effectText(effect: BuildingEffectModel): string {
-    return buildingEffectText(effect, undefined, this.cityService.defaultValues().effect_rules);
+  effectText(effect: BuildingEffectModel, rank = 0): string {
+    return buildingEffectText(
+      rankedEffect(effect, rank, this.rankRules()),
+      undefined,
+      this.cityService.defaultValues().effect_rules,
+    );
   }
 
   autocomplete(): void {

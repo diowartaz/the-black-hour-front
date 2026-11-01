@@ -7,15 +7,19 @@
           <div class="revealed">
             @if (card.is_new) {
               <span class="neon-chip badge" style="--c: var(--green)">New</span>
-            } @else {
-              <span class="neon-chip badge" style="--c: var(--text-mute)">Duplicate</span>
             }
+            <span class="neon-chip copies" style="--c: var(--yellow)">×{{ card.copies }}</span>
             <app-building-card [building]="card.building" [count]="card.count" />
           </div>
         } @else {
-          <button type="button" class="hidden-card" aria-label="Reveal the next plan" (click)="reveal($index)">
-            <app-icon name="sparkle" [size]="32" />
-          </button>
+          <div class="hidden-slot">
+            @if (card.building) {
+              <app-building-card class="size-ref" [building]="card.building" [count]="card.count" />
+            }
+            <button type="button" class="hidden-card" aria-label="Reveal the next plan" (click)="reveal($index)">
+              <app-icon name="sparkle" [size]="32" />
+            </button>
+          </div>
         }
       }
     </div>

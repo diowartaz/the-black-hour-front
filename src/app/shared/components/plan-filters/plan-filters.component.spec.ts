@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { ITEMS } from 'src/app/shared/utils/deck';
 import { PlanFiltersComponent } from './plan-filters.component';
 
 describe('PlanFiltersComponent', () => {
@@ -27,6 +28,12 @@ describe('PlanFiltersComponent', () => {
     await click('Filters');
     expect(host.querySelector('[role="dialog"]')).not.toBeNull();
     expect(button('Show 2 plans')).toBeTruthy();
+  });
+
+  it('affiche le losange de chaque ressource dans ses badges', async () => {
+    await click('Filters');
+    const gems = host.querySelectorAll('[aria-label="Filter by resource"] app-resource-gem');
+    expect(gems.length).toBe(ITEMS.length);
   });
 
   it('retire un filtre quand on le touche à nouveau', async () => {

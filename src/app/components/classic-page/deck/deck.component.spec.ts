@@ -64,8 +64,7 @@ describe('DeckComponent', () => {
     await pointer('Scrap Wall', 'pointerenter');
     const preview = host.querySelector('.preview')!;
     expect(preview.querySelector('app-building-card')?.textContent).toContain('Scrap Wall');
-    expect(preview.textContent).toContain('common');
-    expect(preview.textContent).toContain('×2');
+    expect(preview.textContent).toContain('+1');
     expect(preview.querySelector('.preview-effect')).toBeNull();
 
     await pointer('Scrap Wall', 'pointerleave');
@@ -89,6 +88,25 @@ describe('DeckComponent', () => {
 
     await clickInfo('Scrap Wall');
     expect(host.querySelector('.preview')).toBeNull();
+  });
+
+  it("n'affiche la barre qu'avec des changements, et compte ceux-ci", async () => {
+    const cityService = TestBed.inject(CityService);
+    cityService.catalogBuildings.update((buildings) => [...buildings, { ...wall, id: 3, name: 'Tin Tower' }]);
+    cityService.stats.update((stats) => ({ ...stats, collection: { 1: 2, 2: 1, 3: 1 } }));
+    cityService.defaultValues.update((values) => ({ ...values, DECK_SIZE: 2 }));
+    await fixture.whenStable();
+    expect(host.querySelector('.deck-foot')).toBeNull();
+
+    fixture.componentInstance.toggle(1);
+    fixture.componentInstance.toggle(3);
+    await fixture.whenStable();
+    expect(host.querySelector('.unsaved')?.textContent).toContain('2 unsaved changes');
+
+    host.querySelector<HTMLButtonElement>('.deck-foot .text-btn')!.click();
+    await fixture.whenStable();
+    expect(host.querySelector('.deck-foot')).toBeNull();
+    expect(fixture.componentInstance.draft()).toEqual([1, 2]);
   });
 
   it('seule la poubelle retire le bâtiment, pas un clic sur son nom', async () => {
@@ -127,6 +145,47 @@ describe('DeckComponent', () => {
     expect(collectionNames()).toEqual(['Scrap Wall']);
     deck.kindFilter.set('all');
     expect(collectionNames().length).toBe(2);
+  });
+
+  it('le bouton Upgrade ouvre le panneau sans toucher au deck', async () => {
+    host.querySelector<HTMLButtonElement>('.upgrade-btn')!.click();
+    await fixture.whenStable();
+    expect(host.querySelector('app-upgrade-dialog')).not.toBeNull();
+    expect(fixture.componentInstance.draft()).toEqual([1, 2]);
+  });
+
+  function cardActions(name: string): HTMLElement {
+    const cards = [...host.querySelectorAll<HTMLElement>('.card-btn')];
+    return cards.find((el) => el.textContent?.includes(name))!.querySelector<HTMLElement>('.card-actions')!;
+  }
+
+  it('Remove retire un plan du deck, Add le remet', async () => {
+    cardActions('Scrap Wall').querySelector<HTMLButtonElement>('.toggle-btn.remove')!.click();
+    await fixture.whenStable();
+    expect(fixture.componentInstance.draft()).toEqual([2]);
+
+    cardActions('Scrap Wall').querySelector<HTMLButtonElement>('.toggle-btn')!.click();
+    await fixture.whenStable();
+    expect(fixture.componentInstance.draft()).toEqual([2, 1]);
+  });
+
+  it('grise Add quand le deck est plein', async () => {
+    const cityService = TestBed.inject(CityService);
+    cityService.catalogBuildings.update((buildings) => [...buildings, { ...wall, id: 3, name: 'Tin Tower' }]);
+    cityService.stats.update((stats) => ({ ...stats, collection: { 1: 2, 2: 1, 3: 1 } }));
+    cityService.defaultValues.update((values) => ({ ...values, DECK_SIZE: 2 }));
+    await fixture.whenStable();
+
+    const add = cardActions('Tin Tower').querySelector<HTMLButtonElement>('.toggle-btn')!;
+    expect(add.disabled).toBeTrue();
+    expect(add.textContent).toContain('Add');
+  });
+
+  it('filtre les plans améliorables', () => {
+    const deck = fixture.componentInstance;
+    TestBed.inject(CityService).stats.update((stats) => ({ ...stats, collection: { 1: 6, 2: 1 } }));
+    deck.upgradableOnly.set(true);
+    expect(collectionNames()).toEqual(['Scrap Wall']);
   });
 
   it("recherche dans le nom (sans casse) ou dans le texte de l'effet", () => {

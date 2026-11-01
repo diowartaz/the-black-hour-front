@@ -5,6 +5,7 @@ import { CatalogBuildingModel, ItemModel, MarketListingModel, Rarity } from 'src
 import { CityService } from 'src/app/services/city/city.service';
 import { MarketService } from 'src/app/services/market/market.service';
 import { BuildingCardComponent } from 'src/app/shared/components/building-card/building-card.component';
+import { BuildingEmblemComponent } from 'src/app/shared/components/building-emblem/building-emblem.component';
 import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { PlanFiltersComponent } from 'src/app/shared/components/plan-filters/plan-filters.component';
 import { buildingEffectText } from 'src/app/shared/utils/building-effects';
@@ -19,12 +20,14 @@ type MarketSort = 'rarity' | 'price-asc' | 'price-desc';
 // Black Market : achat de la meilleure offre de chaque plan et vente des doublons
 @Component({
   selector: 'app-market',
-  imports: [FormatNumberPipe, 
+  imports: [
+    FormatNumberPipe,
     DatePipe,
     MatProgressSpinnerModule,
     ClassicPageComponent,
     IconComponent,
     BuildingCardComponent,
+    BuildingEmblemComponent,
     PlanFiltersComponent,
     SellDialogComponent,
   ],
@@ -44,6 +47,7 @@ export class MarketComponent {
   tab = signal<MarketTab>('buy');
   sort = signal<MarketSort>('rarity');
   showUnavailable = signal(false);
+  deckOnly = signal(false);
   search = signal('');
   rarityFilter = signal<Rarity | 'all'>('all');
   itemFilter = signal<ItemModel | 'all'>('all');
@@ -72,8 +76,11 @@ export class MarketComponent {
         kind: this.kindFilter(),
       },
       (effect) => buildingEffectText(effect, undefined, this.cityService.defaultValues().effect_rules),
-    ),
+    ).filter((b) => !this.deckOnly() || this.inDeck(b.id)),
   );
+
+  // Options propres au marché, comptées dans le badge du bouton Filters
+  extraFilters = computed(() => Number(this.deckOnly()) + Number(this.tab() === 'buy' && this.showUnavailable()));
 
   buyPlans = computed(() =>
     this.sorted(this.filteredPlans().filter((b) => this.showUnavailable() || this.offers().has(b.id))),
@@ -92,10 +99,24 @@ export class MarketComponent {
   constructor() {
     this.marketService.market.set(null);
     this.marketService.load();
+    // Arrivée depuis le panneau d'amélioration : ouvre directement la mise en vente de ce plan
+    const sellBuildingId = window.history.state?.sellBuildingId;
+    if (typeof sellBuildingId === 'number') {
+      this.tab.set('sell');
+      this.selectedId.set(sellBuildingId);
+    }
   }
 
   offerOf(buildingId: number): MarketListingModel | undefined {
     return this.offers().get(buildingId);
+  }
+
+  // Les offres du marché excluent celles du joueur, qui peuvent pourtant passer devant la sienne
+  lowestPriceOf(buildingId: number): number | undefined {
+    const myListings = (this.market()?.myListings ?? []).filter((listing) => listing.buildingId === buildingId);
+    const offer = this.offerOf(buildingId);
+    const prices = [...myListings, ...(offer ? [offer] : [])].map((listing) => listing.price);
+    return prices.length ? Math.min(...prices) : undefined;
   }
 
   owned(buildingId: number): number {
@@ -116,6 +137,11 @@ export class MarketComponent {
 
   setSort(value: string): void {
     this.sort.set(value as MarketSort);
+  }
+
+  clearExtraFilters(): void {
+    this.showUnavailable.set(false);
+    this.deckOnly.set(false);
   }
 
   private canSell(buildingId: number): boolean {

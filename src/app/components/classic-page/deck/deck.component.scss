@@ -69,7 +69,8 @@ h2 {
 
 .slots {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(140px, 100%), 1fr));
+  // Assez large pour l'emblème, le nom et les deux boutons : une seule colonne sur mobile
+  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
   gap: 6px;
 }
 
@@ -136,9 +137,16 @@ h2 {
   text-overflow: ellipsis;
   // Nom seul, inerte : un toucher par erreur ne retire plus rien, la place à droite va aux boutons
   .slot-wrap & {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     line-height: 24px;
     padding-right: 64px;
+  }
+  .slot-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   &.empty {
     display: flex;
@@ -181,23 +189,35 @@ h2 {
   }
 }
 
+// Pied de page hors de la zone qui défile : enregistrer ne demande pas de remonter depuis la collection
 .deck-foot {
+  flex: none;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 10px;
-  .problems {
+  padding: 6px 16px max(6px, env(safe-area-inset-bottom));
+  background: var(--surface-2);
+  border-top: 1px solid var(--line-strong);
+  .mini-cta {
+    height: 34px;
+  }
+  .status {
     flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     gap: 2px;
     font-size: 14px;
+  }
+  .problem {
+    display: flex;
+    align-items: center;
+    gap: 4px;
     color: var(--orange-light);
-    span {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
+  }
+  .unsaved {
+    color: var(--text-mute);
   }
 }
 
@@ -213,14 +233,17 @@ h2 {
   gap: 8px;
 }
 
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
 .card-btn {
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
-  font: inherit;
-  text-align: left;
-  &:disabled {
+  cursor: pointer;
+  &[aria-disabled='true'] {
     cursor: default;
   }
   app-building-card {
@@ -231,55 +254,76 @@ h2 {
       filter 0.2s;
   }
   // Cartes possédées hors deck estompées : celles du deck ressortent par contraste
-  &[aria-pressed='false']:not(:disabled) app-building-card {
+  &[aria-pressed='false']:not([aria-disabled='true']) app-building-card {
     opacity: 0.5;
     filter: saturate(0.4);
   }
-  &[aria-pressed='false']:not(:disabled):is(:hover, :focus-visible) app-building-card {
+  // Une carte améliorable reste lisible : son bouton Upgrade ne doit pas se perdre dans l'estompage
+  &[aria-pressed='false']:not([aria-disabled='true']):is(:hover, :focus-visible, :has(.upgrade-btn.ready))
+    app-building-card {
     opacity: 0.85;
     filter: none;
   }
-  // Au survol d'une carte du deck, le pied annonce le retrait
-  &:is(:hover, :focus-visible) .card-foot.in {
-    background: var(--orange);
-    .foot-idle {
-      display: none;
-    }
-    .foot-hover {
-      display: flex;
-    }
-  }
 }
 
-.card-foot {
+// Sur la dernière ligne de la carte, à droite des coûts ; passe dessous quand la place manque
+.card-actions {
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+}
+
+.card-note {
   font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
   color: var(--text-mute);
-  span {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .foot-hover {
-    display: none;
-  }
-  &.in,
-  &.add {
-    padding: 2px 8px;
-    border-radius: 999px;
-    transition: background 0.2s;
-  }
-  &.in {
-    background: var(--c);
-    color: var(--bg);
-  }
-  &.add {
-    border: 1px solid var(--text-mute);
+}
+
+.upgrade-btn,
+.toggle-btn {
+  height: 26px;
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--line-strong);
+  background: none;
+  color: var(--text-mute);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 12px;
+}
+
+// Toujours cliquable : le panneau explique ce qui manque ; mis en avant seulement quand l'amélioration est possible
+.upgrade-btn {
+  &:hover {
     color: var(--text);
+    border-color: var(--text-mute);
+  }
+  &.ready {
+    border-color: var(--green);
+    background: color-mix(in srgb, var(--green) 15%, transparent);
+    color: var(--green);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--green) 35%, transparent);
+  }
+}
+
+// Add, grisé quand le deck est plein, ou Remove pour un plan du deck
+.toggle-btn {
+  border-color: var(--text-mute);
+  color: var(--text);
+  &:disabled {
+    border-color: var(--line-strong);
+    color: var(--text-mute);
+    opacity: 0.6;
+    cursor: default;
+  }
+  &.remove {
+    border-color: var(--orange);
+    background: color-mix(in srgb, var(--orange) 12%, transparent);
+    color: color-mix(in srgb, var(--orange) 60%, white);
   }
 }

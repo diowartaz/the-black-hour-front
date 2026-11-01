@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, linkedSignal, output } from '@angular/core';
 import { CatalogBuildingModel } from 'src/app/models/game';
 import { CityService } from 'src/app/services/city/city.service';
 import { MarketService } from 'src/app/services/market/market.service';
@@ -28,15 +28,42 @@ export class SellDialogComponent {
   taxRate = input.required<number>();
   closed = output<void>();
 
-  price = signal<number | null>(null);
+  // Prérempli juste sous l'offre la plus basse : à prix égal, l'offre la plus ancienne reste devant
+  price = linkedSignal<number | null>(() => {
+    const lowest = this.lowestPrice();
+    return lowest !== undefined && lowest > 1 ? lowest - 1 : null;
+  });
 
   validPrice = computed(() => {
     const price = this.price();
     return price !== null && Number.isInteger(price) && price >= 1;
   });
 
+  presets = computed(() => {
+    const lowest = this.lowestPrice();
+    if (lowest === undefined) {
+      return [];
+    }
+    const presets = [
+      { label: 'Lowest −1', price: lowest - 1 },
+      { label: '−5%', price: Math.floor((lowest * 95) / 100) },
+      { label: '−10%', price: Math.floor((lowest * 90) / 100) },
+    ];
+    return presets.filter(
+      (preset, index) => preset.price >= 1 && presets.findIndex((p) => p.price === preset.price) === index,
+    );
+  });
+
+  // Les acheteurs ne voient que l'offre la moins chère de chaque plan
+  visible = computed(() => {
+    const lowest = this.lowestPrice();
+    return lowest === undefined || (this.validPrice() && this.price()! < lowest);
+  });
+
   // Même calcul que listingTax côté API
   tax = computed(() => (this.validPrice() ? Math.ceil(this.price()! * this.taxRate()) : 0));
+
+  net = computed(() => (this.validPrice() ? this.price()! - this.tax() : 0));
 
   canList = computed(
     () => this.validPrice() && this.tax() <= this.cityService.stats().money && !this.marketService.actionLoading(),

@@ -81,11 +81,18 @@ describe('MarketComponent', () => {
     expect(host.textContent).toContain('No offer');
   });
 
-  it('place le bouton d’achat et les exemplaires possédés dans la carte', async () => {
+  it('place le bouton d’achat dans la carte, sans badge pour un exemplaire unique', async () => {
     await setup(open);
     const card = host.querySelector('.market-card app-building-card');
     expect(card?.querySelector('.buy-btn')?.textContent).toContain('100');
-    expect(card?.querySelector('.head .count')?.textContent).toContain('×1');
+    expect(card?.querySelector('.head .count')).toBeNull();
+  });
+
+  it('montre les doublons dans le badge de la carte', async () => {
+    await setup(open);
+    const card = host.querySelectorAll('.market-card app-building-card')[1];
+    expect(card.querySelector('.name')?.textContent).toContain('Scrap Wall');
+    expect(card.querySelector('.head .count')?.textContent).toContain('+1');
   });
 
   it('grise les tuiles sans offre', async () => {
@@ -101,7 +108,7 @@ describe('MarketComponent', () => {
     await setup({ ...open, offers: [{ listingId: 'e', buildingId: 3, price: 50 }] });
     const card = host.querySelector('.market-card')!;
     expect(card.querySelector('.name')?.textContent).toContain('Tin Tower');
-    expect(card.querySelector('.head .count')?.textContent).toContain('×0');
+    expect(card.querySelector('.head .count')?.textContent).toContain('New');
     expect(card.classList).not.toContain('unavailable');
     expect(card.querySelector('.card.locked')).toBeNull();
   });
@@ -125,6 +132,34 @@ describe('MarketComponent', () => {
     market.search.set('');
     market.rarityFilter.set('epic');
     expect(market.buyPlans().map((b) => b.id)).toEqual([2]);
+  });
+
+  it('ne garde que les plans du deck, sur les deux onglets', async () => {
+    await setup(open);
+    const market = fixture.componentInstance;
+    cityService.stats.update((stats) => ({ ...stats, deck: [1, 3] }));
+    market.deckOnly.set(true);
+    expect(market.buyPlans().map((b) => b.id)).toEqual([1]);
+
+    market.showUnavailable.set(true);
+    expect(market.buyPlans().map((b) => b.id)).toEqual([3, 1]);
+
+    expect(market.sellPlans().map((b) => b.id)).toEqual([1]);
+    cityService.stats.update((stats) => ({ ...stats, deck: [2] }));
+    expect(market.sellPlans()).toEqual([]);
+  });
+
+  it('compte le filtre du deck dans le badge et le retire avec Reset', async () => {
+    await setup(open);
+    const market = fixture.componentInstance;
+    market.deckOnly.set(true);
+    market.showUnavailable.set(true);
+    expect(market.extraFilters()).toBe(2);
+
+    market.clearExtraFilters();
+    expect(market.deckOnly()).toBeFalse();
+    expect(market.showUnavailable()).toBeFalse();
+    expect(market.extraFilters()).toBe(0);
   });
 
   it('achète l’offre affichée et désactive celles qui sont trop chères', async () => {
@@ -171,12 +206,19 @@ describe('MarketComponent', () => {
     host.querySelector<HTMLButtonElement>('.sell-btn')!.click();
     await fixture.whenStable();
     const dialog = host.querySelector('app-sell-dialog');
-    expect(dialog?.textContent).toContain('Sell Scrap Wall');
-    expect(dialog?.textContent).toContain('300');
+    expect(dialog?.textContent).toContain('Scrap Wall');
+    expect(dialog?.querySelector<HTMLInputElement>('.price')?.value).toBe('299');
 
     dialog!.querySelector<HTMLButtonElement>('.close')!.click();
     await fixture.whenStable();
     expect(host.querySelector('app-sell-dialog')).toBeNull();
+  });
+
+  it('prend pour référence l’offre du joueur si elle est la moins chère', async () => {
+    await setup({ ...open, myListings: [{ listingId: 'c', buildingId: 1, price: 200 }] });
+    expect(fixture.componentInstance.lowestPriceOf(1)).toBe(200);
+    expect(fixture.componentInstance.lowestPriceOf(2)).toBe(100);
+    expect(fixture.componentInstance.lowestPriceOf(3)).toBeUndefined();
   });
 
   it('ferme la pop-up quand il ne reste plus assez d’exemplaires', async () => {

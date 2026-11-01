@@ -1,6 +1,7 @@
 import { Component, computed, input, model, ModelSignal, output, signal } from '@angular/core';
 import { ItemModel, Rarity } from 'src/app/models/game';
 import { IconComponent } from 'src/app/shared/components/icon/icon.component';
+import { ResourceGemComponent } from 'src/app/shared/components/resource-gem/resource-gem.component';
 import { RarityToColorPipe } from 'src/app/shared/pipes/rarity-to-color.pipe';
 import { ITEMS, PLAN_KINDS, PlanKind, RARITIES_DESC } from 'src/app/shared/utils/deck';
 
@@ -9,7 +10,7 @@ import { ITEMS, PLAN_KINDS, PlanKind, RARITIES_DESC } from 'src/app/shared/utils
 // sauf celui marqué [filtersEnd], affiché sur la ligne de la recherche
 @Component({
   selector: 'app-plan-filters',
-  imports: [IconComponent, RarityToColorPipe],
+  imports: [IconComponent, RarityToColorPipe, ResourceGemComponent],
   templateUrl: './plan-filters.component.html',
   styleUrls: ['./plan-filters.component.scss'],
   host: {

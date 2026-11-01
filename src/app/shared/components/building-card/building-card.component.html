@@ -9,21 +9,26 @@
     <span class="deck-badge" aria-hidden="true"><app-icon name="check" [size]="12" /></span>
   }
   <div class="head">
+    <app-building-emblem [id]="building().id" [size]="compact() ? 24 : 30" />
     <span class="name">{{ building().name }}</span>
     @if (locked()) {
       <app-icon name="lock" [size]="14" />
-    } @else if (count() > 1 || showCount()) {
-      <span class="count">×{{ count() }}</span>
+    } @else if (count() > 1) {
+      <span class="count">+{{ count() - 1 }}</span>
+    } @else if (count() === 0) {
+      <span class="count">New</span>
     }
   </div>
-  @if (!compact()) {
-    <span class="rarity">{{ building().rarity }}</span>
+  @if (rank() > 0 || showRank()) {
+    <div class="tier">
+      <app-rank-pips [rank]="rank()" [max]="rankRules().max_rank" />
+    </div>
   }
   <div class="stats">
-    @if (building().effect; as effect) {
+    @if (effect(); as effect) {
       <app-effect-tooltip [effect]="effect" />
     } @else {
-      <span class="def"><app-icon name="shield" [size]="13" />{{ building().defense | formatNumber }}</span>
+      <span class="def"><app-icon name="shield" [size]="13" />{{ defense() | formatNumber }}</span>
     }
     <span><app-icon name="trend" [size]="13" />{{ building().lvl_max }} lvl</span>
     <span><app-icon name="clock" [size]="13" />{{ time() }}</span>

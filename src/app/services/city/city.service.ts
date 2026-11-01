@@ -69,6 +69,7 @@ export class CityService {
   );
 
   collection = computed<Record<number, number>>(() => this.stats().collection);
+  buildingRanks = computed<Record<number, number>>(() => this.stats().building_ranks);
   deck = computed<number[]>(() => this.stats().deck);
 
   skills = computed<SkillModel[]>(() => this.city().skills);
@@ -103,6 +104,7 @@ export class CityService {
   referencesBonusesLoading = signal<boolean>(false);
   saveDeckLoading = signal<boolean>(false);
   openBoosterLoading = signal<boolean>(false);
+  upgradeLoading = signal<boolean>(false);
 
   constructor() {
     this.cityTimeSeconds = this.setCityTimeSeconds();
@@ -251,6 +253,13 @@ export class CityService {
     runRequest(this.openBoosterLoading, this.api.openBooster(id), ({ stats, cards }) => {
       this.stats.set(stats);
       this.lastBoosterCards.set(cards);
+    });
+  }
+
+  upgradeBuilding(id: number, onUpgraded: () => void): void {
+    runRequest(this.upgradeLoading, this.api.upgradeBuilding(id), (stats) => {
+      this.stats.set(stats);
+      onUpgraded();
     });
   }
 

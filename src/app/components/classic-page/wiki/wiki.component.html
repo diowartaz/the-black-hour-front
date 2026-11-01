@@ -172,8 +172,8 @@
         <div class="inline-div">
           <app-icon class="ic pink" name="sparkle" [size]="18" /><strong>Special buildings</strong> have no fixed
           defense but have an effect: tap them to read it. Any defense they give benefits from your Efficient defenser
-          bonus. What they did shows up in a pop-up after your action, and in the
-          <strong>Overnight</strong> part of the attack recap.
+          bonus. What they did shows up in a pop-up after your action, and in the <strong>Overnight</strong> part of the
+          attack recap.
         </div>
 
         <p><strong>Discovering plans</strong></p>
@@ -255,7 +255,51 @@
           deck will ask for: digs give each resource 20% of the time.
         </div>
         <div class="inline-div">Your deck is locked in when you create a city: changes apply to your next city.</div>
-        <div class="inline-div">A deck only uses one copy of a plan: sell your duplicates on the Black Market.</div>
+        <div class="inline-div">
+          A deck only uses one copy of a plan: <strong>upgrade</strong> it with your duplicates, or sell them on the
+          Black Market. The choice is yours.
+        </div>
+      </section>
+
+      <section>
+        <h2><app-icon class="ic green" name="trend" [size]="18" /> Plan ranks</h2>
+        <p>
+          Each plan starts at <strong>rank 0</strong> and goes up to <strong>rank 10</strong>. Every rank adds
+          <strong>20% of the base value</strong> to the building's defense and effect, up to +200% at rank 10. Resource
+          costs, build times and levels do not change.
+        </p>
+        <div class="inline-div">
+          Open a plan with the <strong>Upgrade</strong> button of your collection. Nothing upgrades on its own, and an
+          upgrade cannot be undone: the copies are used for good, and you keep your card.
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Copies used</th>
+              <th>Common</th>
+              <th>Rare</th>
+              <th>Epic</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (rank of rankRows(); track rank.rank) {
+              <tr>
+                <td>Rank {{ rank.rank }}</td>
+                <td>{{ rank.common }}</td>
+                <td>{{ rank.rare }}</td>
+                <td>{{ rank.epic }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        <div class="inline-div">
+          Ranks are locked in when you create a city, and count in ranked games too. A rank stays with you: copies sold
+          on the Black Market are always plain copies.
+        </div>
+        <div class="inline-div">
+          Effects that give whole amounts add up: 1.2 defense per dig gives +2 on every fifth dig. Extra offers, horde
+          rolls and skill caps round their total.
+        </div>
       </section>
 
       <section>
@@ -281,27 +325,26 @@
       <section>
         <h2><app-icon class="ic yellow" name="money" [size]="18" /> Shop</h2>
         <p><strong>Boosters</strong></p>
-        <p>Each booster contains <strong>3 random plans</strong>. Duplicates are possible.</p>
+        <p>
+          Each booster costs <strong>1&nbsp;000</strong> and contains <strong>3 to 5 different plans</strong>, with
+          <strong>5 to 15 copies</strong> of each. The rarity of each plan is drawn with these odds:
+        </p>
         <table>
           <tr>
             <th>Rarity</th>
-            <th>Basic · 500</th>
-            <th>Premium · 1&nbsp;500</th>
+            <th>Odds</th>
           </tr>
           <tr>
             <td>Common</td>
-            <td>70%</td>
-            <td>0%</td>
+            <td>50%</td>
           </tr>
           <tr>
             <td>Rare</td>
-            <td>25%</td>
-            <td>70%</td>
+            <td>28%</td>
           </tr>
           <tr>
             <td>Epic</td>
-            <td>5%</td>
-            <td>30%</td>
+            <td>22%</td>
           </tr>
         </table>
 

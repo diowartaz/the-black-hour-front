@@ -599,6 +599,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/buildings/{buildingId}/upgrade": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Monte un plan d'un rang en consommant ses exemplaires (422 NOT_ENOUGH_COPIES, MAX_RANK_REACHED) */
+        post: operations["CollectionController_upgradeBuilding"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/leaderboards/best-day": {
         parameters: {
             query?: never;
@@ -739,6 +756,10 @@ export interface components {
             };
             /** @description Plans possédés : nombre d'exemplaires par id de bâtiment (voir GET /catalog) */
             collection: {
+                [key: string]: number;
+            };
+            /** @description Rang par id de bâtiment : un plan absent est au rang 1 */
+            buildingRanks: {
                 [key: string]: number;
             };
             /** @description Ids des plans du deck, joué à chaque partie */
@@ -954,6 +975,7 @@ export interface components {
         BuildingEffectResponse: {
             /** @enum {string} */
             kind: "nightlyGrowth" | "compoundGrowth" | "buildDayScaling" | "skillDefense" | "stockDefense" | "randomNightDefense" | "survivalTrophy" | "otherBuildDefense" | "surplusDefense" | "stockToDefense" | "digDefense" | "idleNightDefense" | "extraAttackRolls" | "extraDigItem" | "buildRefund" | "morningItems" | "digTimeReduction" | "buildTimeReduction" | "repeatBuildTimeReduction" | "earlierWakeUp" | "sleepRecovery" | "extraArchitectOffers" | "skillLevelCap" | "nightLearning";
+            /** @description Valeur par niveau, au rang du plan */
             value: number;
         };
         BuildingResponse: {
@@ -961,9 +983,11 @@ export interface components {
             name: string;
             /** @enum {string} */
             rarity: "base" | "common" | "rare" | "epic" | "legendary";
+            /** @description Rang du plan, figé à la création de la ville */
+            rank: number;
             level: number;
             maxLevel: number;
-            /** @description Défense apportée par niveau construit */
+            /** @description Défense apportée par niveau construit, au rang du plan */
             defense: number;
             defenseVariancePercent: number;
             /** @description Ressources consommées par niveau */
@@ -1008,9 +1032,11 @@ export interface components {
             name: string;
             /** @enum {string} */
             rarity: "base" | "common" | "rare" | "epic" | "legendary";
+            /** @description Rang du plan, figé à la création de la ville */
+            rank: number;
             level: number;
             maxLevel: number;
-            /** @description Défense apportée par niveau construit */
+            /** @description Défense apportée par niveau construit, au rang du plan */
             defense: number;
             defenseVariancePercent: number;
             /** @description Ressources consommées par niveau */
@@ -1184,6 +1210,8 @@ export interface components {
         };
         BoosterCardResponse: {
             buildingId: number;
+            /** @description Exemplaires gagnés */
+            copies: number;
             /** @description Plan absent de la collection avant l'ouverture */
             isNew: boolean;
         };
@@ -1260,10 +1288,21 @@ export interface components {
             id: number;
             name: string;
             price: number;
-            /** @description Nombre de plans tirés */
-            cards: number;
+            /** @description Nombre minimum de plans différents tirés */
+            minCards: number;
+            /** @description Nombre maximum de plans différents tirés */
+            maxCards: number;
+            /** @description Nombre minimum d'exemplaires de chaque plan */
+            minCopies: number;
+            /** @description Nombre maximum d'exemplaires de chaque plan */
+            maxCopies: number;
             /** @description Probabilité de chaque rareté pour chaque plan */
             odds: components["schemas"]["BoosterOddsResponse"];
+        };
+        UpgradeCopiesResponse: {
+            common: number[];
+            rare: number[];
+            epic: number[];
         };
         CatalogResponse: {
             items: ("wood" | "metal" | "stone" | "screw" | "patch")[];
@@ -1276,6 +1315,7 @@ export interface components {
             boosters: components["schemas"]["CatalogBoosterResponse"][];
             /** @description Collection et deck de départ de tout nouveau joueur */
             starterBuildingIds: number[];
+            upgradeCopies: components["schemas"]["UpgradeCopiesResponse"];
             /** @description Constantes d'équilibrage (durées en secondes de jeu) */
             rules: {
                 [key: string]: number;
@@ -2258,6 +2298,27 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BoosterOpeningResponse"];
+                };
+            };
+        };
+    };
+    CollectionController_upgradeBuilding: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                buildingId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayerResponse"];
                 };
             };
         };

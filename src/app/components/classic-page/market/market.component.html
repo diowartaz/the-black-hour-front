@@ -41,8 +41,8 @@
           [(item)]="itemFilter"
           [(kind)]="kindFilter"
           [count]="visiblePlans().length"
-          [extraFilters]="tab() === 'buy' && showUnavailable() ? 1 : 0"
-          (cleared)="showUnavailable.set(false)"
+          [extraFilters]="extraFilters()"
+          (cleared)="clearExtraFilters()"
         >
           <div class="options" filtersEnd>
             <span class="select-wrap">
@@ -65,6 +65,10 @@
               Show plans without offers
             </label>
           }
+          <label class="toggle">
+            <input type="checkbox" [checked]="deckOnly()" (change)="deckOnly.set($any($event.target).checked)" />
+            Only plans in my deck
+          </label>
         </app-plan-filters>
 
         @if (tab() === 'buy') {
@@ -74,7 +78,7 @@
                 <app-building-card
                   [building]="building"
                   [count]="owned(building.id)"
-                  [showCount]="true"
+                  [showNew]="true"
                   [inDeck]="inDeck(building.id)"
                   [compact]="true"
                 >
@@ -126,7 +130,7 @@
               [building]="building"
               [count]="owned(building.id)"
               [inDeck]="inDeck(building.id)"
-              [lowestPrice]="offerOf(building.id)?.price"
+              [lowestPrice]="lowestPriceOf(building.id)"
               [taxRate]="market.taxRate"
               (closed)="selectedId.set(null)"
             />
@@ -136,6 +140,7 @@
             <h2>My listings</h2>
             @for (listing of market.myListings; track listing.listingId) {
               <div class="row">
+                <app-building-emblem [id]="listing.buildingId" [size]="22" />
                 <span class="row-name">{{ buildingOf(listing.buildingId)?.name }}</span>
                 <span class="row-price"><app-icon name="money" [size]="14" />{{ listing.price | formatNumber }}</span>
                 <button
@@ -156,6 +161,7 @@
             <h2>Sales history</h2>
             @for (sale of market.sales; track $index) {
               <div class="row">
+                <app-building-emblem [id]="sale.buildingId" [size]="22" />
                 <span class="row-name">{{ buildingOf(sale.buildingId)?.name }}</span>
                 <span class="row-price"><app-icon name="money" [size]="14" />{{ sale.price | formatNumber }}</span>
                 <span class="row-date">{{ sale.soldAt | date: 'mediumDate' }}</span>

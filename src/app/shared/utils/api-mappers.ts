@@ -67,6 +67,7 @@ function toBuildingModel(building: ApiBuilding | ApiBuildingOffer): BuildingMode
     id: building.id,
     name: building.name,
     rarity: building.rarity,
+    rank: building.rank,
     defense: building.defense,
     defense_ratio_percentage: building.defenseVariancePercent,
     time: building.buildTime,
@@ -158,6 +159,7 @@ export function toStatsModel(player: ApiPlayer): StatsModel {
     bonuses: Object.fromEntries(Object.entries(player.bonusLevels).map(([id, lvl]) => [Number(id), lvl])),
     ranked_points: player.rankedPoints,
     collection: Object.fromEntries(Object.entries(player.collection).map(([id, count]) => [Number(id), count])),
+    building_ranks: Object.fromEntries(Object.entries(player.buildingRanks).map(([id, rank]) => [Number(id), rank])),
     deck: [...player.deck],
   };
 }
@@ -180,7 +182,7 @@ export function toBoosters(catalog: ApiCatalog): BoosterModel[] {
 }
 
 export function toBoosterCards(cards: ApiBoosterCard[]): BoosterCardModel[] {
-  return cards.map((card) => ({ building_id: card.buildingId, is_new: card.isNew }));
+  return cards.map((card) => ({ building_id: card.buildingId, copies: card.copies, is_new: card.isNew }));
 }
 
 export function toBonusReferences(catalog: ApiCatalog): Record<number, BonusWithoutLvl> {
@@ -227,6 +229,11 @@ export function toDefaultValues(catalog: ApiCatalog): DefaultValuesModel {
       carrion_surplus_step: rules['CARRION_SURPLUS_STEP'],
       carrion_max_steps: rules['CARRION_MAX_STEPS'],
       vault_max_defense_per_level: rules['VAULT_MAX_DEFENSE_PER_LEVEL'],
+    },
+    rank_rules: {
+      max_rank: rules['CARD_MAX_RANK'],
+      rank_bonus: rules['CARD_RANK_BONUS'],
+      upgrade_copies: catalog.upgradeCopies,
     },
   };
 }

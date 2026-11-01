@@ -50,31 +50,88 @@ describe('SellDialogComponent', () => {
     await fixture.whenStable();
   }
 
-  const cta = () => host.querySelector<HTMLButtonElement>('.mini-cta')!;
+  const cta = () => host.querySelector<HTMLButtonElement>('.cta')!;
+  const status = () => host.querySelector('.status')!;
 
   it('affiche la tuile complète du plan', async () => {
     await setup();
     const tile = host.querySelector('app-building-card');
     expect(tile?.textContent).toContain('Scrap Wall');
-    expect(tile?.textContent).toContain('common');
-    expect(tile?.textContent).toContain('×3');
+    expect(tile?.textContent).not.toContain('common');
+    expect(tile?.textContent).toContain('+2');
   });
 
-  it('indique l’offre la plus basse, ou son absence', async () => {
-    await setup(undefined, 300);
-    expect(host.querySelector('.lowest')?.textContent).toContain('300');
+  it('ne répète pas le nom du bâtiment dans le titre', async () => {
+    await setup();
+    expect(host.querySelector('h2')?.textContent?.trim()).toBe('Sell');
+  });
 
-    fixture.componentRef.setInput('lowestPrice', undefined);
+  it('n’affiche pas les copies nécessaires au rang suivant', async () => {
+    await setup();
+    expect(host.textContent).not.toContain('copies for Rank');
+  });
+
+  it('préremplit juste sous l’offre la plus basse', async () => {
+    await setup(undefined, 300);
+    expect(host.querySelector<HTMLInputElement>('.price')?.value).toBe('299');
+    expect(cta().textContent).toContain('List for 299');
+  });
+
+  it('propose les prix rapides et les applique', async () => {
+    await setup(undefined, 300);
+    const presets = [...host.querySelectorAll<HTMLButtonElement>('.preset')];
+    expect(presets.map((b) => b.querySelector('strong')?.textContent)).toEqual(['299', '285', '270']);
+    expect(presets[0].getAttribute('aria-pressed')).toBe('true');
+
+    presets[2].click();
     await fixture.whenStable();
-    expect(host.querySelector('.lowest')?.textContent).toContain('No other offer');
+    expect(host.querySelector<HTMLInputElement>('.price')?.value).toBe('270');
+    expect(presets[2].classList).toContain('active');
+    expect(presets[0].classList).not.toContain('active');
+  });
+
+  it('retire les prix rapides impossibles ou en double', async () => {
+    await setup(undefined, 2);
+    const prices = [...host.querySelectorAll('.preset strong')].map((el) => el.textContent);
+    expect(prices).toEqual(['1']);
+  });
+
+  it('ne préremplit rien sous une offre à 1 pièce', async () => {
+    await setup(undefined, 1);
+    expect(host.querySelector<HTMLInputElement>('.price')?.value).toBe('');
+    expect(host.querySelector('.preset')).toBeNull();
+  });
+
+  it('dit si les acheteurs verront l’offre', async () => {
+    await setup(undefined, 300);
+    expect(status().textContent).toContain('buyers will see yours');
+    expect(status().classList).toContain('visible');
+
+    // À prix égal, l'offre la plus ancienne reste devant
+    await typePrice('300');
+    expect(status().textContent).toContain('Hidden while 300');
+    expect(status().classList).toContain('hidden');
+
+    await typePrice('');
+    expect(status().textContent).toContain('Lowest offer: 300');
+    expect(status().classList).not.toContain('hidden');
+  });
+
+  it('sans offre concurrente, ne préremplit rien et n’affiche pas de prix rapides', async () => {
+    await setup();
+    expect(host.querySelector<HTMLInputElement>('.price')?.value).toBe('');
+    expect(host.querySelector('.preset')).toBeNull();
+    expect(status().textContent).toContain('No other offer');
   });
 
   it('calcule la taxe et n’accepte qu’un prix valide et payable', async () => {
     await setup();
     expect(cta().disabled).toBeTrue();
+    expect(cta().textContent).toContain('Enter a price');
 
     await typePrice('210');
-    expect(host.querySelector('.tax')?.textContent).toContain('11 coins');
+    expect(host.querySelector('.tax')?.textContent).toContain('11');
+    expect(host.querySelector('.net')?.textContent).toContain('199 coins');
     expect(cta().disabled).toBeFalse();
 
     await typePrice('10.5');

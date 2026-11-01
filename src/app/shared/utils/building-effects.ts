@@ -6,8 +6,12 @@ import {
   ItemModel,
 } from 'src/app/models/game';
 
-const percent = (value: number) => `${Math.round(value * 100)}%`;
+// Une décimale au plus : le rang d'un plan donne des valeurs comme 11.2%
+const percent = (value: number) => `${Math.round(value * 1000) / 10}%`;
 const minutes = (seconds: number) => `${Math.round(seconds / 60)} min`;
+const decimal = (value: number) => Math.round(value * 100) / 100;
+// Effet qui ne peut être qu'entier : le rang d'un plan s'applique au total, arrondi
+const roundedNote = (value: number) => (Number.isInteger(value) ? '' : ' The total is rounded.');
 
 // Description d'un effet de bâtiment spécial (règles dans the-black-hour-api, src/game/city/effects/handlers/).
 // `day` : jour de la ville en cours, pour afficher la valeur actuelle des effets qui en dépendent.
@@ -26,7 +30,7 @@ export function buildingEffectText(
     case 'buildDayScaling':
       return (
         `Each level built gives ${value} × the current day in defense.` +
-        (day ? ` Today: +${value * day} per level.` : '')
+        (day ? ` Today: +${decimal(value * day)} per level.` : '')
       );
     case 'skillDefense':
       return `Each skill level learned gives +${value} defense per level of this building.`;
@@ -37,12 +41,12 @@ export function buildingEffectText(
     case 'survivalTrophy':
       return (
         `Each night survived earns a trophy, then gives +${value} permanent defense per level for every ${rules.trophy_nights_per_point} trophies.` +
-        (day ? ` Tonight: +${value * Math.floor(day / rules.trophy_nights_per_point)} per level.` : '')
+        (day ? ` Tonight: +${decimal(value * Math.floor(day / rules.trophy_nights_per_point))} per level.` : '')
       );
     case 'otherBuildDefense':
       return `Each level you build on another building gives +${value} defense per level.`;
     case 'surplusDefense':
-      return `Each night survived: +${value} permanent defense per level for every ${rules.carrion_surplus_step} defense above the zombies, up to +${value * rules.carrion_max_steps} per level.`;
+      return `Each night survived: +${value} permanent defense per level for every ${rules.carrion_surplus_step} defense above the zombies, up to +${decimal(value * rules.carrion_max_steps)} per level.`;
     case 'stockToDefense':
       return `Each night survived: uses ${rules.larder_items_per_level} of your most plentiful resource per level, +${value} permanent defense for each.`;
     case 'digDefense':
@@ -50,7 +54,7 @@ export function buildingEffectText(
     case 'idleNightDefense':
       return `Tonight only: +${value} defense per level for each full hour left when you go to sleep.`;
     case 'extraAttackRolls':
-      return `The horde size is rolled ${value} more time per level; the smallest roll is kept.`;
+      return `The horde size is rolled ${value} more time per level; the smallest roll is kept.${roundedNote(value)}`;
     case 'extraDigItem':
       return `Each dig has a ${percent(value)} chance per level to bring back one more resource.`;
     case 'buildRefund':
@@ -68,9 +72,9 @@ export function buildingEffectText(
     case 'sleepRecovery':
       return `Going to sleep early gives back ${percent(value)} more of the remaining time per level, up to ${minutes(rules.dormitory_max_sleep_bonus_per_level)} more per level.`;
     case 'extraArchitectOffers':
-      return `The Blueprint Workshop shows ${value} more building per level to choose from.`;
+      return `The Blueprint Workshop shows ${value} more building per level to choose from.${roundedNote(value)}`;
     case 'skillLevelCap':
-      return `Every skill can be unlocked ${value} level higher per level.`;
+      return `Every skill can be unlocked ${value} level higher per level.${roundedNote(value)}`;
     case 'nightLearning':
       return `Each night survived: ${percent(value)} chance per level to learn an unlocked skill level for free.`;
   }

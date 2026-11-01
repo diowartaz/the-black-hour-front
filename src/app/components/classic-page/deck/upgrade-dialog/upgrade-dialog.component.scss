@@ -1,0 +1,203 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 4px;
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  backdrop-filter: blur(4px);
+}
+
+.sheet {
+  width: min(480px, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 16px max(16px, env(safe-area-inset-bottom));
+  border-radius: var(--radius-xl);
+  background: var(--surface-solid);
+  border: 1px solid var(--c);
+  box-shadow: 0 0 40px color-mix(in srgb, var(--c) 20%, transparent);
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.04em;
+  }
+}
+
+.sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.close {
+  width: 36px;
+  height: 36px;
+  margin: -8px -8px -8px 0;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-m);
+  background: none;
+  color: var(--text-dim);
+}
+
+.sheet-actions {
+  display: flex;
+  gap: 8px;
+  > * {
+    flex: 1;
+    height: 42px;
+    // .ghost-btn impose un min-height plus grand
+    min-height: 0;
+    margin: 0;
+  }
+}
+
+.tile {
+  position: relative;
+  app-building-card {
+    display: block;
+  }
+  &.fusing app-building-card {
+    animation: fuse 1s ease-out;
+  }
+}
+
+// Exemplaire consommé : part d'un côté de la carte et s'y fond
+.ghost {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 56px;
+  height: 76px;
+  margin: -38px 0 0 -28px;
+  border-radius: var(--radius-m);
+  border: 1px solid var(--c);
+  background: color-mix(in srgb, var(--c) 25%, var(--surface-2));
+  pointer-events: none;
+  opacity: 0;
+  animation: merge 0.7s ease-in calc(var(--i) * 50ms) forwards;
+}
+
+@keyframes merge {
+  0% {
+    opacity: 0.9;
+    transform: translateX(calc((var(--i) - 2) * 62px)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(0) scale(0.3);
+  }
+}
+
+@keyframes fuse {
+  0%,
+  45% {
+    filter: none;
+    transform: none;
+  }
+  70% {
+    filter: brightness(1.7) drop-shadow(0 0 14px var(--c));
+    transform: scale(1.03);
+  }
+  100% {
+    filter: none;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ghost {
+    display: none;
+  }
+  .tile.fusing app-building-card {
+    animation: none;
+  }
+}
+
+// Annonce pour les lecteurs d'écran : le passage de rang se voit dans la carte
+.sr-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.compare {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  .arrow {
+    color: var(--text-mute);
+  }
+}
+
+.side {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  border-radius: var(--radius-m);
+  border: 1px solid var(--line-strong);
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--text-dim);
+  &.next {
+    border-color: var(--c);
+    color: var(--text);
+  }
+  p {
+    margin: 0;
+  }
+}
+
+.side-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.def {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 16px;
+  color: var(--yellow);
+}
+
+.usage {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-dim);
+  strong {
+    color: var(--text);
+  }
+}
+
+.note {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-mute);
+}

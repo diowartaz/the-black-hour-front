@@ -1,0 +1,92 @@
+<div class="backdrop" (click)="closed.emit()">
+  <div
+    class="sheet"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="'Upgrade ' + building().name"
+    [style.--c]="building().rarity | rarityToColor"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="sheet-head">
+      <h2><app-icon name="trend" [size]="18" />Upgrade</h2>
+      <button type="button" class="close" aria-label="Close" (click)="closed.emit()">
+        <app-icon name="close" [size]="20" />
+      </button>
+    </div>
+
+    <section>
+      <div class="tile" [class.fusing]="animating()">
+        <app-building-card
+          [building]="building()"
+          [count]="owned()"
+          [rank]="rank()"
+          [showRank]="true"
+          [inDeck]="inDeck()"
+        />
+        @for (ghost of ghosts(); track ghost) {
+          <span class="ghost" [style.--i]="ghost" aria-hidden="true"></span>
+        }
+      </div>
+
+      <p class="sr-status" role="status">
+        @if (animating()) {
+          Rank {{ rank() }} reached
+        }
+      </p>
+
+      @if (copies(); as copies) {
+        <div class="compare">
+          <div class="side">
+            <span class="side-title">Rank {{ rank() }}</span>
+            @if (!building().effect) {
+              <span class="def"><app-icon name="shield" [size]="13" />{{ defenseAt(rank()) | formatNumber }}</span>
+            } @else {
+              <p>{{ effectAt(rank()) }}</p>
+            }
+          </div>
+          <app-icon class="arrow" name="chevron-right" [size]="18" />
+          <div class="side next">
+            <span class="side-title">Rank {{ nextRank() }}</span>
+            @if (!building().effect) {
+              <span class="def"><app-icon name="shield" [size]="13" />{{ defenseAt(nextRank()) | formatNumber }}</span>
+            } @else {
+              <p>{{ effectAt(nextRank()) }}</p>
+            }
+          </div>
+        </div>
+
+        @if (ready()) {
+          <p class="usage">
+            Uses <strong>{{ copies }} cop{{ copies === 1 ? 'y' : 'ies' }}</strong> for good. You keep your card and
+            {{ spare() - copies }} spare cop{{ spare() - copies === 1 ? 'y' : 'ies' }}.
+          </p>
+        } @else {
+          <p class="usage">
+            <strong>{{ spare() }}/{{ copies }} copies.</strong> Find the others in boosters or on the Black Market.
+          </p>
+        }
+      } @else {
+        <p class="usage"><strong>Max rank.</strong> This plan cannot be upgraded any further.</p>
+      }
+      <p class="note">An upgrade applies from your next city. Sold copies never carry a rank.</p>
+    </section>
+
+    <div class="sheet-actions">
+      @if (spare() > 0) {
+        <button type="button" class="ghost-btn" style="--c: var(--yellow)" (click)="sell.emit()">
+          <app-icon name="tag" [size]="16" />Sell a copy
+        </button>
+      }
+      @if (copies() !== null) {
+        <button
+          type="button"
+          class="mini-cta"
+          [disabled]="!ready() || animating() || cityService.upgradeLoading()"
+          (click)="upgrade()"
+        >
+          <app-icon name="trend" [size]="16" />Upgrade
+        </button>
+      }
+    </div>
+  </div>
+</div>

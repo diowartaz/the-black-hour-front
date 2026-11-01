@@ -7,40 +7,88 @@
     (click)="$event.stopPropagation()"
   >
     <div class="sheet-head">
-      <h2>Sell {{ building().name }}</h2>
+      <h2><app-icon name="tag" [size]="18" />Sell</h2>
       <button type="button" class="close" aria-label="Close" (click)="closed.emit()">
         <app-icon name="close" [size]="20" />
       </button>
     </div>
 
-    <section>
-      <div class="tile">
-        <app-building-card [building]="building()" [count]="count()" [inDeck]="inDeck()" />
-      </div>
-      <p class="lowest">
-        @if (lowestPrice(); as lowest) {
-          Lowest offer: <strong>{{ lowest | formatNumber }}</strong> coins
-        } @else {
-          No other offer for this plan
-        }
-      </p>
-      <input
-        type="number"
-        class="price"
-        min="1"
-        step="1"
-        placeholder="Your price"
-        aria-label="Your price in coins"
-        [value]="price()"
-        (input)="setPrice($any($event.target).value)"
-      />
-      <span class="tax">Tax: {{ tax() | formatNumber }} coins, not refunded</span>
-    </section>
-
-    <div class="sheet-actions">
-      <button type="button" class="mini-cta" [disabled]="!canList()" (click)="list()">
-        <app-icon name="check" [size]="16" />List for sale
-      </button>
+    <div class="tile">
+      <app-building-card [building]="building()" [count]="count()" [inDeck]="inDeck()" />
     </div>
+
+    <div class="field">
+      <label class="label" for="sell-price">Your price</label>
+      <div class="price-box">
+        <app-icon name="money" [size]="24" />
+        <input
+          id="sell-price"
+          type="text"
+          inputmode="numeric"
+          class="price"
+          placeholder="Price"
+          autocomplete="off"
+          [value]="price()"
+          (input)="setPrice($any($event.target).value)"
+        />
+      </div>
+    </div>
+
+    @if (presets().length) {
+      <div class="presets">
+        @for (preset of presets(); track preset.label) {
+          <button
+            type="button"
+            class="preset"
+            [class.active]="preset.price === price()"
+            [attr.aria-pressed]="preset.price === price()"
+            (click)="price.set(preset.price)"
+          >
+            <strong>{{ preset.price | formatNumber }}</strong>
+            <span>{{ preset.label }}</span>
+          </button>
+        }
+      </div>
+    }
+
+    <p class="status" [class.visible]="validPrice() && visible()" [class.hidden]="validPrice() && !visible()">
+      <app-icon [name]="visible() ? 'check' : 'clock'" [size]="16" />
+      <span>
+        @if (lowestPrice(); as lowest) {
+          @if (!validPrice()) {
+            Lowest offer: {{ lowest | formatNumber }} coins
+          } @else if (visible()) {
+            Cheapest offer: buyers will see yours
+          } @else {
+            Hidden while {{ lowest | formatNumber }} is cheaper or older
+          }
+        } @else {
+          No other offer: buyers will see yours
+        }
+      </span>
+    </p>
+
+    <dl class="receipt">
+      <div class="tax">
+        <dt>Tax, paid now</dt>
+        <dd>−{{ tax() | formatNumber }}</dd>
+      </div>
+      <div>
+        <dt>Paid when sold</dt>
+        <dd>+{{ (validPrice() ? price()! : 0) | formatNumber }}</dd>
+      </div>
+      <div class="net">
+        <dt>You keep</dt>
+        <dd>{{ net() | formatNumber }} coins</dd>
+      </div>
+    </dl>
+
+    <button type="button" class="cta cta-gold" [disabled]="!canList()" (click)="list()">
+      @if (validPrice()) {
+        List for {{ price()! | formatNumber }}
+      } @else {
+        Enter a price
+      }
+    </button>
   </div>
 </div>

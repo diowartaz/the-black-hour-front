@@ -112,6 +112,7 @@
               [attr.aria-pressed]="item() === option"
               (click)="toggle(item, option)"
             >
+              <app-resource-gem [item]="option" [size]="10" aria-hidden="true" />
               {{ option }}
             </button>
           }

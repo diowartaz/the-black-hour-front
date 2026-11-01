@@ -1,10 +1,14 @@
 import { KeyValuePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { CatalogBuildingModel } from 'src/app/models/game';
+import { CityService } from 'src/app/services/city/city.service';
 import { RarityToColorPipe } from '../../pipes/rarity-to-color.pipe';
+import { rankedDefense, rankedEffect } from '../../utils/ranks';
 import { formatTimeToString } from '../../utils/time';
+import { BuildingEmblemComponent } from '../building-emblem/building-emblem.component';
 import { EffectTooltipComponent } from '../effect-tooltip/effect-tooltip.component';
 import { IconComponent } from '../icon/icon.component';
+import { RankPipsComponent } from '../rank-pips/rank-pips.component';
 import { ResourceGemComponent } from '../resource-gem/resource-gem.component';
 import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
 
@@ -15,7 +19,9 @@ import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
     FormatNumberPipe,
     KeyValuePipe,
     IconComponent,
+    BuildingEmblemComponent,
     EffectTooltipComponent,
+    RankPipsComponent,
     ResourceGemComponent,
     RarityToColorPipe,
   ],
@@ -24,15 +30,27 @@ import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BuildingCardComponent {
+  private readonly cityService = inject(CityService);
+
   building = input.required<CatalogBuildingModel>();
-  // Exemplaires possédés : 0 = plan pas encore obtenu
+  // Rang du plan : défense et effet s'affichent à sa valeur. Sans ce champ, la carte montre un exemplaire de base
+  rank = input(0);
+  // Affiche les pastilles de rang même au rang 1 (collection)
+  showRank = input(false);
+  // Exemplaires possédés : 0 = plan pas encore obtenu. Le badge montre les doublons, seuls utilisables
   count = input(1);
-  // Affiche toujours le nombre d'exemplaires, même 0 ou 1, sans griser la carte (Black Market)
-  showCount = input(false);
+  // Signale un plan non possédé comme nouveau au lieu de griser la carte (Black Market)
+  showNew = input(false);
   inDeck = input(false);
-  // Version resserrée (éditeur de deck) : nom plus petit, rareté indiquée par la seule bordure
+  // Version resserrée (éditeur de deck) : nom plus petit
   compact = input(false);
 
-  locked = computed(() => this.count() === 0 && !this.showCount());
+  locked = computed(() => this.count() === 0 && !this.showNew());
   time = computed(() => formatTimeToString(this.building().time));
+  rankRules = computed(() => this.cityService.defaultValues().rank_rules);
+  defense = computed(() => rankedDefense(this.building().defense, this.rank(), this.rankRules()));
+  effect = computed(() => {
+    const effect = this.building().effect;
+    return effect && rankedEffect(effect, this.rank(), this.rankRules());
+  });
 }

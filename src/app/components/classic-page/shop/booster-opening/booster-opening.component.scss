@@ -5,7 +5,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  padding: 4px 16px;
   background: color-mix(in srgb, var(--bg) 85%, transparent);
   backdrop-filter: blur(4px);
 }
@@ -31,6 +31,13 @@
   gap: 10px;
 }
 
+// En grille : la carte s'étire à la hauteur de la rangée, face visible ou non
+.revealed,
+.hidden-slot {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .revealed {
   position: relative;
   text-align: left;
@@ -42,10 +49,26 @@
     z-index: 1;
     background: var(--surface-solid);
   }
+  .copies {
+    position: absolute;
+    top: -10px;
+    left: 8px;
+    z-index: 1;
+    background: var(--surface-solid);
+  }
+}
+
+// Dos de carte posé sur la vraie carte, invisible : il en prend la hauteur exacte
+.hidden-slot > * {
+  grid-area: 1 / 1;
+}
+
+.size-ref {
+  visibility: hidden;
 }
 
 .hidden-card {
-  min-height: 150px;
+  min-height: 80px;
   border-radius: var(--radius-l);
   border: 1px dashed color-mix(in srgb, var(--yellow) 60%, transparent);
   background: repeating-linear-gradient(

@@ -201,6 +201,10 @@ export class GameApiService {
       .pipe(map((response) => ({ stats: toStatsModel(response.player), cards: toBoosterCards(response.cards) })));
   }
 
+  upgradeBuilding(id: number): Observable<StatsModel> {
+    return this.httpClient.post<ApiPlayer>(this.API_URL + `me/buildings/${id}/upgrade`, {}).pipe(map(toStatsModel));
+  }
+
   getMarket(): Observable<MarketModel> {
     return this.httpClient.get<Schemas['MarketResponse']>(this.API_URL + 'market');
   }

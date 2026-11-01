@@ -5,53 +5,156 @@
   display: block;
 }
 
-.booster {
+// Paquet mis en avant : prend toute la hauteur, le bouton d'ouverture reste en bas
+.pack-panel {
+  flex: 1 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 14px;
-  border-radius: var(--radius-xl);
-  background: var(--surface-2);
-  border: 1px solid color-mix(in srgb, var(--yellow) 40%, transparent);
-  box-shadow: 0 0 22px color-mix(in srgb, var(--yellow) 12%, transparent);
-  .booster-head {
-    display: flex;
-    gap: 12px;
-    color: var(--yellow);
-    > div {
-      min-width: 0;
-    }
-    h3 {
-      font-weight: 700;
-      font-size: 19px;
-      color: var(--text);
-    }
-    p {
-      font-size: 15px;
-      color: var(--text-dim);
-    }
-  }
-  .odds {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
+  gap: 8px;
+}
+
+.hero {
+  position: relative;
+  flex: none;
+  // Le paquet rétrécit sur les écrans courts pour garder les probabilités au-dessus du bouton
+  height: clamp(150px, calc(100dvh - 390px), 216px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .halo {
+    position: absolute;
+    width: 210px;
+    height: 210px;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--yellow) 30%, transparent), transparent 68%);
   }
 }
 
-.collection-summary {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 14px;
-  font-size: 15px;
+.pack {
+  position: absolute;
+  height: min(172px, calc(100% - 12px));
+  aspect-ratio: 122 / 172;
+  border-radius: var(--radius-l);
+  background: var(--surface-solid);
+  border: 2px solid var(--c, var(--yellow));
+  &.back-left {
+    --c: var(--violet-light);
+    opacity: 0.75;
+    transform: rotate(-11deg) translateX(-24px) scale(0.92);
+  }
+  &.back-right {
+    --c: var(--cyan);
+    opacity: 0.75;
+    transform: rotate(11deg) translateX(24px) scale(0.92);
+  }
+  &.front {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 0 4px;
+    text-align: center;
+    color: var(--yellow);
+    background: linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--violet) 35%, var(--surface-solid)),
+      var(--surface-solid) 70%
+    );
+    box-shadow: 0 0 26px color-mix(in srgb, var(--yellow) 50%, transparent);
+    h3 {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+    span {
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+  }
+}
+
+.rule {
+  text-align: center;
+  font-size: 16px;
   color: var(--text-dim);
-  small {
-    color: var(--text-mute);
+}
+
+.odds-bar {
+  flex: none;
+  display: flex;
+  gap: 2px;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  i {
+    background: var(--c);
   }
-  .text-btn {
-    margin-left: auto;
+}
+
+.odds-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0 8px;
+  font-size: 14px;
+  span {
+    color: var(--c);
+    text-transform: capitalize;
   }
+}
+
+// Reste collé en bas de l'écran quand la hauteur manque
+.pack-foot {
+  position: sticky;
+  bottom: 0;
+  margin-top: auto;
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pack-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  button {
+    min-width: 0;
+    height: 44px;
+    padding: 0 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border-radius: var(--radius-m);
+    border: 1px solid var(--line-strong);
+    background: var(--surface-solid);
+    color: var(--text-dim);
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 15px;
+    white-space: nowrap;
+    cursor: pointer;
+    b {
+      color: var(--text);
+      font-weight: 700;
+    }
+  }
+}
+
+.open-btn {
+  width: 100%;
+  height: 54px;
+  justify-content: center;
+  gap: 8px;
+  font-size: 16px;
 }
 
 .cards {
@@ -128,9 +231,6 @@
   }
 }
 
-.bonus,
-.booster {
-  .maxed {
-    align-self: flex-start;
-  }
+.bonus .maxed {
+  align-self: flex-start;
 }

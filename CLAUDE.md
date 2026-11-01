@@ -29,6 +29,7 @@ npm run api:types  # régénère src/app/models/api.ts depuis ../the-black-hour-
 - Application **zoneless** et composants en OnPush (défaut d'Angular 22) : tout état modifié de façon asynchrone (callback HTTP, `setTimeout`) doit être un `signal`. Ne jamais muter un objet contenu dans un signal (utiliser `set`/`update`).
 - Écrans chargés à la demande (`loadComponent`) ; templates en control flow `@if`/`@for` ; pas de `CommonModule`, importer `NgClass`/`NgStyle`/`KeyValuePipe` au besoin.
 - Sélecteurs de composants préfixés `app-` ; `any` autorisé par ESLint.
+- Rangs de cartes : `shared/utils/ranks.ts` reprend les calculs de l'API. `app-building-card` montre un exemplaire de base sans son input `rank` (Black Market). En partie, `BuildingModel.rank`, sa défense et son effet viennent du serveur, déjà à la valeur du rang : ne pas réappliquer le rang.
 - L'URL de l'API vient de `src/environments/environment*.ts`.
 - Gestionnaire de paquets : npm uniquement (`package-lock.json`).
 - Git : pas de branches pour le moment, tout se fait directement sur `rework` (branche principale).
