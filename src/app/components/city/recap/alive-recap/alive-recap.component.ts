@@ -1,14 +1,23 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { EffectReportModel } from 'src/app/models/game';
 import { CityService } from 'src/app/services/city/city.service';
-import { RecapHeaderComponent } from '../recap-header/recap-header.component';
+import { effectReportText } from 'src/app/shared/utils/building-effects';
+import { NightEvent, NightLogComponent } from '../night-log/night-log.component';
+import { RecapRadarComponent } from '../recap-radar/recap-radar.component';
 import { BuildingRecapComponent } from './building-recap/building-recap.component';
-import { SkillRecapComponent, SkillDiscovery } from './skill-recap/skill-recap.component';
 import { IconComponent } from 'src/app/shared/components/icon/icon.component';
-import { EffectReportsComponent } from 'src/app/shared/components/effect-reports/effect-reports.component';
+
+// Couleur du signal d'un effet : défense, puis compétences, puis objets
+function effectColor(report: EffectReportModel): string {
+  if (report.defense > 0) return 'var(--cyan)';
+  if (report.skillLevels.length > 0) return 'var(--green)';
+  if (Object.values(report.itemsGained).some((n) => (n ?? 0) > 0)) return 'var(--yellow)';
+  return 'var(--violet-light)';
+}
 
 @Component({
   selector: 'app-alive-recap',
-  imports: [RecapHeaderComponent, BuildingRecapComponent, SkillRecapComponent, IconComponent, EffectReportsComponent],
+  imports: [RecapRadarComponent, NightLogComponent, BuildingRecapComponent, IconComponent],
   templateUrl: './alive-recap.component.html',
   styleUrls: ['./alive-recap.component.scss'],
 })
@@ -21,25 +30,29 @@ export class AliveRecapComponent {
   architectBuildings = computed(() => this.cityService.city().attackRecap.architect_shelter_buildings);
   nbChoicesAvailable = computed(() => this.architectBuildings().length);
   nbMaxChoices = computed(() => this.cityService.city().attackRecap.building_picks);
-  // Ce que les bâtiments spéciaux ont fait pendant la nuit
-  overnightEffects = computed(() => this.cityService.city().attackRecap.effects);
 
-  libraryDiscoveries = computed<SkillDiscovery[]>(() => {
+  // Effets des bâtiments spéciaux puis découvertes de compétences, dans l'ordre du journal
+  nightEvents = computed<NightEvent[]>(() => {
     const city = this.cityService.city();
-    const discoveries: SkillDiscovery[] = [];
+    const effects = city.attackRecap.effects.map((report) => ({
+      name: report.name,
+      text: effectReportText(report),
+      color: effectColor(report),
+    }));
+    const discoveries: NightEvent[] = [];
     for (const [skillId, nbNewLevels] of Object.entries(city.attackRecap.library_discoveries)) {
       const skill = city.skills.find((s) => String(s.id) === skillId);
       if (skill) {
         discoveries.push({
           name: skill.name,
-          lvl: skill.lvl,
-          old_lvl_max: skill.lvl_max - nbNewLevels,
-          lvl_max: skill.lvl_max,
+          text: `Max level ${skill.lvl_max - nbNewLevels} → ${skill.lvl_max}`,
+          color: 'var(--green)',
         });
       }
     }
-    return discoveries;
+    return [...effects, ...discoveries];
   });
+  blipColors = computed(() => this.nightEvents().map((event) => event.color));
 
   startDay() {
     this.cityService.startDay([...this.selectedBuildings()].sort((a, b) => a - b));

@@ -468,28 +468,6 @@ input[type='checkbox'] {
   }
 }
 
-// === Badges de pourcentage de défense ===
-
-.percentdef {
-  display: inline-block;
-  min-width: 42px;
-  padding: 1px 6px;
-  border-radius: var(--radius-xs);
-  font-size: 12px;
-  font-weight: 700;
-  text-align: center;
-}
-.percentdef-green {
-  color: var(--green);
-  background: color-mix(in srgb, var(--green) 12%, transparent);
-  border: 1px solid var(--green);
-}
-.percentdef-red {
-  color: var(--danger);
-  background: color-mix(in srgb, var(--danger) 12%, transparent);
-  border: 1px solid var(--danger);
-}
-
 // === Mise en page des écrans de jeu ===
 
 .play-header {

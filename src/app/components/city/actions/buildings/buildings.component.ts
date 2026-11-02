@@ -5,7 +5,6 @@ import { AdvancedBuildingModel, ItemModel } from 'src/app/models/game';
 import { BuildingEmblemComponent } from 'src/app/shared/components/building-emblem/building-emblem.component';
 import { EffectTooltipComponent } from 'src/app/shared/components/effect-tooltip/effect-tooltip.component';
 import { IconComponent } from 'src/app/shared/components/icon/icon.component';
-import { RankPipsComponent } from 'src/app/shared/components/rank-pips/rank-pips.component';
 import { ResourceGemComponent } from 'src/app/shared/components/resource-gem/resource-gem.component';
 import { RarityToColorPipe } from 'src/app/shared/pipes/rarity-to-color.pipe';
 import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
@@ -18,7 +17,6 @@ import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
     IconComponent,
     BuildingEmblemComponent,
     EffectTooltipComponent,
-    RankPipsComponent,
     ResourceGemComponent,
     RarityToColorPipe,
   ],
@@ -53,7 +51,7 @@ export class BuildingsComponent {
     if (!building.enoughRessources) {
       this.openSnackBar('Not enough ressources');
       return;
-    } else if ((this.cityService.cityTimeSeconds() || 0) > building.expirationCityTime) {
+    } else if (this.isLate(building)) {
       this.openSnackBar('Not enough time');
       return;
     } else if (!building.enoughLvlMax) {
@@ -62,6 +60,11 @@ export class BuildingsComponent {
     }
 
     this.cityService.build(building.id);
+  }
+
+  // La construction finirait après la tombée de la nuit
+  isLate(building: AdvancedBuildingModel): boolean {
+    return (this.cityService.cityTimeSeconds() || 0) > building.expirationCityTime;
   }
 
   castKey(key: string): ItemModel {

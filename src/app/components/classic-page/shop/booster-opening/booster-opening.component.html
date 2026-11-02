@@ -1,26 +1,42 @@
 <div class="backdrop" role="dialog" aria-modal="true" [attr.aria-label]="boosterName() + ' booster'">
-  <div class="panel">
+  <div #panel class="panel">
     <h2 class="neon-title" style="--glow: var(--yellow)">{{ boosterName() }} booster</h2>
     <div class="cards">
       @for (card of shownCards(); track $index) {
-        @if ($index < revealed() && card.building) {
-          <div class="revealed">
-            @if (card.is_new) {
-              <span class="neon-chip badge" style="--c: var(--green)">New</span>
-            }
-            <span class="neon-chip copies" style="--c: var(--yellow)">×{{ card.copies }}</span>
-            <app-building-card [building]="card.building" [count]="card.count" />
-          </div>
-        } @else {
-          <div class="hidden-slot">
-            @if (card.building) {
-              <app-building-card class="size-ref" [building]="card.building" [count]="card.count" />
-            }
-            <button type="button" class="hidden-card" aria-label="Reveal the next plan" (click)="reveal($index)">
-              <app-icon name="sparkle" [size]="32" />
-            </button>
-          </div>
-        }
+        @let isRevealed = $index < revealed() && !!card.building;
+        <div
+          class="slot"
+          [class.revealed]="isRevealed"
+          [style.--rarity]="card.rarity | rarityToColor"
+          [style.--delay]="(delays()[$index] ?? 0) + 'ms'"
+        >
+          @if (card.building) {
+            <div class="front">
+              @if (card.is_new) {
+                <span class="neon-chip badge" style="--c: var(--green)">New</span>
+              }
+              <span class="neon-chip copies" style="--c: var(--yellow)" [style.--copies]="card.copies"></span>
+              <app-building-card [building]="card.building" [count]="card.count" />
+            </div>
+          }
+          <button
+            type="button"
+            class="hidden-card"
+            aria-label="Reveal the next plan"
+            [attr.inert]="isRevealed ? '' : null"
+            (click)="reveal($index)"
+          >
+            <app-icon name="sparkle" [size]="32" />
+          </button>
+          @if (isRevealed) {
+            <span class="impact" aria-hidden="true">
+              <span class="wave"></span>
+              @for (grain of card.impact.dust; track $index) {
+                <i class="dust" [style]="grain"></i>
+              }
+            </span>
+          }
+        </div>
       }
     </div>
     <div class="actions">

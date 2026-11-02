@@ -77,7 +77,22 @@ describe('UpgradeDialogComponent', () => {
     expect(upgradeBuilding).toHaveBeenCalledOnceWith(1);
     expect(fixture.componentInstance.rank()).toBe(1);
     expect(fixture.componentInstance.animating()).toBeTrue();
-    expect(host.querySelectorAll('.ghost').length).toBe(5);
+  });
+
+  it("balaie la carte d'avant pour révéler la carte améliorée", async () => {
+    await setup(7, 0);
+    upgradeBuilding.and.returnValue(
+      of({ ...createDefaultStatsModel(), collection: { 1: 2 }, building_ranks: { 1: 1 } }),
+    );
+    button('Upgrade')!.click();
+    await fixture.whenStable();
+    const cards = host.querySelectorAll('.tile app-building-card');
+    expect(cards.length).toBe(2);
+    expect(cards[0].querySelector('.count')?.textContent).toBe('+1');
+    expect(cards[0].querySelectorAll('.pip.on').length).toBe(1);
+    expect(host.querySelector('.scan .before .count')?.textContent).toBe('+6');
+    expect(host.querySelectorAll('.scan .before .pip.on').length).toBe(0);
+    expect(host.querySelector('.scan .beam')).not.toBeNull();
   });
 
   it("propose de vendre tant qu'il reste un doublon", async () => {

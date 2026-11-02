@@ -1,20 +1,17 @@
 <div class="recap">
   <div class="scroll">
-    <app-recap-header></app-recap-header>
+    <app-recap-radar
+      [defense]="cityService.city().attackRecap.defense"
+      [zombies]="cityService.city().attackRecap.nb_zb"
+      [night]="cityService.city().day - 1"
+      [blips]="blipColors()"
+    />
 
-    @if (overnightEffects().length > 0) {
-      <section class="neon-card">
-        <h2 class="label">Overnight</h2>
-        <app-effect-reports [reports]="overnightEffects()" />
-      </section>
-    }
+    <app-night-log [events]="nightEvents()" />
 
     @if (nbMaxChoices() > 0) {
       <section class="neon-card">
-        <h2 class="label">
-          Pick {{ nbMaxChoices() }} building{{ nbMaxChoices() > 1 ? 's' : '' }} from the {{ nbChoicesAvailable() }}
-          available
-        </h2>
+        <h2 class="label">Architect's shelter · pick {{ nbMaxChoices() }} of {{ nbChoicesAvailable() }}</h2>
         @for (building of architectBuildings(); track $index) {
           <label class="pick" [class.selected]="selectedBuildings().has($index)">
             <input
@@ -27,28 +24,11 @@
         }
       </section>
     }
-
-    @if (libraryDiscoveries().length > 0) {
-      <section class="neon-card">
-        <h2 class="label">
-          {{ libraryDiscoveries().length }} skill {{ libraryDiscoveries().length > 1 ? 'discoveries' : 'discovery' }}
-        </h2>
-        @for (skill of libraryDiscoveries(); track skill.name) {
-          <app-skill-recap [skill]="skill"></app-skill-recap>
-        }
-      </section>
-    }
-
-    <div class="result">
-      <app-icon name="shield-check" [size]="40" />
-      <span class="result-title">You survived!</span>
-      <span class="result-sub">Your walls held. Day {{ cityService.city().day }} begins.</span>
-    </div>
   </div>
 
   <div class="footer">
     <button type="button" class="cta" (click)="startDay()">
-      <app-icon name="clock" [size]="22" />Wait for the attack to pass
+      <app-icon name="play" [size]="22" />Start day {{ cityService.city().day }}
     </button>
   </div>
 </div>

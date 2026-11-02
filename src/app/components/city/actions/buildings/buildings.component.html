@@ -40,67 +40,66 @@
 
   <div class="cards">
     @for (building of cityService.advancedBuildings(); track building.id) {
-      <article class="building" [style.--c]="building.rarity | rarityToColor">
-        <span class="tier" [title]="building.rarity"></span>
-        <div class="body">
-          <div class="row">
-            <app-building-emblem [id]="building.id" [size]="26" />
-            <span class="name">{{ building.name }}</span>
-            @if (building.rank > 0) {
-              <app-rank-pips [rank]="building.rank" [max]="cityService.defaultValues().rank_rules.max_rank" />
+      @let done = building.lvl === building.lvl_max;
+      @let inPile = done && deck.recycling && building.rarity !== 'base';
+      @let late = isLate(building);
+      <article class="building" [class.done]="done" [style.--c]="building.rarity | rarityToColor">
+        <div class="strip">
+          <app-building-emblem [id]="building.id" [size]="26" />
+          <span class="name">{{ building.name }}</span>
+          <span class="lv"
+            >LV {{ building.lvl }}
+            @if (!done) {
+              → {{ building.lvl + 1 }}
             }
+          </span>
+        </div>
+        <div class="body">
+          <div class="gain">
             @if (building.effect; as effect) {
-              <app-effect-tooltip [effect]="effect" [day]="cityService.city().day" />
+              <app-effect-tooltip [effect]="effect" [day]="cityService.city().day" variant="stat" />
             } @else {
-              <span class="def"><app-icon name="shield" [size]="13" />{{ building.defense | formatNumber }}</span>
-              <span
-                class="percentdef"
-                [class.percentdef-green]="building.defense_ratio_percentage >= 0"
-                [class.percentdef-red]="building.defense_ratio_percentage < 0"
-                >{{ building.defense_ratio_percentage >= 0 ? '+' : '' }}{{ building.defense_ratio_percentage }}%</span
-              >
+              <b>{{ building.defense ? '+' + (building.defense | formatNumber) : '—' }}</b>
+              <small>defense</small>
             }
           </div>
-          @if (building.lvl !== building.lvl_max) {
-            <div class="row costs">
+          @if (done) {
+            <p class="done-msg">Completed.<br />{{ inPile ? 'Back in the draw pile.' : 'Every level is built.' }}</p>
+          } @else {
+            <div class="checklist">
               @for (item of building.inventory | keyvalue; track item.key) {
                 @if (item.value > 0) {
-                  <span class="cost" [class.ok]="cityService.city().inventory[castKey(item.key)] >= item.value">
+                  @let owned = cityService.city().inventory[castKey(item.key)];
+                  <span class="ck" [class.missing]="owned < item.value">
                     <app-resource-gem [item]="item.key" [size]="10" />
-                    <span class="cost-name">{{ item.key }}</span>
-                    <span class="cost-qty">{{ cityService.city().inventory[castKey(item.key)] }}/{{ item.value }}</span>
+                    <span class="ck-name">{{ item.key }}</span>
+                    <span class="ck-qty">{{ owned }}/{{ item.value }}</span>
                   </span>
                 }
               }
             </div>
           }
-          <div class="row meta">
-            <span><app-icon name="clock" [size]="13" />{{ building.timeString }}</span>
-            <span><app-icon name="trend" [size]="13" />{{ building.lvl }}/{{ building.lvl_max }}</span>
-          </div>
         </div>
-        @if (building.lvl !== building.lvl_max) {
-          <button
-            type="button"
-            class="build-btn"
-            (click)="build(building)"
-            [disabled]="cityService.buildLoading()"
-            [class.ready]="
-              building.enoughRessources &&
-              (cityService.cityTimeSeconds() || 0) < building.expirationCityTime &&
-              building.enoughLvlMax
-            "
-          >
-            <app-icon name="build" [size]="18" />
-            Build
-          </button>
-        } @else if (deck.recycling && building.rarity !== 'base') {
-          <span class="neon-chip max" style="--c: var(--cyan)" title="Back in the draw pile"
-            ><app-icon name="recycle" [size]="12" />Pile</span
-          >
-        } @else {
-          <span class="neon-chip max" style="--c: var(--green)">Max</span>
-        }
+        <div class="foot">
+          @if (!done) {
+            <span class="time"><app-icon name="clock" [size]="13" />{{ building.timeString }}</span>
+            <button
+              type="button"
+              class="build-btn"
+              (click)="build(building)"
+              [disabled]="cityService.buildLoading()"
+              [class.late]="late"
+              [class.ready]="building.enoughRessources && !late && building.enoughLvlMax"
+            >
+              <app-icon [name]="late ? 'moon' : 'build'" [size]="14" />
+              {{ late ? 'Too late' : 'Build' }}
+            </button>
+          } @else if (inPile) {
+            <span class="neon-chip state" style="--c: var(--cyan)"><app-icon name="recycle" [size]="12" />In pile</span>
+          } @else {
+            <span class="neon-chip state" style="--c: var(--green)"><app-icon name="check" [size]="12" />Max</span>
+          }
+        </div>
       </article>
     }
   </div>

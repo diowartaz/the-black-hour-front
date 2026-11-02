@@ -25,16 +25,6 @@ $grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width=
   }
 }
 
-@keyframes pulseAlarm {
-  0%,
-  100% {
-    opacity: 0.55;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
 // =====================================================================
 // 1. QUARANTAINE — zone contaminée : kaki, vert toxique, jaune danger
 // =====================================================================
@@ -304,16 +294,10 @@ $grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width=
   .icon-tile {
     box-shadow: 0 0 8px color-mix(in srgb, var(--c, var(--cyan)) 45%, transparent);
   }
-  .percentdef-red {
-    animation: pulseAlarm 1.2s infinite;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   :root[data-theme] {
     --page-overlay-anim: none;
-    .percentdef-red {
-      animation: none;
-    }
   }
 }

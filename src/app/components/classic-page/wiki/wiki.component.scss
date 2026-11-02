@@ -122,20 +122,6 @@
     flex-wrap: wrap;
   }
 
-  .def-sample {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    vertical-align: middle;
-    font-family: var(--font-display);
-    font-weight: 900;
-    font-size: 13px;
-    color: var(--yellow);
-    .ic {
-      margin: 0;
-    }
-  }
-
   .sleep-sample {
     display: inline-flex;
     align-items: center;

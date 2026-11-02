@@ -989,7 +989,6 @@ export interface components {
             maxLevel: number;
             /** @description Défense apportée par niveau construit, au rang du plan */
             defense: number;
-            defenseVariancePercent: number;
             /** @description Ressources consommées par niveau */
             cost: components["schemas"]["ItemQuantitiesResponse"];
             /** @description Temps de construction de base d'un niveau, avant vitesses et bonus */
@@ -1038,7 +1037,6 @@ export interface components {
             maxLevel: number;
             /** @description Défense apportée par niveau construit, au rang du plan */
             defense: number;
-            defenseVariancePercent: number;
             /** @description Ressources consommées par niveau */
             cost: components["schemas"]["ItemQuantitiesResponse"];
             /** @description Temps de construction de base d'un niveau, avant vitesses et bonus */

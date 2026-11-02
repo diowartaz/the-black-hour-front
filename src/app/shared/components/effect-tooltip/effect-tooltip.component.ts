@@ -34,7 +34,7 @@ const POSITIONS: ConnectedPosition[] = [
       (pointerleave)="hide($event)"
       (click)="toggle($event)"
     >
-      <app-icon name="sparkle" [size]="13" />Effect
+      <app-icon name="sparkle" [size]="variant() === 'stat' ? 22 : 13" />Effect
     </button>
     <ng-template
       cdkConnectedOverlay
@@ -51,6 +51,7 @@ const POSITIONS: ConnectedPosition[] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '(document:keydown.escape)': 'close()',
+    '[class.stat]': "variant() === 'stat'",
   },
 })
 export class EffectTooltipComponent implements OnDestroy {
@@ -59,6 +60,8 @@ export class EffectTooltipComponent implements OnDestroy {
   effect = input.required<BuildingEffectModel>();
   // Jour de la ville en cours : affiche la valeur actuelle des effets qui en dépendent
   day = input<number>();
+  // « stat » : grande icône et libellé dessous, à la place d'un bloc de défense (tuiles de construction)
+  variant = input<'chip' | 'stat'>('chip');
 
   readonly positions = POSITIONS;
   open = computed(() => openTooltip() === this);

@@ -1,0 +1,75 @@
+<div class="radar-recap" [class.breached]="layout().breached">
+  <div class="title">
+    <span class="neon-chip" style="--c: var(--pink-light)">
+      <app-icon name="calendar" [size]="14" />Night of day {{ night() }}
+    </span>
+    <h1 class="neon-title">Attack recap</h1>
+  </div>
+
+  <div class="radar">
+    <svg
+      viewBox="-120 -120 240 240"
+      role="img"
+      [attr.aria-label]="defense() + ' defense against ' + zombies() + ' zombies'"
+    >
+      <circle class="grid" [attr.r]="R" />
+      <circle class="grid" [attr.r]="R * 0.75" />
+      <circle class="grid" [attr.r]="R * 0.5" />
+      <circle class="grid" [attr.r]="R * 0.25" />
+      <path class="grid" [attr.d]="'M' + -R + ' 0H' + R + 'M0 ' + -R + 'V' + R" />
+
+      <circle class="ring" [attr.r]="ring()" />
+
+      <g class="sweep">
+        <path class="sweep-area" [attr.d]="'M0 0L' + R + ' 0A' + R + ' ' + R + ' 0 0 0 84.3 -70.7Z'" />
+        <path class="sweep-edge" [attr.d]="'M0 0L' + R + ' 0'" />
+      </g>
+
+      @for (dot of layout().dots; track $index) {
+        <circle
+          class="dot"
+          r="2.6"
+          [style.--angle]="dot.angle + 'deg'"
+          [style.--from]="dot.from * R + 'px'"
+          [style.--to]="dot.to * R + 'px'"
+          [style.--delay]="dot.delay + 's'"
+        />
+      }
+
+      @for (blip of blipPoints(); track blip.n) {
+        <g class="blip" [attr.transform]="'translate(' + blip.x + ' ' + blip.y + ')'" [style.--c]="blip.color">
+          <circle r="9" />
+          <text dy="0.35em">{{ blip.n }}</text>
+        </g>
+      }
+    </svg>
+    <div class="city"><app-icon [name]="layout().breached ? 'skull' : 'shield'" [size]="26" /></div>
+  </div>
+
+  <div class="stats">
+    <span class="def"><app-icon name="shield" [size]="14" />{{ defense() | formatNumber }} defense</span>
+    <span class="zb"><app-icon name="zombie" [size]="14" />{{ zombies() | formatNumber }} zombies</span>
+    @if (layout().zombiesPerDot > 1) {
+      <span class="scale">1 dot ≈ {{ layout().zombiesPerDot }}</span>
+    }
+  </div>
+
+  <div class="result">
+    @if (layout().breached) {
+      <span class="result-title">You died!</span>
+      <span class="result-sub"
+        >The horde broke through on day {{ night() }}, {{ -margin() | formatNumber }} zombies too many.</span
+      >
+    } @else {
+      <span class="result-title">You survived!</span>
+      <span class="result-sub">
+        @if (margin() > 0) {
+          The closest zombie stopped {{ margin() | formatNumber }} m from the wall.
+        } @else {
+          The horde stopped right at the wall.
+        }
+        Day {{ night() + 1 }} begins.
+      </span>
+    }
+  </div>
+</div>

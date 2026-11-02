@@ -1,3 +1,6 @@
+// Atterrissage d'un plan après le clic : la poussière, l'onde et la secousse du panneau (IMPACT_MS en TS) partent à cet instant
+$impact: 0.5s;
+
 .backdrop {
   position: fixed;
   inset: 0;
@@ -14,6 +17,9 @@
   width: min(720px, 100%);
   max-height: 100%;
   overflow-y: auto;
+  // Les effets d'atterrissage (chute agrandie, onde, poussière) débordent des cartes : coupés au bord du
+  // panneau sans ajouter de défilement horizontal
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -31,17 +37,25 @@
   gap: 10px;
 }
 
-// En grille : la carte s'étire à la hauteur de la rangée, face visible ou non
-.revealed,
-.hidden-slot {
+// Dos et face empilés dans la même cellule : la face, invisible tant que le plan est caché, donne la hauteur
+// exacte. En grille, la carte s'étire à la hauteur de la rangée, face visible ou non
+.slot {
+  --delay: 0ms;
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
+  > .front,
+  > .hidden-card {
+    grid-area: 1 / 1;
+  }
 }
 
-.revealed {
+.front {
   position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   text-align: left;
-  animation: flip-in 0.35s ease-out;
+  visibility: hidden;
   .badge {
     position: absolute;
     top: -10px;
@@ -55,16 +69,13 @@
     left: 8px;
     z-index: 1;
     background: var(--surface-solid);
+    font-variant-numeric: tabular-nums;
+    // Nombre d'exemplaires affiché par un compteur CSS, pour le faire défiler à l'atterrissage
+    counter-reset: copies var(--copies);
+    &::after {
+      content: '×' counter(copies);
+    }
   }
-}
-
-// Dos de carte posé sur la vraie carte, invisible : il en prend la hauteur exacte
-.hidden-slot > * {
-  grid-area: 1 / 1;
-}
-
-.size-ref {
-  visibility: hidden;
 }
 
 .hidden-card {
@@ -84,19 +95,186 @@
   }
 }
 
+// Révélation : le dos s'envole, la face tombe sur la table et s'écrase. --delay enchaîne les plans de « Reveal all »
+.revealed {
+  .hidden-card {
+    animation: lift-off 0.18s ease-in var(--delay) forwards;
+  }
+  .front {
+    visibility: visible;
+    transform-origin: 50% 100%;
+    animation:
+      slam 0.42s cubic-bezier(0.5, 0, 0.9, 0.4) calc(var(--delay) + 0.08s) both,
+      squash 0.32s ease-out calc(var(--delay) + #{$impact});
+  }
+  .copies {
+    animation:
+      chip-pop 0.32s cubic-bezier(0.3, 1.6, 0.5, 1) calc(var(--delay) + #{$impact}) both,
+      count-up 0.45s ease-out calc(var(--delay) + #{$impact} + 0.06s) both;
+  }
+  // Badge tamponné, qui reste légèrement de travers
+  .badge {
+    transform: rotate(-4deg);
+    animation: stamp 0.3s cubic-bezier(0.3, 1.5, 0.6, 1) calc(var(--delay) + #{$impact} + 0.12s) both;
+  }
+}
+
+// Onde au sol et poussière à l'atterrissage, à la couleur de la rareté
+.impact {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.wave {
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  bottom: -12px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--rarity) 60%, transparent), transparent);
+  animation: wave calc(#{$impact} + 0.55s) ease-out var(--delay) both;
+}
+
+.dust {
+  position: absolute;
+  left: var(--x);
+  top: calc(100% - 3px);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  transform-origin: 0 50%;
+  background: color-mix(in srgb, var(--rarity) 35%, var(--text-mute));
+  box-shadow: 0 0 4px color-mix(in srgb, var(--rarity) 50%, transparent);
+  // Invisible jusqu'à l'atterrissage
+  opacity: 0;
+  animation: dust var(--t) cubic-bezier(0.15, 0.7, 0.3, 1) calc(var(--delay) + #{$impact}) forwards;
+}
+
 .actions {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr));
   gap: 10px;
 }
 
-@keyframes flip-in {
+// Propriété typée : interpolée en entier, le compteur défile de 0 au nombre d'exemplaires
+@property --copies {
+  syntax: '<integer>';
+  inherits: false;
+  initial-value: 0;
+}
+
+@keyframes lift-off {
+  to {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+}
+
+// Chute accélérée depuis le joueur : la carte grossie et floue retrouve sa taille au contact de la table
+@keyframes slam {
+  0% {
+    opacity: 0;
+    transform: translateY(-28px) scale(1.3) rotate(-4deg);
+    filter: blur(3px) drop-shadow(0 28px 14px rgba(0, 0, 0, 0.55));
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+    filter: blur(0) drop-shadow(0 0 0 transparent);
+  }
+}
+
+@keyframes squash {
+  0% {
+    transform: scale(1.04, 0.94);
+  }
+  45% {
+    transform: scale(0.99, 1.02);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
+@keyframes chip-pop {
   from {
     opacity: 0;
-    transform: rotateY(90deg);
+    transform: translateY(6px) scale(0.6);
+  }
+}
+
+@keyframes count-up {
+  from {
+    --copies: 0;
+  }
+}
+
+@keyframes stamp {
+  from {
+    opacity: 0;
+    transform: scale(2.4) rotate(-14deg);
+  }
+}
+
+// L'ombre au sol grandit pendant la chute, puis s'étale et s'efface après l'atterrissage
+@keyframes wave {
+  0% {
+    opacity: 0;
+    transform: scaleX(0.3);
+  }
+  47% {
+    opacity: 1;
+    transform: scaleX(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleX(1.25);
+  }
+}
+
+@keyframes dust {
+  from {
+    opacity: 1;
+    transform: rotate(var(--a)) translateX(0);
   }
   to {
-    opacity: 1;
-    transform: none;
+    opacity: 0;
+    transform: rotate(var(--a)) translateX(var(--r));
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .revealed {
+    .hidden-card {
+      animation: fade-out 0.2s var(--delay) forwards;
+    }
+    .front {
+      animation: fade-in 0.2s var(--delay) both;
+    }
+    .copies,
+    .badge {
+      animation: none;
+    }
+  }
+  .impact {
+    display: none;
   }
 }

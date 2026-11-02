@@ -74,59 +74,109 @@
   app-building-card {
     display: block;
   }
-  &.fusing app-building-card {
-    animation: fuse 1s ease-out;
+  // Signal brouillé pendant le balayage, puis éclat de la carte améliorée
+  &.scanning {
+    animation: glitch 0.2s steps(2) 5;
+    > app-building-card {
+      animation: flash 0.5s ease-out 1s;
+    }
   }
 }
 
-// Exemplaire consommé : part d'un côté de la carte et s'y fond
-.ghost {
+// Balayage : au-dessus de la ligne, la carte améliorée ; en dessous, celle d'avant, rognée au fil du passage
+.scan {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 56px;
-  height: 76px;
-  margin: -38px 0 0 -28px;
-  border-radius: var(--radius-m);
-  border: 1px solid var(--c);
-  background: color-mix(in srgb, var(--c) 25%, var(--surface-2));
+  inset: 0;
+  overflow: hidden;
+  border-radius: var(--radius-l);
   pointer-events: none;
-  opacity: 0;
-  animation: merge 0.7s ease-in calc(var(--i) * 50ms) forwards;
 }
 
-@keyframes merge {
-  0% {
-    opacity: 0.9;
-    transform: translateX(calc((var(--i) - 2) * 62px)) scale(1);
+// Fond plein : la carte améliorée, dessous, ne doit pas transparaître
+.before {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-l);
+  background: var(--surface-solid);
+  animation: reveal 1s ease-in-out forwards;
+}
+
+// Même durée et même courbe que reveal : la ligne suit le bord rogné de .before
+.beam {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 40px;
+  border-bottom: 2px solid color-mix(in srgb, var(--c) 45%, white);
+  background: linear-gradient(transparent, color-mix(in srgb, var(--c) 30%, transparent));
+  box-shadow: 0 6px 14px -4px var(--c);
+  animation:
+    sweep 1s ease-in-out forwards,
+    fade-out 0.2s linear 1s forwards;
+}
+
+@keyframes reveal {
+  from {
+    clip-path: inset(0 0 0 0);
   }
-  100% {
+  to {
+    clip-path: inset(100% 0 0 0);
+  }
+}
+
+@keyframes sweep {
+  from {
+    top: -40px;
+  }
+  to {
+    top: calc(100% - 40px);
+  }
+}
+
+@keyframes fade-out {
+  to {
     opacity: 0;
-    transform: translateX(0) scale(0.3);
   }
 }
 
-@keyframes fuse {
+@keyframes glitch {
   0%,
-  45% {
-    filter: none;
-    transform: none;
-  }
-  70% {
-    filter: brightness(1.7) drop-shadow(0 0 14px var(--c));
-    transform: scale(1.03);
-  }
   100% {
-    filter: none;
     transform: none;
+    text-shadow: none;
+  }
+  25% {
+    transform: translateX(-1px);
+    text-shadow:
+      -2px 0 var(--cyan),
+      2px 0 var(--pink);
+  }
+  50% {
+    transform: translateX(1px);
+  }
+  75% {
+    transform: translateX(-1px);
+    text-shadow:
+      2px 0 var(--cyan),
+      -2px 0 var(--pink);
+  }
+}
+
+@keyframes flash {
+  from {
+    filter: brightness(1.5) drop-shadow(0 0 14px var(--c));
+  }
+  to {
+    filter: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ghost {
+  .scan {
     display: none;
   }
-  .tile.fusing app-building-card {
+  .tile.scanning,
+  .tile.scanning > app-building-card {
     animation: none;
   }
 }

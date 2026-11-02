@@ -8,9 +8,8 @@ import { RarityToColorPipe } from 'src/app/shared/pipes/rarity-to-color.pipe';
 import { buildingEffectText } from 'src/app/shared/utils/building-effects';
 import { canUpgrade, cardRank, rankedDefense, rankedEffect, upgradeCopies } from 'src/app/shared/utils/ranks';
 
-const ANIMATION_MS = 1000;
-// Au-delà, les exemplaires animés ne se distinguent plus
-const MAX_GHOSTS = 5;
+// Balayage (1 s) puis éclat de la carte (0,5 s) : durées de upgrade-dialog.component.scss
+const ANIMATION_MS = 1500;
 
 // Amélioration d'un plan : panneau du bas, comme la mise en vente. Il reste ouvert pour enchaîner les rangs.
 @Component({
@@ -31,8 +30,8 @@ export class UpgradeDialogComponent implements OnDestroy {
   // Vendre un exemplaire au lieu de l'utiliser : l'autre choix du joueur
   sell = output<void>();
 
-  // Exemplaires consommés affichés par l'animation en cours (vide : pas d'animation)
-  ghosts = signal<number[]>([]);
+  // Carte d'avant l'amélioration, effacée par le balayage de l'animation en cours (null : pas d'animation)
+  previous = signal<{ count: number; rank: number } | null>(null);
   private animationTimer?: ReturnType<typeof setTimeout>;
 
   private rankRules = computed(() => this.cityService.defaultValues().rank_rules);
@@ -44,7 +43,7 @@ export class UpgradeDialogComponent implements OnDestroy {
   // Exemplaires utilisables : le joueur garde toujours sa carte
   spare = computed(() => this.owned() - 1);
   ready = computed(() => canUpgrade(this.owned(), this.building().rarity, this.rank(), this.rankRules()));
-  animating = computed(() => this.ghosts().length > 0);
+  animating = computed(() => this.previous() !== null);
 
   defenseAt(rank: number): number {
     return rankedDefense(this.building().defense, rank, this.rankRules());
@@ -62,13 +61,13 @@ export class UpgradeDialogComponent implements OnDestroy {
   }
 
   upgrade(): void {
-    const copies = this.copies();
-    if (copies === null || !this.ready() || this.animating()) {
+    if (this.copies() === null || !this.ready() || this.animating()) {
       return;
     }
+    const previous = { count: this.owned(), rank: this.rank() };
     this.cityService.upgradeBuilding(this.building().id, () => {
-      this.ghosts.set(Array.from({ length: Math.min(copies, MAX_GHOSTS) }, (_, i) => i));
-      this.animationTimer = setTimeout(() => this.ghosts.set([]), ANIMATION_MS);
+      this.previous.set(previous);
+      this.animationTimer = setTimeout(() => this.previous.set(null), ANIMATION_MS);
     });
   }
 

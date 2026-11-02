@@ -162,7 +162,6 @@ export function createDefaultBuildingModel(): BuildingModel {
     },
     rarity: 'common',
     selected: false,
-    defense_ratio_percentage: -22,
     recycled: false,
     next_level_duration: 3600,
   };
@@ -185,7 +184,6 @@ export interface BuildingModel {
   // Rang du plan, figé à la création de la ville : la défense et l'effet sont déjà à sa valeur
   rank: number;
   selected: boolean;
-  defense_ratio_percentage: number;
   // Offre de l'architecte : bâtiment terminé revenu dans la pioche (lvl_max inclut déjà les niveaux gagnés)
   recycled: boolean;
   effect?: BuildingEffectModel;
@@ -263,7 +261,6 @@ export interface AdvancedBuildingModel {
   enoughRessources: boolean;
   enoughLvlMax: boolean;
   expirationCityTime: number;
-  defense_ratio_percentage: number;
   effect?: BuildingEffectModel;
 }
 
@@ -351,7 +348,6 @@ export interface DefaultValuesModel {
   nb_skills_start: number;
   probaBuildingDiscovery: number;
   probaSkillDiscovery: number;
-  randomPercentageDefBuilding: number;
   bonuses: Record<string, BonusWithoutLvl>;
   SKILL_TIME_MULTIPLIER: number;
   BONUS_PRICE_GROWTH: number;
@@ -392,7 +388,6 @@ export function createDefaultDefaultValuesModel(): DefaultValuesModel {
     nb_skills_start: 9,
     probaBuildingDiscovery: 0.7,
     probaSkillDiscovery: 0.5,
-    randomPercentageDefBuilding: 20,
     bonuses: {},
     SKILL_TIME_MULTIPLIER: 1.5,
     BONUS_PRICE_GROWTH: 1.5,

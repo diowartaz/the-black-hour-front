@@ -1,0 +1,19 @@
+<section class="night-log">
+  <h2 class="label">Night log</h2>
+  @if (lines().length > 0) {
+    <ol>
+      @for (line of lines(); track line.n) {
+        <li [style.--c]="line.color">
+          <span class="n">{{ line.n }}</span>
+          <span class="time">{{ line.time }}</span>
+          <span class="body">
+            <span class="name">{{ line.name }}</span>
+            <span class="text">{{ line.text }}</span>
+          </span>
+        </li>
+      }
+    </ol>
+  } @else {
+    <p class="quiet">Quiet night. Nothing else to report.</p>
+  }
+</section>

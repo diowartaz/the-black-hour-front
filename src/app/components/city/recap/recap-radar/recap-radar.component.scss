@@ -1,0 +1,230 @@
+// Durée de l'approche des zombies : les signaux, le balayage et le résultat arrivent ensuite
+$approach: 2.2s;
+$reveal: 2.6s;
+
+:host {
+  display: block;
+}
+
+.radar-recap {
+  --ring: var(--cyan);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  &.breached {
+    --ring: var(--danger);
+  }
+}
+
+.title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  .neon-title {
+    font-size: 28px;
+  }
+}
+
+.radar {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 1;
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 50%;
+  }
+  .city {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ring);
+    pointer-events: none;
+    filter: drop-shadow(0 0 8px var(--ring));
+  }
+}
+
+.grid {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.ring {
+  fill: color-mix(in srgb, var(--ring) 9%, transparent);
+  stroke: var(--ring);
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 6px var(--ring));
+  .breached & {
+    stroke-dasharray: 12 5;
+    animation: breach 0.6s ease-out $approach both;
+  }
+}
+
+.sweep {
+  transform-origin: 0 0;
+  opacity: 0;
+  animation:
+    fade-in 0.6s ease-out $reveal forwards,
+    sweep 6s linear $reveal infinite;
+  .sweep-area {
+    fill: color-mix(in srgb, var(--green) 14%, transparent);
+  }
+  .sweep-edge {
+    stroke: color-mix(in srgb, var(--green) 70%, transparent);
+    stroke-width: 1.5;
+  }
+}
+
+.dot {
+  fill: var(--danger);
+  transform-origin: 0 0;
+  transform: rotate(var(--angle)) translateX(var(--to));
+  animation: approach $approach cubic-bezier(0.2, 0.7, 0.3, 1) var(--delay) both;
+}
+
+.blip {
+  opacity: 0;
+  animation: fade-in 0.5s ease-out $reveal forwards;
+  circle {
+    fill: color-mix(in srgb, var(--c) 22%, var(--bg));
+    stroke: var(--c);
+    stroke-width: 1.5;
+  }
+  text {
+    fill: var(--text-strong);
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 10px;
+    text-anchor: middle;
+  }
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .def {
+    color: var(--cyan-light);
+  }
+  .zb {
+    color: var(--danger-light);
+  }
+  .scale {
+    color: var(--text-mute);
+  }
+}
+
+.result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: var(--radius-l);
+  border: 1px solid var(--green);
+  background: color-mix(in srgb, var(--green) 10%, transparent);
+  text-align: center;
+  opacity: 0;
+  animation: fade-in 0.5s ease-out $reveal forwards;
+  .breached & {
+    border-color: var(--danger);
+    background: color-mix(in srgb, var(--danger) 10%, transparent);
+  }
+  .result-title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 24px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-strong);
+    text-shadow: 0 0 12px var(--green);
+    .breached & {
+      text-shadow: 0 0 12px var(--danger);
+    }
+  }
+  .result-sub {
+    font-size: 15px;
+    color: var(--text-dim);
+  }
+}
+
+@keyframes approach {
+  from {
+    transform: rotate(var(--angle)) translateX(var(--from));
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+}
+
+@keyframes sweep {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fade-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes breach {
+  0%,
+  100% {
+    stroke-width: 2.5;
+  }
+  40% {
+    stroke-width: 7;
+  }
+}
+
+// Sans animations : l'état final tout de suite, sans balayage
+@media (prefers-reduced-motion: reduce) {
+  .dot,
+  .ring {
+    animation: none;
+  }
+  .blip,
+  .result {
+    animation: none;
+    opacity: 1;
+  }
+  .sweep {
+    display: none;
+  }
+}
+
+// Très petits écrans (320px)
+@media (max-width: 360px) {
+  .title .neon-title {
+    font-size: 22px;
+  }
+  .result {
+    padding: 10px 12px;
+    .result-title {
+      font-size: 20px;
+    }
+    .result-sub {
+      font-size: 14px;
+    }
+  }
+}

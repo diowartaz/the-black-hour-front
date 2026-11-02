@@ -15,7 +15,7 @@
     </div>
 
     <section>
-      <div class="tile" [class.fusing]="animating()">
+      <div class="tile" [class.scanning]="animating()">
         <app-building-card
           [building]="building()"
           [count]="owned()"
@@ -23,8 +23,18 @@
           [showRank]="true"
           [inDeck]="inDeck()"
         />
-        @for (ghost of ghosts(); track ghost) {
-          <span class="ghost" [style.--i]="ghost" aria-hidden="true"></span>
+        @if (previous(); as previous) {
+          <div class="scan" aria-hidden="true">
+            <app-building-card
+              class="before"
+              [building]="building()"
+              [count]="previous.count"
+              [rank]="previous.rank"
+              [showRank]="true"
+              [inDeck]="inDeck()"
+            />
+            <span class="beam"></span>
+          </div>
         }
       </div>
 

@@ -1,12 +1,10 @@
 <div class="recap">
   <div class="scroll">
-    <app-recap-header></app-recap-header>
-
-    <div class="result">
-      <app-icon name="skull" [size]="40" />
-      <span class="result-title">You died!</span>
-      <span class="result-sub">The horde broke through on day {{ cityService.city().day - 1 }}.</span>
-    </div>
+    <app-recap-radar
+      [defense]="cityService.city().attackRecap.defense"
+      [zombies]="cityService.city().attackRecap.nb_zb"
+      [night]="cityService.city().day - 1"
+    />
 
     @if (lastGame(); as game) {
       <app-game [game]="game"></app-game>

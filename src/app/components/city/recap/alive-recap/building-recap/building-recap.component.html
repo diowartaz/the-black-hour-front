@@ -16,12 +16,6 @@
         <app-effect-tooltip [effect]="effect" [day]="cityService.city().day" />
       } @else {
         <span class="def"><app-icon name="shield" [size]="13" />{{ building.defense | formatNumber }}</span>
-        <span
-          class="percentdef"
-          [class.percentdef-green]="building.defense_ratio_percentage >= 0"
-          [class.percentdef-red]="building.defense_ratio_percentage < 0"
-          >{{ building.defense_ratio_percentage >= 0 ? '+' : '' }}{{ building.defense_ratio_percentage }}%</span
-        >
       }
     </div>
     <app-building-recap-inventory-inventory [building]="building"></app-building-recap-inventory-inventory>
