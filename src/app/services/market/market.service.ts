@@ -20,8 +20,8 @@ export class MarketService {
     runRequest(this.loadLoading, this.api.getMarket(), (market) => this.market.set(market));
   }
 
-  createListing(buildingId: number, price: number, onListed: () => void): void {
-    this.runAction(this.api.createMarketListing(buildingId, price), onListed);
+  createListing(buildingId: number, quantity: number, price: number, onListed: () => void): void {
+    this.runAction(this.api.createMarketListing(buildingId, quantity, price), onListed);
   }
 
   buy(listingId: string): void {

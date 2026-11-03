@@ -74,23 +74,52 @@
         @if (tab() === 'buy') {
           <div class="cards">
             @for (building of buyPlans(); track building.id) {
-              <article class="market-card" [class.unavailable]="!offerOf(building.id)">
+              @let offers = offersOf(building.id);
+              @let mine = myOffersOf(building.id);
+              <article class="market-card" [class.unavailable]="!offers.length && !mine.length">
                 <app-building-card
                   [building]="building"
                   [count]="owned(building.id)"
                   [showNew]="true"
                   [inDeck]="inDeck(building.id)"
                   [compact]="true"
+                  [costsOnTop]="true"
                 >
-                  @if (offerOf(building.id); as offer) {
-                    <button
-                      type="button"
-                      class="buy-btn"
-                      [disabled]="marketService.actionLoading() || !canAfford(offer.price)"
-                      (click)="marketService.buy(offer.listingId)"
-                    >
-                      <app-icon name="money" [size]="16" />{{ offer.price | formatNumber }} · Buy
-                    </button>
+                  @if (offers.length || mine.length) {
+                    <div class="price-list">
+                      @for (offer of offers; track offer.listingId) {
+                        <div class="price-row">
+                          <span class="qty">×{{ offer.quantity }}</span>
+                          <span class="price"
+                            ><app-icon name="money" [size]="14" />{{ offer.price | formatNumber }}</span
+                          >
+                          <button
+                            type="button"
+                            class="row-buy"
+                            [attr.aria-label]="
+                              'Buy ' +
+                              (offer.quantity > 1 ? 'a lot of ' + offer.quantity : 'one') +
+                              ' for ' +
+                              offer.price
+                            "
+                            [disabled]="marketService.actionLoading() || !canAfford(offer.price)"
+                            (click)="marketService.buy(offer.listingId)"
+                          >
+                            Buy
+                          </button>
+                        </div>
+                      }
+                      @for (listing of mine; track listing.listingId) {
+                        @let shown = isShownToBuyers(listing);
+                        <div class="price-row mine" [class.shown]="shown">
+                          <span class="qty">×{{ listing.quantity }}</span>
+                          <span class="price"
+                            ><app-icon name="money" [size]="14" />{{ listing.price | formatNumber }}</span
+                          >
+                          <span class="mine-tag">{{ shown ? 'cheapest' : 'listed' }}</span>
+                        </div>
+                      }
+                    </div>
                   } @else {
                     <span class="no-offer">No offer</span>
                   }
@@ -109,6 +138,7 @@
                   [count]="owned(building.id)"
                   [inDeck]="inDeck(building.id)"
                   [compact]="true"
+                  [costsOnTop]="true"
                 >
                   <button
                     type="button"
@@ -130,9 +160,12 @@
               [building]="building"
               [count]="owned(building.id)"
               [inDeck]="inDeck(building.id)"
-              [lowestPrice]="lowestPriceOf(building.id)"
+              [lowestPrices]="lowestPricesOf(building.id)"
+              [lotSizes]="market.lotSizes"
+              [minCopiesToSell]="market.minCopiesToSell"
+              [initialQuantity]="initialSellQuantity(building.id)"
               [taxRate]="market.taxRate"
-              (closed)="selectedId.set(null)"
+              (closed)="closeSellDialog()"
             />
           }
 
@@ -142,6 +175,9 @@
               <div class="row">
                 <app-building-emblem [id]="listing.buildingId" [size]="22" />
                 <span class="row-name">{{ buildingOf(listing.buildingId)?.name }}</span>
+                @if (listing.quantity > 1) {
+                  <span class="lot">×{{ listing.quantity }}</span>
+                }
                 <span class="row-price"><app-icon name="money" [size]="14" />{{ listing.price | formatNumber }}</span>
                 <button
                   type="button"
@@ -163,6 +199,9 @@
               <div class="row">
                 <app-building-emblem [id]="sale.buildingId" [size]="22" />
                 <span class="row-name">{{ buildingOf(sale.buildingId)?.name }}</span>
+                @if (sale.quantity > 1) {
+                  <span class="lot">×{{ sale.quantity }}</span>
+                }
                 <span class="row-price"><app-icon name="money" [size]="14" />{{ sale.price | formatNumber }}</span>
                 <span class="row-date">{{ sale.soldAt | date: 'mediumDate' }}</span>
               </div>

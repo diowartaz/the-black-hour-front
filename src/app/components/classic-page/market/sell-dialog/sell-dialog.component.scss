@@ -92,6 +92,38 @@
   }
 }
 
+.lots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  grid-auto-flow: column;
+  gap: 6px;
+}
+
+.lot {
+  height: 40px;
+  border-radius: var(--radius-m);
+  border: 1px solid var(--line);
+  background: none;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  &.active {
+    border-color: var(--yellow);
+    background: color-mix(in srgb, var(--yellow) 14%, transparent);
+    color: var(--yellow);
+  }
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.per-plan {
+  font-size: 13px;
+  color: var(--text-mute);
+}
+
 .presets {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

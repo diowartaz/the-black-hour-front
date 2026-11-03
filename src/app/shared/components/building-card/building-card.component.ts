@@ -1,4 +1,4 @@
-import { KeyValuePipe } from '@angular/common';
+import { KeyValuePipe, NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { CatalogBuildingModel } from 'src/app/models/game';
 import { CityService } from 'src/app/services/city/city.service';
@@ -18,6 +18,7 @@ import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
   imports: [
     FormatNumberPipe,
     KeyValuePipe,
+    NgTemplateOutlet,
     IconComponent,
     BuildingEmblemComponent,
     EffectTooltipComponent,
@@ -44,6 +45,8 @@ export class BuildingCardComponent {
   inDeck = input(false);
   // Version resserrée (éditeur de deck) : nom plus petit
   compact = input(false);
+  // Coûts sous les stats plutôt qu'en pied de carte (Black Market, pied de carte long)
+  costsOnTop = input(false);
 
   locked = computed(() => this.count() === 0 && !this.showNew());
   time = computed(() => formatTimeToString(this.building().time));

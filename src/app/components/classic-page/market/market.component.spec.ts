@@ -6,6 +6,8 @@ import { CatalogBuildingModel, MarketModel } from 'src/app/models/game';
 import { CityService } from 'src/app/services/city/city.service';
 import { GameApiService, MarketUpdate } from 'src/app/services/game-api/game-api.service';
 
+import { formatNumber } from 'src/app/shared/utils/format';
+
 import { MarketComponent } from './market.component';
 
 describe('MarketComponent', () => {
@@ -30,13 +32,14 @@ describe('MarketComponent', () => {
     gamesPlayed: 6,
     requiredGames: 5,
     minCopiesToSell: 2,
+    lotSizes: [1, 10],
     taxRate: 0.05,
     offers: [
-      { listingId: 'a', buildingId: 1, price: 300 },
-      { listingId: 'b', buildingId: 2, price: 100 },
+      { listingId: 'a', buildingId: 1, quantity: 1, price: 300 },
+      { listingId: 'b', buildingId: 2, quantity: 1, price: 100 },
     ],
-    myListings: [{ listingId: 'c', buildingId: 3, price: 500 }],
-    sales: [{ buildingId: 3, price: 450, soldAt: '2026-10-20T10:00:00.000Z' }],
+    myListings: [{ listingId: 'c', buildingId: 3, quantity: 1, price: 500 }],
+    sales: [{ buildingId: 3, quantity: 1, price: 450, soldAt: '2026-10-20T10:00:00.000Z' }],
   };
 
   async function setup(market: MarketModel, api: Partial<Record<keyof GameApiService, unknown>> = {}): Promise<void> {
@@ -71,8 +74,10 @@ describe('MarketComponent', () => {
     expect(host.querySelector('.tabs')).toBeNull();
   });
 
+  const noneMine: MarketModel = { ...open, myListings: [] };
+
   it('ne montre que les plans en vente, sauf demande contraire', async () => {
-    await setup(open);
+    await setup(noneMine);
     expect(names('.market-card')).toEqual(['Night Totem', 'Scrap Wall']);
 
     fixture.componentInstance.showUnavailable.set(true);
@@ -84,19 +89,20 @@ describe('MarketComponent', () => {
   it('place le bouton d’achat dans la carte, sans badge pour un exemplaire unique', async () => {
     await setup(open);
     const card = host.querySelector('.market-card app-building-card');
-    expect(card?.querySelector('.buy-btn')?.textContent).toContain('100');
+    expect(card?.querySelector('.price-row')?.textContent).toContain('100');
+    expect(card?.querySelector('.row-buy')).not.toBeNull();
     expect(card?.querySelector('.head .count')).toBeNull();
   });
 
   it('montre les doublons dans le badge de la carte', async () => {
-    await setup(open);
+    await setup(noneMine);
     const card = host.querySelectorAll('.market-card app-building-card')[1];
     expect(card.querySelector('.name')?.textContent).toContain('Scrap Wall');
     expect(card.querySelector('.head .count')?.textContent).toContain('+1');
   });
 
   it('grise les tuiles sans offre', async () => {
-    await setup(open);
+    await setup(noneMine);
     fixture.componentInstance.showUnavailable.set(true);
     await fixture.whenStable();
 
@@ -105,7 +111,7 @@ describe('MarketComponent', () => {
   });
 
   it('laisse normal un plan non possédé mais en vente', async () => {
-    await setup({ ...open, offers: [{ listingId: 'e', buildingId: 3, price: 50 }] });
+    await setup({ ...open, offers: [{ listingId: 'e', buildingId: 3, quantity: 1, price: 50 }] });
     const card = host.querySelector('.market-card')!;
     expect(card.querySelector('.name')?.textContent).toContain('Tin Tower');
     expect(card.querySelector('.head .count')?.textContent).toContain('New');
@@ -114,7 +120,7 @@ describe('MarketComponent', () => {
   });
 
   it('trie par prix, les plans sans offre en dernier', async () => {
-    await setup(open);
+    await setup(noneMine);
     const market = fixture.componentInstance;
     market.showUnavailable.set(true);
 
@@ -135,7 +141,7 @@ describe('MarketComponent', () => {
   });
 
   it('ne garde que les plans du deck, sur les deux onglets', async () => {
-    await setup(open);
+    await setup(noneMine);
     const market = fixture.componentInstance;
     cityService.stats.update((stats) => ({ ...stats, deck: [1, 3] }));
     market.deckOnly.set(true);
@@ -168,7 +174,7 @@ describe('MarketComponent', () => {
     cityService.stats.update((stats) => ({ ...stats, money: 200 }));
     await fixture.whenStable();
 
-    const buttons = [...host.querySelectorAll<HTMLButtonElement>('.buy-btn')];
+    const buttons = [...host.querySelectorAll<HTMLButtonElement>('.row-buy')];
     expect(buttons.map((b) => b.disabled)).toEqual([false, true]);
     buttons[0].click();
     expect(buyMarketListing).toHaveBeenCalledOnceWith('b');
@@ -177,16 +183,16 @@ describe('MarketComponent', () => {
   it('recharge le marché sans relancer l’achat si l’offre est déjà partie', async () => {
     const conflict = new HttpErrorResponse({ status: 409 });
     const buyMarketListing = jasmine.createSpy().and.returnValue(throwError(() => conflict));
-    const refreshed = { ...open, offers: [{ listingId: 'd', buildingId: 2, price: 120 }] };
+    const refreshed = { ...open, offers: [{ listingId: 'd', buildingId: 2, quantity: 1, price: 120 }] };
     const getMarket = jasmine.createSpy().and.returnValues(of(open), of(refreshed));
     await setup(open, { buyMarketListing, getMarket });
 
-    host.querySelector<HTMLButtonElement>('.buy-btn')!.click();
+    host.querySelector<HTMLButtonElement>('.row-buy')!.click();
     await fixture.whenStable();
 
     expect(getMarket).toHaveBeenCalledTimes(2);
     expect(buyMarketListing).toHaveBeenCalledTimes(1);
-    expect(host.querySelector('.buy-btn')?.textContent).toContain('120');
+    expect(host.querySelector('.price-row')?.textContent).toContain('120');
   });
 
   it('ne propose à la vente que les plans en plusieurs exemplaires', async () => {
@@ -215,10 +221,77 @@ describe('MarketComponent', () => {
   });
 
   it('prend pour référence l’offre du joueur si elle est la moins chère', async () => {
-    await setup({ ...open, myListings: [{ listingId: 'c', buildingId: 1, price: 200 }] });
-    expect(fixture.componentInstance.lowestPriceOf(1)).toBe(200);
-    expect(fixture.componentInstance.lowestPriceOf(2)).toBe(100);
-    expect(fixture.componentInstance.lowestPriceOf(3)).toBeUndefined();
+    await setup({ ...open, myListings: [{ listingId: 'c', buildingId: 1, quantity: 1, price: 200 }] });
+    expect(fixture.componentInstance.lowestPricesOf(1)).toEqual({ 1: 200 });
+    expect(fixture.componentInstance.lowestPricesOf(2)).toEqual({ 1: 100 });
+    expect(fixture.componentInstance.lowestPricesOf(3)).toEqual({});
+  });
+
+  const lots: MarketModel = {
+    ...open,
+    offers: [
+      { listingId: 'l', buildingId: 1, quantity: 10, price: 2000 },
+      { listingId: 'a', buildingId: 1, quantity: 1, price: 300 },
+      { listingId: 'b', buildingId: 2, quantity: 1, price: 250 },
+    ],
+  };
+
+  it('propose une offre par taille de lot, avec son prix unitaire', async () => {
+    const buyMarketListing = jasmine.createSpy().and.callFake(() => of(update(lots)));
+    await setup(lots, { buyMarketListing });
+    cityService.stats.update((stats) => ({ ...stats, money: 5000 }));
+    await fixture.whenStable();
+
+    const card = [...host.querySelectorAll('.market-card')].find((c) => c.textContent?.includes('Scrap Wall'))!;
+    const rows = [...card.querySelectorAll('.price-row')];
+    expect(rows.map((row) => row.querySelector('.qty')?.textContent)).toEqual(['×1', '×10']);
+    expect(card.querySelector('.price-list')?.textContent).not.toContain('/plan');
+    expect(rows[1].querySelector('.price')?.textContent).toContain(formatNumber(2000));
+
+    rows[1].querySelector<HTMLButtonElement>('.row-buy')!.click();
+    expect(buyMarketListing).toHaveBeenCalledOnceWith('l');
+  });
+
+  it('montre l’offre du joueur en grisé, sans bouton d’achat, et dit si les acheteurs la voient', async () => {
+    await setup({
+      ...lots,
+      myListings: [
+        { listingId: 'm1', buildingId: 1, quantity: 1, price: 350 },
+        { listingId: 'm2', buildingId: 1, quantity: 1, price: 320 },
+        { listingId: 'm3', buildingId: 1, quantity: 10, price: 1900 },
+      ],
+    });
+    const card = [...host.querySelectorAll('.market-card')].find((c) => c.textContent?.includes('Scrap Wall'))!;
+    const mine = [...card.querySelectorAll('.price-row.mine')];
+    expect(mine.map((row) => row.querySelector('.qty')?.textContent)).toEqual(['×1', '×10']);
+    expect(mine[0].querySelector('.price')?.textContent).toContain('320');
+    expect(mine.map((row) => row.querySelector('.mine-tag')?.textContent?.trim())).toEqual(['listed', 'cheapest']);
+    expect(mine.map((row) => row.querySelector('.row-buy'))).toEqual([null, null]);
+    expect(card.querySelector('.price-list')?.textContent).not.toContain('yours');
+    expect(card.querySelectorAll('.row-buy').length).toBe(2);
+  });
+
+  it('montre dans Buy un plan dont seule l’offre du joueur est en vente', async () => {
+    await setup(open);
+    expect(names('.market-card')).toEqual(['Night Totem', 'Tin Tower', 'Scrap Wall']);
+    const tower = [...host.querySelectorAll('.market-card')].find((c) => c.textContent?.includes('Tin Tower'))!;
+    expect(tower.classList).not.toContain('unavailable');
+    expect(tower.querySelector('.mine-tag')?.textContent).toContain('cheapest');
+    expect(tower.textContent).not.toContain('No offer');
+  });
+
+  it('trie par prix sur le prix unitaire le plus bas', async () => {
+    await setup(lots);
+    const market = fixture.componentInstance;
+    market.sort.set('price-asc');
+    // Tin Tower n'a que l'offre du joueur : sans prix d'achat, il passe après les autres
+    expect(market.buyPlans().map((b) => b.id)).toEqual([1, 2, 3]);
+  });
+
+  it('affiche la taille des lots dans les offres du joueur', async () => {
+    await setup({ ...open, myListings: [{ listingId: 'c', buildingId: 3, quantity: 10, price: 4000 }] });
+    await openSellTab();
+    expect(host.querySelector('.row .lot')?.textContent).toContain('×10');
   });
 
   it('ferme la pop-up quand il ne reste plus assez d’exemplaires', async () => {

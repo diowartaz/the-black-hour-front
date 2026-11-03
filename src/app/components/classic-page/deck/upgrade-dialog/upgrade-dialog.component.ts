@@ -6,7 +6,14 @@ import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
 import { RarityToColorPipe } from 'src/app/shared/pipes/rarity-to-color.pipe';
 import { buildingEffectText } from 'src/app/shared/utils/building-effects';
-import { canUpgrade, cardRank, rankedDefense, rankedEffect, upgradeCopies } from 'src/app/shared/utils/ranks';
+import {
+  canUpgrade,
+  cardRank,
+  rankedDefense,
+  rankedEffect,
+  rankMultiplier,
+  upgradeCopies,
+} from 'src/app/shared/utils/ranks';
 
 // Balayage (1 s) puis éclat de la carte (0,5 s) : durées de upgrade-dialog.component.scss
 const ANIMATION_MS = 1500;
@@ -52,11 +59,10 @@ export class UpgradeDialogComponent implements OnDestroy {
   effectAt(rank: number): string {
     const effect = this.building().effect;
     return effect
-      ? buildingEffectText(
-          rankedEffect(effect, rank, this.rankRules()),
-          undefined,
-          this.cityService.defaultValues().effect_rules,
-        )
+      ? buildingEffectText(rankedEffect(effect, rank, this.rankRules()), {
+          rules: this.cityService.defaultValues().effect_rules,
+          rankMultiplier: rankMultiplier(rank, this.rankRules()),
+        })
       : '';
   }
 

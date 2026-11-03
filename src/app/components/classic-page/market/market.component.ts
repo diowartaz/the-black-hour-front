@@ -17,7 +17,7 @@ import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
 type MarketTab = 'buy' | 'sell';
 type MarketSort = 'rarity' | 'price-asc' | 'price-desc';
 
-// Black Market : achat de la meilleure offre de chaque plan et vente des doublons
+// Black Market : achat de la meilleure offre de chaque plan et taille de lot, et vente des doublons
 @Component({
   selector: 'app-market',
   imports: [
@@ -54,6 +54,8 @@ export class MarketComponent {
   kindFilter = signal<PlanKind>('all');
 
   selectedId = signal<number | null>(null);
+  // Ouverture depuis le panneau d'amélioration : la pop-up de vente propose d'abord le plus gros lot possible
+  sellLargestLot = signal(false);
 
   market = this.marketService.market;
   gamesLeft = computed(() => {
@@ -61,10 +63,20 @@ export class MarketComponent {
     return market ? market.requiredGames - market.gamesPlayed : 0;
   });
 
-  private offers = computed(
-    () =>
-      new Map((this.market()?.offers ?? []).map((offer): [number, MarketListingModel] => [offer.buildingId, offer])),
-  );
+  // Offres de chaque plan, une par taille de lot, du plus petit lot au plus grand
+  private offers = computed(() => byPlan(this.market()?.offers ?? []));
+
+  // Offre la moins chère du joueur pour chaque plan et taille de lot, affichée à part dans l'onglet Buy
+  private myOffers = computed(() => {
+    const cheapest = new Map<string, MarketListingModel>();
+    for (const listing of this.market()?.myListings ?? []) {
+      const key = `${listing.buildingId}:${listing.quantity}`;
+      if (listing.price < (cheapest.get(key)?.price ?? Infinity)) {
+        cheapest.set(key, listing);
+      }
+    }
+    return byPlan([...cheapest.values()]);
+  });
 
   private filteredPlans = computed(() =>
     filterPlans(
@@ -75,7 +87,7 @@ export class MarketComponent {
         item: this.itemFilter(),
         kind: this.kindFilter(),
       },
-      (effect) => buildingEffectText(effect, undefined, this.cityService.defaultValues().effect_rules),
+      (effect) => buildingEffectText(effect, { rules: this.cityService.defaultValues().effect_rules }),
     ).filter((b) => !this.deckOnly() || this.inDeck(b.id)),
   );
 
@@ -83,7 +95,11 @@ export class MarketComponent {
   extraFilters = computed(() => Number(this.deckOnly()) + Number(this.tab() === 'buy' && this.showUnavailable()));
 
   buyPlans = computed(() =>
-    this.sorted(this.filteredPlans().filter((b) => this.showUnavailable() || this.offers().has(b.id))),
+    this.sorted(
+      this.filteredPlans().filter(
+        (b) => this.showUnavailable() || this.offers().has(b.id) || this.myOffers().has(b.id),
+      ),
+    ),
   );
 
   sellPlans = computed(() => this.sorted(this.filteredPlans().filter((b) => this.canSell(b.id))));
@@ -104,19 +120,47 @@ export class MarketComponent {
     if (typeof sellBuildingId === 'number') {
       this.tab.set('sell');
       this.selectedId.set(sellBuildingId);
+      this.sellLargestLot.set(true);
     }
   }
 
-  offerOf(buildingId: number): MarketListingModel | undefined {
-    return this.offers().get(buildingId);
+  offersOf(buildingId: number): MarketListingModel[] {
+    return this.offers().get(buildingId) ?? [];
   }
 
-  // Les offres du marché excluent celles du joueur, qui peuvent pourtant passer devant la sienne
-  lowestPriceOf(buildingId: number): number | undefined {
-    const myListings = (this.market()?.myListings ?? []).filter((listing) => listing.buildingId === buildingId);
-    const offer = this.offerOf(buildingId);
-    const prices = [...myListings, ...(offer ? [offer] : [])].map((listing) => listing.price);
-    return prices.length ? Math.min(...prices) : undefined;
+  myOffersOf(buildingId: number): MarketListingModel[] {
+    return this.myOffers().get(buildingId) ?? [];
+  }
+
+  // Les acheteurs ne voient que l'offre la moins chère de chaque taille de lot ; à prix égal, celle des autres,
+  // plus ancienne, reste devant
+  isShownToBuyers(listing: MarketListingModel): boolean {
+    const other = this.offersOf(listing.buildingId).find((offer) => offer.quantity === listing.quantity);
+    return !other || listing.price < other.price;
+  }
+
+  // Taille de lot présélectionnée dans la pop-up de vente
+  initialSellQuantity(buildingId: number): number {
+    const market = this.market();
+    if (!this.sellLargestLot() || !market) {
+      return 1;
+    }
+    const sellable = market.lotSizes.filter((size) => this.owned(buildingId) >= size + market.minCopiesToSell - 1);
+    return sellable.length ? Math.max(...sellable) : 1;
+  }
+
+  // Prix le plus bas de chaque taille de lot. Les offres du marché excluent celles du joueur, qui peuvent
+  // pourtant passer devant la sienne
+  lowestPricesOf(buildingId: number): Record<number, number> {
+    const lowest: Record<number, number> = {};
+    const listings = [
+      ...(this.market()?.myListings ?? []).filter((listing) => listing.buildingId === buildingId),
+      ...this.offersOf(buildingId),
+    ];
+    for (const { quantity, price } of listings) {
+      lowest[quantity] = Math.min(lowest[quantity] ?? Infinity, price);
+    }
+    return lowest;
   }
 
   owned(buildingId: number): number {
@@ -139,6 +183,11 @@ export class MarketComponent {
     this.sort.set(value as MarketSort);
   }
 
+  closeSellDialog(): void {
+    this.selectedId.set(null);
+    this.sellLargestLot.set(false);
+  }
+
   clearExtraFilters(): void {
     this.showUnavailable.set(false);
     this.deckOnly.set(false);
@@ -146,6 +195,12 @@ export class MarketComponent {
 
   private canSell(buildingId: number): boolean {
     return this.owned(buildingId) >= (this.market()?.minCopiesToSell ?? Infinity);
+  }
+
+  // Prix unitaire le plus bas, toutes tailles de lot confondues
+  private bestUnitPrice(buildingId: number): number | undefined {
+    const prices = this.offersOf(buildingId).map((offer) => offer.price / offer.quantity);
+    return prices.length ? Math.min(...prices) : undefined;
   }
 
   // Les plans sans offre passent toujours après les autres
@@ -156,7 +211,7 @@ export class MarketComponent {
     }
     const direction = sort === 'price-asc' ? 1 : -1;
     return [...plans].sort((a, b) => {
-      const [priceA, priceB] = [this.offerOf(a.id)?.price, this.offerOf(b.id)?.price];
+      const [priceA, priceB] = [this.bestUnitPrice(a.id), this.bestUnitPrice(b.id)];
       if (priceA === undefined || priceB === undefined) {
         return Number(priceA === undefined) - Number(priceB === undefined) || byRarityDesc(a, b);
       }
@@ -164,3 +219,14 @@ export class MarketComponent {
     });
   }
 }
+
+const byPlan = (listings: MarketListingModel[]): Map<number, MarketListingModel[]> => {
+  const plans = new Map<number, MarketListingModel[]>();
+  for (const listing of listings) {
+    plans.set(listing.buildingId, [...(plans.get(listing.buildingId) ?? []), listing]);
+  }
+  for (const list of plans.values()) {
+    list.sort((a, b) => a.quantity - b.quantity);
+  }
+  return plans;
+};

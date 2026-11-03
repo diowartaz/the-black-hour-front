@@ -5,6 +5,8 @@ import { CatalogBuildingModel, MarketModel } from 'src/app/models/game';
 import { CityService } from 'src/app/services/city/city.service';
 import { GameApiService } from 'src/app/services/game-api/game-api.service';
 
+import { formatNumber } from 'src/app/shared/utils/format';
+
 import { SellDialogComponent } from './sell-dialog.component';
 
 describe('SellDialogComponent', () => {
@@ -23,7 +25,11 @@ describe('SellDialogComponent', () => {
     inventory: { wood: 4 },
   };
 
-  async function setup(createMarketListing: jasmine.Spy = jasmine.createSpy(), lowestPrice?: number): Promise<void> {
+  async function setup(
+    createMarketListing: jasmine.Spy = jasmine.createSpy(),
+    lowestPrice?: number,
+    options: { count?: number; lowestPrices?: Record<number, number> } = {},
+  ): Promise<void> {
     await TestBed.configureTestingModule({
       imports: [SellDialogComponent],
       providers: [provideRouter([]), { provide: GameApiService, useValue: { createMarketListing } }],
@@ -34,9 +40,13 @@ describe('SellDialogComponent', () => {
 
     fixture = TestBed.createComponent(SellDialogComponent);
     fixture.componentRef.setInput('building', wall);
-    fixture.componentRef.setInput('count', 3);
+    fixture.componentRef.setInput('count', options.count ?? 3);
     fixture.componentRef.setInput('taxRate', 0.05);
-    fixture.componentRef.setInput('lowestPrice', lowestPrice);
+    fixture.componentRef.setInput('lotSizes', [1, 10]);
+    fixture.componentRef.setInput(
+      'lowestPrices',
+      options.lowestPrices ?? (lowestPrice === undefined ? {} : { 1: lowestPrice }),
+    );
     closed = jasmine.createSpy();
     fixture.componentInstance.closed.subscribe(closed);
     host = fixture.nativeElement;
@@ -152,8 +162,54 @@ describe('SellDialogComponent', () => {
     await typePrice('210');
     cta().click();
 
-    expect(createMarketListing).toHaveBeenCalledOnceWith(1, 210);
+    expect(createMarketListing).toHaveBeenCalledOnceWith(1, 1, 210);
     expect(closed).toHaveBeenCalledTimes(1);
+  });
+
+  const lotButtons = () => [...host.querySelectorAll<HTMLButtonElement>('.lot')];
+
+  it('n’autorise un lot de 10 qu’avec 11 exemplaires', async () => {
+    await setup(undefined, 300, { count: 10 });
+    expect(lotButtons().map((b) => b.textContent?.trim())).toEqual(['1 plan', 'Lot of 10']);
+    expect(lotButtons()[0].getAttribute('aria-checked')).toBe('true');
+    expect(lotButtons()[1].disabled).toBeTrue();
+  });
+
+  it('prend pour référence l’offre la plus basse de la même taille de lot', async () => {
+    await setup(undefined, undefined, { count: 11, lowestPrices: { 1: 300, 10: 2500 } });
+    lotButtons()[1].click();
+    await fixture.whenStable();
+
+    expect(host.querySelector<HTMLInputElement>('.price')?.value).toBe('2499');
+    expect(host.querySelector('label')?.textContent).toContain('Price for the lot');
+    expect(host.querySelector('.per-plan')?.textContent).toContain('250 per plan');
+    expect(status().textContent).toContain('Cheapest lot of 10');
+    expect(cta().textContent).toContain(`List 10 for ${formatNumber(2499)}`);
+  });
+
+  it('sans lot concurrent, part de l’offre unitaire la plus basse × 10', async () => {
+    await setup(undefined, 300, { count: 11 });
+    lotButtons()[1].click();
+    await fixture.whenStable();
+
+    const presets = [...host.querySelectorAll('.preset')];
+    expect(presets.map((el) => el.querySelector('strong')?.textContent)).toEqual([3000, 2850, 2700].map(formatNumber));
+    expect(presets[0].querySelector('span')?.textContent).toBe('10 × lowest');
+    expect(status().textContent).toContain('No other lot of 10');
+  });
+
+  it('met un lot en vente, taxé sur son prix total', async () => {
+    const createMarketListing = jasmine
+      .createSpy()
+      .and.returnValue(of({ stats: {} as any, market: {} as MarketModel }));
+    await setup(createMarketListing, undefined, { count: 11 });
+    fixture.componentRef.setInput('initialQuantity', 10);
+    await fixture.whenStable();
+    await typePrice('2000');
+    expect(host.querySelector('.tax')?.textContent).toContain('100');
+
+    cta().click();
+    expect(createMarketListing).toHaveBeenCalledOnceWith(1, 10, 2000);
   });
 
   it('reste ouverte si la mise en vente échoue', async () => {

@@ -24,7 +24,7 @@ import {
   StatsModel,
 } from 'src/app/models/game';
 import { UserState } from 'src/app/models/router';
-import { computeBonuses } from 'src/app/shared/utils/bonuses';
+import { computeBonuses, defenseMultiplier } from 'src/app/shared/utils/bonuses';
 import { calculateAdvancedBuildings } from 'src/app/shared/utils/buildings';
 import { runRequest } from 'src/app/shared/utils/http';
 import { calculateAdvancedSkills } from 'src/app/shared/utils/skills';
@@ -62,6 +62,7 @@ export class CityService {
   bonuses = computed<Record<number, AdvancedBonus>>(() =>
     computeBonuses(this.stats(), this.defaultValues(), this.referencesBonuses()),
   );
+  defenseMultiplier = computed<number>(() => defenseMultiplier(this.bonuses()));
 
   buildings = computed<BuildingModel[]>(() => this.city().buildings);
   advancedBuildings = computed<AdvancedBuildingModel[]>(() =>

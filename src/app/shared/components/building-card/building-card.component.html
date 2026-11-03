@@ -26,23 +26,32 @@
   }
   <div class="stats">
     @if (effect(); as effect) {
-      <app-effect-tooltip [effect]="effect" />
+      <app-effect-tooltip [effect]="effect" [rank]="rank()" />
     } @else {
       <span class="def"><app-icon name="shield" [size]="13" />{{ defense() | formatNumber }}</span>
     }
     <span><app-icon name="trend" [size]="13" />{{ building().lvl_max }} lvl</span>
     <span><app-icon name="clock" [size]="13" />{{ time() }}</span>
   </div>
+  @if (costsOnTop()) {
+    <ng-container *ngTemplateOutlet="costs" />
+  }
   <div class="foot">
-    <div class="costs">
-      @for (item of building().inventory | keyvalue; track item.key) {
-        @if (item.value > 0) {
-          <span class="cost"><app-resource-gem [item]="item.key" [size]="9" />{{ item.value }}</span>
-        }
-      } @empty {
-        <span class="free">No resources</span>
-      }
-    </div>
+    @if (!costsOnTop()) {
+      <ng-container *ngTemplateOutlet="costs" />
+    }
     <ng-content></ng-content>
   </div>
 </article>
+
+<ng-template #costs>
+  <div class="costs">
+    @for (item of building().inventory | keyvalue; track item.key) {
+      @if (item.value > 0) {
+        <span class="cost"><app-resource-gem [item]="item.key" [size]="9" />{{ item.value }}</span>
+      }
+    } @empty {
+      <span class="free">No resources</span>
+    }
+  </div>
+</ng-template>

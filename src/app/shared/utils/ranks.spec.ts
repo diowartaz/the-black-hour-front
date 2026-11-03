@@ -1,5 +1,5 @@
 import { createDefaultDefaultValuesModel } from 'src/app/models/game';
-import { canUpgrade, cardRank, rankedDefense, rankedEffect, upgradeCopies } from './ranks';
+import { canUpgrade, cardRank, rankedDefense, rankedEffect, rankMultiplier, upgradeCopies } from './ranks';
 
 describe('ranks', () => {
   const rules = createDefaultDefaultValuesModel().rank_rules;
@@ -13,6 +13,7 @@ describe('ranks', () => {
     expect(rankedDefense(180, 0, rules)).toBe(180);
     expect(rankedDefense(180, 1, rules)).toBe(216);
     expect(rankedDefense(180, 10, rules)).toBe(540);
+    expect(rankMultiplier(4, rules)).toBeCloseTo(1.8);
   });
 
   it('applique le rang aux effets, sans décimales parasites', () => {

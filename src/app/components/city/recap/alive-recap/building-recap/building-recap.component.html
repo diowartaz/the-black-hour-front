@@ -13,7 +13,12 @@
         >
       }
       @if (building.effect; as effect) {
-        <app-effect-tooltip [effect]="effect" [day]="cityService.city().day" />
+        <app-effect-tooltip
+          [effect]="effect"
+          [day]="cityService.city().day"
+          [rank]="building.rank"
+          [withDefenseBonus]="true"
+        />
       } @else {
         <span class="def"><app-icon name="shield" [size]="13" />{{ building.defense | formatNumber }}</span>
       }

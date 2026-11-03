@@ -566,6 +566,10 @@ input[type='checkbox'] {
   --mat-snack-bar-supporting-text-color: var(--text);
   --mat-snack-bar-button-color: var(--pink-light);
   --mat-snack-bar-supporting-text-font: var(--font-body);
+  // Pas de thème Material : sans ces opacités, le calque de survol du bouton est opaque et masque son libellé
+  --mat-sys-hover-state-layer-opacity: 0.08;
+  --mat-sys-focus-state-layer-opacity: 0.12;
+  --mat-sys-pressed-state-layer-opacity: 0.12;
   .mat-mdc-snackbar-surface {
     border: 1px solid var(--danger);
     box-shadow: 0 0 18px color-mix(in srgb, var(--danger) 40%, transparent);

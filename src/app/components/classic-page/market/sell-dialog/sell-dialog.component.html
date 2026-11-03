@@ -17,8 +17,29 @@
       <app-building-card [building]="building()" [count]="count()" [inDeck]="inDeck()" />
     </div>
 
+    @if (lots().length > 1) {
+      <div class="field">
+        <span class="label" id="sell-quantity">Quantity</span>
+        <div class="lots" role="radiogroup" aria-labelledby="sell-quantity">
+          @for (lot of lots(); track lot.size) {
+            <button
+              type="button"
+              class="lot"
+              role="radio"
+              [class.active]="lot.size === quantity()"
+              [attr.aria-checked]="lot.size === quantity()"
+              [disabled]="!lot.available"
+              (click)="quantity.set(lot.size)"
+            >
+              {{ lot.size === 1 ? '1 plan' : 'Lot of ' + lot.size }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+
     <div class="field">
-      <label class="label" for="sell-price">Your price</label>
+      <label class="label" for="sell-price">{{ isLot() ? 'Price for the lot' : 'Your price' }}</label>
       <div class="price-box">
         <app-icon name="money" [size]="24" />
         <input
@@ -32,6 +53,9 @@
           (input)="setPrice($any($event.target).value)"
         />
       </div>
+      @if (isLot() && validPrice()) {
+        <span class="per-plan">≈ {{ unitPrice() | formatNumber }} per plan</span>
+      }
     </div>
 
     @if (presets().length) {
@@ -56,14 +80,14 @@
       <span>
         @if (lowestPrice(); as lowest) {
           @if (!validPrice()) {
-            Lowest offer: {{ lowest | formatNumber }} coins
+            Lowest {{ offerName() }}: {{ lowest | formatNumber }} coins
           } @else if (visible()) {
-            Cheapest offer: buyers will see yours
+            Cheapest {{ offerName() }}: buyers will see yours
           } @else {
             Hidden while {{ lowest | formatNumber }} is cheaper or older
           }
         } @else {
-          No other offer: buyers will see yours
+          No other {{ offerName() }}: buyers will see yours
         }
       </span>
     </p>
@@ -85,7 +109,7 @@
 
     <button type="button" class="cta cta-gold" [disabled]="!canList()" (click)="list()">
       @if (validPrice()) {
-        List for {{ price()! | formatNumber }}
+        List {{ isLot() ? quantity() + ' ' : '' }}for {{ price()! | formatNumber }}
       } @else {
         Enter a price
       }

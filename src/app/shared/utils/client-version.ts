@@ -4,7 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 // Version du contrat d'API connue de ce build, envoyée dans l'en-tête X-Client-Version.
 // À incrémenter avec MIN_CLIENT_VERSION de l'API (the-black-hour-api/src/common/client-version/client-version.middleware.ts)
 // à chaque changement incompatible du contrat.
-export const CLIENT_VERSION = 1;
+export const CLIENT_VERSION = 2;
 
 export const CLIENT_VERSION_HEADER = 'X-Client-Version';
 

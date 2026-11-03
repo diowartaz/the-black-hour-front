@@ -209,9 +209,9 @@ export class GameApiService {
     return this.httpClient.get<Schemas['MarketResponse']>(this.API_URL + 'market');
   }
 
-  createMarketListing(buildingId: number, price: number): Observable<MarketUpdate> {
+  createMarketListing(buildingId: number, quantity: number, price: number): Observable<MarketUpdate> {
     return this.httpClient
-      .post<Schemas['MarketActionResponse']>(this.API_URL + 'market/listings', { buildingId, price })
+      .post<Schemas['MarketActionResponse']>(this.API_URL + 'market/listings', { buildingId, quantity, price })
       .pipe(map(toMarketUpdate));
   }
 

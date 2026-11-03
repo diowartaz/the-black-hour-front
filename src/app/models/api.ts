@@ -406,7 +406,7 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Met en vente un exemplaire d'un plan et paie la taxe
+         * Met en vente un lot d'exemplaires d'un plan (1 par défaut) et paie la taxe
          *     (422 MARKET_LOCKED, INVALID_LISTING, NOT_ENOUGH_COPIES, NOT_ENOUGH_MONEY)
          */
         post: operations["MarketController_createListing"];
@@ -899,17 +899,21 @@ export interface components {
         MarketOfferResponse: {
             listingId: string;
             buildingId: number;
+            /** @description Taille du lot ; price est le prix du lot entier */
+            quantity: number;
             price: number;
         };
         MarketListingResponse: {
             listingId: string;
             buildingId: number;
+            quantity: number;
             price: number;
             /** Format: date-time */
             listedAt: string;
         };
         MarketSaleResponse: {
             buildingId: number;
+            quantity: number;
             price: number;
             /** Format: date-time */
             soldAt: string;
@@ -919,11 +923,13 @@ export interface components {
             unlocked: boolean;
             gamesPlayed: number;
             requiredGames: number;
-            /** @description Exemplaires à posséder pour pouvoir en vendre un */
+            /** @description Exemplaires à posséder pour vendre un lot de 1 (un lot de n en demande n − 1 de plus) */
             minCopiesToSell: number;
+            /** @description Tailles de lot possibles */
+            lotSizes: number[];
             /** @description Part du prix payée à la mise en vente, arrondie au supérieur */
             taxRate: number;
-            /** @description Offre la moins chère de chaque plan disponible, hors offres du joueur */
+            /** @description Offre la moins chère de chaque plan et taille de lot disponibles, hors offres du joueur */
             offers: components["schemas"]["MarketOfferResponse"][];
             /** @description Offres en cours du joueur */
             myListings: components["schemas"]["MarketListingResponse"][];
@@ -931,9 +937,14 @@ export interface components {
             sales: components["schemas"]["MarketSaleResponse"][];
         };
         CreateListingDto: {
-            /** @description Plan à vendre : il faut en posséder au moins rules.MARKET_MIN_COPIES_TO_SELL exemplaires */
+            /** @description Plan à vendre : le vendeur en garde toujours au moins un exemplaire */
             buildingId: number;
-            /** @description Prix de vente : la taxe de mise en vente en est déduite d'avance, sur l'argent du vendeur */
+            /**
+             * @description Taille du lot, parmi MARKET_LOT_SIZES (1 par défaut)
+             * @enum {number}
+             */
+            quantity?: 1 | 10;
+            /** @description Prix du lot entier : la taxe de mise en vente en est déduite d'avance, sur l'argent du vendeur */
             price: number;
         };
         MarketActionResponse: {

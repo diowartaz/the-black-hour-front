@@ -225,14 +225,17 @@ export interface BoosterCardModel {
   is_new: boolean;
 }
 
+// Un lot de quantity exemplaires ; price est le prix du lot entier
 export interface MarketListingModel {
   listingId: string;
   buildingId: number;
+  quantity: number;
   price: number;
 }
 
 export interface MarketSaleModel {
   buildingId: number;
+  quantity: number;
   price: number;
   soldAt: string;
 }
@@ -241,9 +244,11 @@ export interface MarketModel {
   unlocked: boolean;
   gamesPlayed: number;
   requiredGames: number;
+  // Exemplaires à posséder pour vendre un lot de 1 (un lot de n en demande n − 1 de plus)
   minCopiesToSell: number;
+  lotSizes: number[];
   taxRate: number;
-  // Offre la moins chère de chaque plan, hors offres du joueur
+  // Offre la moins chère de chaque plan et taille de lot, hors offres du joueur
   offers: MarketListingModel[];
   myListings: MarketListingModel[];
   sales: MarketSaleModel[];

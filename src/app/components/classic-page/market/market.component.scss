@@ -101,12 +101,101 @@ app-plan-filters {
   }
 }
 
-// En bas à droite de la tuile, dans son pied
-.market-card .buy-btn {
-  margin-left: auto;
-  height: 34px;
-  padding: 0 10px;
+// Pied de la tuile, sous les coûts : une ligne par taille de lot en vente, puis les offres du joueur, en grisé.
+// Trois colonnes : quantité, prix, bouton (ou étiquette pour une offre du joueur)
+.price-list {
+  flex-basis: 100%;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--line);
+}
+
+.price-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 64px;
+  align-items: center;
+  column-gap: 8px;
+  min-height: 38px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--line);
+  font-variant-numeric: tabular-nums;
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.qty {
+  line-height: 1;
+  font-family: var(--font-display);
+  font-weight: 700;
   font-size: 13px;
+  color: var(--yellow);
+}
+
+.price {
+  justify-self: end;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--yellow);
+}
+
+.row-buy {
+  height: 28px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--grad-gold);
+  color: var(--text-on-gold);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--yellow) 45%, transparent);
+  &:hover:not(:disabled) {
+    box-shadow: 0 0 16px color-mix(in srgb, var(--yellow) 70%, transparent);
+  }
+  &:disabled {
+    background: color-mix(in srgb, var(--text-mute) 25%, transparent);
+    color: var(--text-mute);
+    box-shadow: none;
+  }
+}
+
+.mine {
+  .qty,
+  .price {
+    color: var(--text-mute);
+  }
+}
+
+.mine-tag {
+  justify-self: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  border: 1px dashed var(--line);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-mute);
+  .shown & {
+    border-style: solid;
+    border-color: color-mix(in srgb, var(--green) 50%, transparent);
+    color: var(--green);
+  }
+}
+
+// Taille du lot, dans les listes du joueur
+.lot {
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--yellow) 16%, transparent);
+  color: var(--yellow);
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .no-offer {

@@ -6,7 +6,7 @@ export function cardRank(ranks: Record<number, number>, buildingId: number): num
   return ranks[buildingId] ?? 0;
 }
 
-function rankMultiplier(rank: number, rules: RankRulesModel): number {
+export function rankMultiplier(rank: number, rules: RankRulesModel): number {
   return 1 + rules.rank_bonus * rank;
 }
 

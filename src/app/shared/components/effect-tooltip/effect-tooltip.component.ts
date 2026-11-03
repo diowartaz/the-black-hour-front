@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, OnDestroy,
 import { BuildingEffectModel } from 'src/app/models/game';
 import { CityService } from 'src/app/services/city/city.service';
 import { buildingEffectText } from '../../utils/building-effects';
+import { rankMultiplier } from '../../utils/ranks';
 import { IconComponent } from '../icon/icon.component';
 
 // Bulle ouverte dans toute l'application : en ouvrir une ferme la précédente
@@ -60,12 +61,24 @@ export class EffectTooltipComponent implements OnDestroy {
   effect = input.required<BuildingEffectModel>();
   // Jour de la ville en cours : affiche la valeur actuelle des effets qui en dépendent
   day = input<number>();
+  // Rang du plan, pour ses plafonds (`effect` doit déjà être au rang)
+  rank = input(0);
+  // En partie : les valeurs de défense incluent le bonus de défense du joueur
+  withDefenseBonus = input(false);
   // « stat » : grande icône et libellé dessous, à la place d'un bloc de défense (tuiles de construction)
   variant = input<'chip' | 'stat'>('chip');
 
   readonly positions = POSITIONS;
   open = computed(() => openTooltip() === this);
-  text = computed(() => buildingEffectText(this.effect(), this.day(), this.cityService.defaultValues().effect_rules));
+  text = computed(() => {
+    const defaultValues = this.cityService.defaultValues();
+    return buildingEffectText(this.effect(), {
+      day: this.day(),
+      rules: defaultValues.effect_rules,
+      rankMultiplier: rankMultiplier(this.rank(), defaultValues.rank_rules),
+      defenseMultiplier: this.withDefenseBonus() ? this.cityService.defenseMultiplier() : 1,
+    });
+  });
   // Ouverte par un clic : reste affichée quand la souris quitte le bouton
   private pinned = false;
 

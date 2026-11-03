@@ -57,7 +57,13 @@
         <div class="body">
           <div class="gain">
             @if (building.effect; as effect) {
-              <app-effect-tooltip [effect]="effect" [day]="cityService.city().day" variant="stat" />
+              <app-effect-tooltip
+                [effect]="effect"
+                [day]="cityService.city().day"
+                [rank]="building.rank"
+                [withDefenseBonus]="true"
+                variant="stat"
+              />
             } @else {
               <b>{{ building.defense ? '+' + (building.defense | formatNumber) : '—' }}</b>
               <small>defense</small>

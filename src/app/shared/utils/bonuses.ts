@@ -10,6 +10,14 @@ export function bonusEffect(bonus: AdvancedBonus | undefined): number {
   return bonus ? bonus.value * bonus.lvl : 0;
 }
 
+// Bonus de défense en pourcentage (BonusId.PercentDefense dans the-black-hour-api)
+export const DEFENSE_BONUS_ID = 3;
+
+// Multiplicateur de défense du joueur, même formule que defenseMultiplier de l'API : bâtiments spéciaux compris
+export function defenseMultiplier(bonuses: Record<number, AdvancedBonus>): number {
+  return 1 + bonusEffect(bonuses[DEFENSE_BONUS_ID]);
+}
+
 export function computeBonuses(
   stats: StatsModel,
   defaultValues: DefaultValuesModel,

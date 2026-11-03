@@ -1,3 +1,4 @@
+<!-- Dernière revue complète du guide (2026-11-03) : the-black-hour-api@306ad60, the-black-hour-front@761a405 -->
 <app-classic-page [title]="'Guide'" [subtitle]="'How to survive the waves'" [glow]="'var(--cyan)'">
   <ng-container icon><app-icon name="bookmark" [size]="28" /></ng-container>
   <ng-container content>
@@ -22,6 +23,9 @@
         <div class="inline-div">
           When your city falls, you earn <app-icon class="ic yellow" name="money" [size]="18" />coins to buy new
           building plans and permanent bonuses for your next games.
+        </div>
+        <div class="inline-div">
+          Upgrade your plans, trade them on the Black Market, and join a guild to earn even more.
         </div>
         <div class="inline-div">
           <strong>Are you ready to climb the ranks and dominate the leaderboard?</strong>
@@ -157,9 +161,9 @@
         </p>
         <div class="inline-div">
           <app-icon class="ic pink" name="sparkle" [size]="18" /><strong>Special buildings</strong> have no fixed
-          defense but have an effect: tap them to read it. Any defense they give benefits from your Efficient defenser
-          bonus. What they did shows up in a pop-up after your action, and in the <strong>Overnight</strong> part of the
-          attack recap.
+          defense but have an effect: hover or tap them to read it. Any defense they give benefits from your Efficient
+          defenser bonus, limits included, and the effect shown during a game already counts it. What they did shows up
+          in a pop-up after your action, and in the <strong>Night log</strong> of the attack recap.
         </div>
 
         <p><strong>Discovering plans</strong></p>
@@ -172,7 +176,7 @@
         <div class="inline-div">
           <app-icon class="ic cyan" name="recycle" [size]="18" />When <strong>15 buildings</strong> of your deck (75%)
           reach their max level, every completed building goes back into the draw pile. Picking one again unlocks a new
-          set of levels for it, with the same defense.
+          set of levels for it.
         </div>
       </section>
 
@@ -251,7 +255,8 @@
         <h2><app-icon class="ic green" name="trend" [size]="18" /> Plan ranks</h2>
         <p>
           Each plan starts at <strong>rank 0</strong> and goes up to <strong>rank 10</strong>. Every rank adds
-          <strong>20% of the base value</strong> to the building's defense and effect, up to +200% at rank 10. Resource
+          <strong>20% of the base value</strong> to the building's defense and effect, effect limits included, up to
+          +200% at rank 10. Resource
           costs, build times and levels do not change.
         </p>
         <div class="inline-div">
@@ -291,20 +296,21 @@
       <section>
         <h2><app-icon class="ic yellow" name="money" [size]="18" /> Black Market</h2>
         <p>
-          The Black Market opens after <strong>5 finished games</strong>. Players trade plans there, one copy at a time,
-          without knowing who they deal with.
+          The Black Market opens after <strong>5 finished games</strong>. Players trade plans there, one copy at a time or in
+          <strong>lots of 10</strong>, without knowing who they deal with.
         </p>
         <div class="inline-div">
-          <strong>Buying:</strong> only the cheapest offer of each plan is shown. When it is bought, the next one takes
-          its place. You always pay the price you see: if someone else was faster, nothing is charged.
+          <strong>Buying:</strong> only the cheapest offer of each plan is shown, one for single copies and one for
+          lots of 10. When it is bought, the next one takes its place. You always pay the price you see: if someone else was faster, nothing is charged.
         </div>
         <div class="inline-div">
-          <strong>Selling:</strong> you need at least <strong>2 copies</strong> of a plan, so you always keep one. You
-          set the price and pay a <strong>5% tax</strong> when listing. The tax is never refunded.
+          <strong>Selling:</strong> you always keep one copy of a plan: selling one needs <strong>2 copies</strong>,
+          a lot of 10 needs <strong>11</strong>. You set the price of the whole lot and pay a <strong>5% tax</strong>
+          on it when listing. The tax is never refunded.
         </div>
         <div class="inline-div">
-          The plan leaves your collection as soon as it is listed. You get the coins when it sells, even if you are
-          offline, and you can withdraw an unsold plan at any time.
+          The plans leave your collection as soon as they are listed. You get the coins when it sells, even if you are
+          offline, and you can withdraw an unsold offer at any time.
         </div>
       </section>
 
@@ -336,63 +342,54 @@
 
         <p><strong>Permanent bonuses</strong></p>
         <p>
-          Bonuses are <strong>automatically applied</strong> to all your future games, ranked included. The price of
-          level N is the level 1 price × N<sup>1.5</sup>.
+          Bonuses are <strong>automatically applied</strong> to all your future games, ranked included. Every bonus goes
+          up to <strong>level 15</strong>, and each level costs <strong>1.5 times</strong> the previous one.
         </p>
         <table>
           <tr>
             <th>Bonus</th>
             <th>Effect per level</th>
-            <th>Max</th>
             <th>Level 1</th>
           </tr>
           <tr>
             <td><app-icon class="ic yellow" name="money" [size]="18" />Money Maker</td>
             <td>+3% coins at the end of a game</td>
-            <td>10</td>
-            <td>360</td>
+            <td>500</td>
           </tr>
           <tr>
             <td><app-icon class="ic yellow" name="shield-plus" [size]="18" />Efficient defenser</td>
             <td>+2% defense for all buildings, special buildings included</td>
-            <td>10</td>
-            <td>450</td>
+            <td>1&nbsp;000</td>
           </tr>
           <tr>
             <td><app-icon class="ic orange" name="build" [size]="18" />Efficient builder 1</td>
             <td>Building takes 2% less time</td>
-            <td>10</td>
-            <td>300</td>
+            <td>500</td>
           </tr>
           <tr>
             <td><app-icon class="ic orange" name="build" [size]="18" />Efficient builder 2</td>
             <td>Building takes 1 min less</td>
-            <td>10</td>
-            <td>180</td>
+            <td>350</td>
           </tr>
           <tr>
             <td><app-icon class="ic yellow" name="dig" [size]="18" />Efficient Digger 1</td>
             <td>Digging takes 2% less time</td>
-            <td>10</td>
-            <td>300</td>
+            <td>500</td>
           </tr>
           <tr>
             <td><app-icon class="ic yellow" name="dig" [size]="18" />Efficient Digger 2</td>
             <td>Digging takes 1 min less</td>
-            <td>10</td>
-            <td>180</td>
+            <td>400</td>
           </tr>
           <tr>
             <td><app-icon class="ic yellow" name="dig" [size]="18" />Lucky Digger</td>
             <td>2% chance to find 1 more resource per dig</td>
-            <td>10</td>
-            <td>240</td>
+            <td>500</td>
           </tr>
           <tr>
             <td><app-icon class="ic cyan" name="book" [size]="18" />Efficient Learner 1</td>
             <td>Learning takes 3% less time</td>
-            <td>10</td>
-            <td>180</td>
+            <td>500</td>
           </tr>
         </table>
       </section>
@@ -425,10 +422,14 @@
             <td>+40% of all your coins from the game, if you win a ranked duel.</td>
           </tr>
           <tr>
-            <td><app-icon class="ic yellow" name="sparkle" [size]="18" />Bonus</td>
+            <td><app-icon class="ic yellow" name="sparkle" [size]="18" />Money Maker</td>
             <td>+3% per Money Maker level.</td>
           </tr>
         </table>
+        <div class="inline-div">
+          <app-icon class="ic yellow" name="shield" [size]="18" />In a guild, your coins also feed the guild pot, paid
+          to its members every day.
+        </div>
         <div class="inline-div">
           <app-icon class="ic yellow" name="sparkle" [size]="18" />Every coin earned in a game is also earned as
           <strong>XP</strong>. Your XP raises your level, shown on your profile.
@@ -462,8 +463,9 @@
         <div class="inline-div">
           Both players share the same random draws: same zombie waves
           <app-icon class="ic danger" name="zombie" [size]="18" />night after night, same starting skills, same
-          resources offered dig after dig, same building defense variations. Each player brings their own
-          <app-icon class="ic cyan" name="cards" [size]="18" />deck: building it well is part of the duel.
+          resources offered dig after dig. Each player brings their own
+          <app-icon class="ic cyan" name="cards" [size]="18" />deck and plan ranks: building them well is part of the
+          duel.
         </div>
         <div class="inline-div">
           Your permanent <app-icon class="ic yellow" name="sparkle" [size]="18" />bonuses still apply in ranked.
@@ -571,8 +573,50 @@
         </table>
         <div class="inline-div">
           <app-icon class="ic cyan" name="friends" [size]="18" />Tap a player to open their <strong>profile</strong>:
-          level, XP, rank, ranked points, records and their last <strong>20 games</strong>, with each ranked duel's
-          opponent and result.
+          level, XP, guild, rank, ranked points, records and their last <strong>20 games</strong>, with each ranked
+          duel's opponent, result and victory bonus.
+        </div>
+        <div class="inline-div">
+          <app-icon class="ic green" name="money" [size]="18" />Your own profile also shows what you earned
+          <strong>today</strong> and your share of the guild pot.
+        </div>
+      </section>
+
+      <section>
+        <h2><app-icon class="ic yellow" name="shield" [size]="18" /> Guilds</h2>
+        <p>
+          A guild gathers up to <strong>20 players</strong> who share part of their earnings. Open it from the
+          <strong>Guild</strong> menu. You can only be in one guild at a time.
+        </p>
+        <p><strong>The guild pot</strong></p>
+        <div class="inline-div">
+          <app-icon class="ic yellow" name="money" [size]="18" />Every game a member finishes adds
+          <strong>1%</strong> of its coins (ranked victory bonus included) to the day's pot. It takes nothing from their
+          own coins.
+        </div>
+        <div class="inline-div">
+          <app-icon class="ic cyan" name="clock" [size]="18" />After <strong>midnight (Paris time)</strong>, every
+          member who finished at least one game that day receives <strong>the whole pot</strong>. The more members play,
+          the bigger it gets for everyone.
+        </div>
+        <div class="inline-div">
+          Your share follows you if you change guild. If you have no guild at midnight, it is lost.
+        </div>
+        <p><strong>Joining and leading</strong></p>
+        <div class="inline-div">
+          <strong>Public guilds</strong> with free places can be joined directly. They are listed with the biggest pot
+          of the day first, and you can search them by name.
+        </div>
+        <div class="inline-div">
+          <strong>Private guilds</strong> are joined on invitation only. An invitation lasts <strong>7 days</strong>.
+        </div>
+        <div class="inline-div">
+          <app-icon class="ic yellow" name="crown" [size]="18" />Anyone without a guild can create one and becomes its
+          <strong>leader</strong>. The name (3 to 24 characters) can't be changed later. The leader chooses whether the
+          guild is public or private, invites players who have no guild, and can kick members.
+        </div>
+        <div class="inline-div">
+          Members can leave at any time. If the leader leaves, the guild is <strong>disbanded</strong>.
         </div>
       </section>
 
@@ -629,8 +673,16 @@
           deck with balanced resource needs.
         </div>
         <div class="inline-div">
-          <app-icon class="ic yellow" name="money" [size]="18" />Play ranked for 25% more coins (75% if you win), and buy Money Maker
-          early to earn more from every game.
+          <app-icon class="ic yellow" name="money" [size]="18" />Play ranked for 25% more coins (75% if you win), and
+          buy Money Maker early to earn more from every game.
+        </div>
+        <div class="inline-div">
+          <app-icon class="ic green" name="trend" [size]="18" />Use your duplicates to upgrade the plans you build the
+          most, and sell the rest on the Black Market.
+        </div>
+        <div class="inline-div">
+          <app-icon class="ic yellow" name="shield" [size]="18" />Join an active guild and finish at least one game a
+          day to get the pot.
         </div>
       </section>
 

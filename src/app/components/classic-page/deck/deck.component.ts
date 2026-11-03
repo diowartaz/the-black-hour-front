@@ -18,7 +18,7 @@ import {
   filterPlans,
   PlanKind,
 } from 'src/app/shared/utils/deck';
-import { canUpgrade, cardRank, rankedEffect } from 'src/app/shared/utils/ranks';
+import { canUpgrade, cardRank, rankedEffect, rankMultiplier } from 'src/app/shared/utils/ranks';
 import { ClassicPageComponent } from '../classic-page.component';
 import { UpgradeDialogComponent } from './upgrade-dialog/upgrade-dialog.component';
 
@@ -180,11 +180,10 @@ export class DeckComponent {
 
   // Le bouton « Effect » de la carte n'est pas cliquable dans la bulle : l'effet y est écrit en clair
   effectText(effect: BuildingEffectModel, rank = 0): string {
-    return buildingEffectText(
-      rankedEffect(effect, rank, this.rankRules()),
-      undefined,
-      this.cityService.defaultValues().effect_rules,
-    );
+    return buildingEffectText(rankedEffect(effect, rank, this.rankRules()), {
+      rules: this.cityService.defaultValues().effect_rules,
+      rankMultiplier: rankMultiplier(rank, this.rankRules()),
+    });
   }
 
   autocomplete(): void {

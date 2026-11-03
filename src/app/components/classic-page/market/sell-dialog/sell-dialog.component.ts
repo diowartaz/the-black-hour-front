@@ -6,7 +6,7 @@ import { BuildingCardComponent } from 'src/app/shared/components/building-card/b
 import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
 
-// Mise en vente d'un plan : panneau du bas, comme les filtres
+// Mise en vente d'un plan, à l'unité ou en lot : panneau du bas, comme les filtres
 @Component({
   selector: 'app-sell-dialog',
   imports: [FormatNumberPipe, BuildingCardComponent, IconComponent],
@@ -23,15 +23,41 @@ export class SellDialogComponent {
   building = input.required<CatalogBuildingModel>();
   count = input(1);
   inDeck = input(false);
-  // Absent quand personne d'autre ne vend ce plan
-  lowestPrice = input<number | undefined>(undefined);
+  // Prix le plus bas de chaque taille de lot ; une taille absente quand personne d'autre n'en vend
+  lowestPrices = input<Record<number, number>>({});
+  lotSizes = input([1]);
+  minCopiesToSell = input(2);
+  initialQuantity = input(1);
   taxRate = input.required<number>();
   closed = output<void>();
 
+  quantity = linkedSignal(() => this.initialQuantity());
+
+  // Le vendeur garde toujours un exemplaire : un lot de n en demande n − 1 de plus qu'une vente à l'unité
+  lots = computed(() =>
+    this.lotSizes().map((size) => ({ size, available: this.count() >= size + this.minCopiesToSell() - 1 })),
+  );
+
+  isLot = computed(() => this.quantity() > 1);
+
+  lowestPrice = computed<number | undefined>(() => this.lowestPrices()[this.quantity()]);
+
+  // Sans lot concurrent de cette taille, la référence est l'offre unitaire la plus basse, multipliée
+  private reference = computed<{ price: number; label: string } | undefined>(() => {
+    const lowest = this.lowestPrice();
+    if (lowest !== undefined) {
+      return { price: lowest - 1, label: 'Lowest −1' };
+    }
+    const unit = this.lowestPrices()[1];
+    return this.isLot() && unit !== undefined
+      ? { price: unit * this.quantity(), label: `${this.quantity()} × lowest` }
+      : undefined;
+  });
+
   // Prérempli juste sous l'offre la plus basse : à prix égal, l'offre la plus ancienne reste devant
   price = linkedSignal<number | null>(() => {
-    const lowest = this.lowestPrice();
-    return lowest !== undefined && lowest > 1 ? lowest - 1 : null;
+    const reference = this.reference();
+    return reference && reference.price >= 1 ? reference.price : null;
   });
 
   validPrice = computed(() => {
@@ -40,33 +66,42 @@ export class SellDialogComponent {
   });
 
   presets = computed(() => {
-    const lowest = this.lowestPrice();
-    if (lowest === undefined) {
+    const reference = this.reference();
+    if (!reference) {
       return [];
     }
+    const base = this.lowestPrice() ?? reference.price;
     const presets = [
-      { label: 'Lowest −1', price: lowest - 1 },
-      { label: '−5%', price: Math.floor((lowest * 95) / 100) },
-      { label: '−10%', price: Math.floor((lowest * 90) / 100) },
+      reference,
+      { label: '−5%', price: Math.floor((base * 95) / 100) },
+      { label: '−10%', price: Math.floor((base * 90) / 100) },
     ];
     return presets.filter(
       (preset, index) => preset.price >= 1 && presets.findIndex((p) => p.price === preset.price) === index,
     );
   });
 
-  // Les acheteurs ne voient que l'offre la moins chère de chaque plan
+  // Les acheteurs ne voient que l'offre la moins chère de chaque plan et taille de lot
   visible = computed(() => {
     const lowest = this.lowestPrice();
     return lowest === undefined || (this.validPrice() && this.price()! < lowest);
   });
 
-  // Même calcul que listingTax côté API
+  offerName = computed(() => (this.isLot() ? `lot of ${this.quantity()}` : 'offer'));
+
+  unitPrice = computed(() => (this.validPrice() ? Math.round(this.price()! / this.quantity()) : 0));
+
+  // Même calcul que listingTax côté API, sur le prix du lot entier
   tax = computed(() => (this.validPrice() ? Math.ceil(this.price()! * this.taxRate()) : 0));
 
   net = computed(() => (this.validPrice() ? this.price()! - this.tax() : 0));
 
   canList = computed(
-    () => this.validPrice() && this.tax() <= this.cityService.stats().money && !this.marketService.actionLoading(),
+    () =>
+      this.validPrice() &&
+      this.lots().some((lot) => lot.size === this.quantity() && lot.available) &&
+      this.tax() <= this.cityService.stats().money &&
+      !this.marketService.actionLoading(),
   );
 
   setPrice(value: string): void {
@@ -75,7 +110,7 @@ export class SellDialogComponent {
 
   list(): void {
     if (this.canList()) {
-      this.marketService.createListing(this.building().id, this.price()!, () => this.closed.emit());
+      this.marketService.createListing(this.building().id, this.quantity(), this.price()!, () => this.closed.emit());
     }
   }
 }
