@@ -16,6 +16,7 @@ npm run api:types  # régénère src/app/models/api.ts depuis ../the-black-hour-
 
 - Un seul fichier de test : `npx ng test --watch=false --browsers=ChromeHeadless --include=src/app/components/create-city/create-city.component.spec.ts`.
 - `src/app/models/api.ts` est généré : ne jamais l'éditer à la main. Quand un DTO change côté API : `npm run openapi` dans `the-black-hour-api`, puis `npm run api:types` ici, puis adapter le mapping dans `GameApiService`.
+- Version de contrat : `versionInterceptor` envoie `CLIENT_VERSION` (`shared/utils/client-version.ts`) ; une réponse `CLIENT_OUTDATED` (426) affiche une seule fois le snackbar « Refresh » (`OutdatedClientNotifier`), sans déconnexion. Changement incompatible de l'API : incrémenter `CLIENT_VERSION` avec `MIN_CLIENT_VERSION` de l'API et le signaler à l'utilisateur (règle complète dans le `CLAUDE.md` racine).
 
 ## Conventions
 

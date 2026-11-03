@@ -38,6 +38,10 @@
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
+    // Ranked gagnée en second : 4 gains, en deux rangées
+    &.with-win {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
   .reward {
     display: flex;
@@ -47,6 +51,12 @@
     padding: 8px 0;
     border-radius: var(--radius-m);
     background: color-mix(in srgb, var(--yellow) 8%, transparent);
+    &.win {
+      background: color-mix(in srgb, var(--green) 12%, transparent);
+      .reward-label {
+        color: var(--green);
+      }
+    }
     .reward-label {
       font-size: 11px;
       font-weight: 700;

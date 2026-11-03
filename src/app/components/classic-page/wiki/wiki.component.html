@@ -418,7 +418,11 @@
           </tr>
           <tr>
             <td><app-icon class="ic pink" name="ranked" [size]="18" />Ranked</td>
-            <td>+50% of the base, in ranked games.</td>
+            <td>+25% of the base, in ranked games.</td>
+          </tr>
+          <tr>
+            <td><app-icon class="ic green" name="crown" [size]="18" />Victory</td>
+            <td>+40% of all your coins from the game, if you win a ranked duel.</td>
           </tr>
           <tr>
             <td><app-icon class="ic yellow" name="sparkle" [size]="18" />Bonus</td>
@@ -435,8 +439,8 @@
         <h2><app-icon class="ic pink" name="ranked" [size]="18" /> Ranked mode</h2>
         <p>
           <strong
-            >Don't hesitate to play ranked to earn more
-            <app-icon class="ic yellow" name="money" [size]="18" /> (+50%)!</strong
+            >Don't hesitate to play ranked to earn more <app-icon class="ic yellow" name="money" [size]="18" /> (+25%,
+            +75% if you win)!</strong
           >
         </p>
         <p>
@@ -528,7 +532,13 @@
         <p><strong>Ranked coins</strong></p>
         <div class="inline-div">
           <app-icon class="ic yellow" name="money" [size]="18" />When your city falls, you earn
-          <strong>50% more coins</strong>, win or lose. They are credited right away, without waiting for your opponent.
+          <strong>25% more coins</strong>, win or lose. They are credited right away, without waiting for your opponent.
+        </div>
+        <div class="inline-div">
+          <app-icon class="ic green" name="crown" [size]="18" />The winner of the duel earns
+          <strong>40% more</strong> on top of all their coins from the game: 75% more than a normal game. If you played
+          second, you get it as soon as your city falls; if you played first, it is credited when your opponent falls or
+          runs out of time.
         </div>
 
         <p><strong>Time limit</strong></p>
@@ -619,7 +629,7 @@
           deck with balanced resource needs.
         </div>
         <div class="inline-div">
-          <app-icon class="ic yellow" name="money" [size]="18" />Play ranked for 50% more coins, and buy Money Maker
+          <app-icon class="ic yellow" name="money" [size]="18" />Play ranked for 25% more coins (75% if you win), and buy Money Maker
           early to earn more from every game.
         </div>
       </section>

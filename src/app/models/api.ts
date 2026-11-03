@@ -1067,6 +1067,8 @@ export interface components {
             baseMoney: number;
             rankedMoney: number;
             bonusMoney: number;
+            /** @description Bonus de victoire ranked, quand le joueur gagne en terminant second (sinon 0) */
+            winMoney: number;
             totalMoney: number;
         };
         AttackRecapResponse: {
@@ -1183,6 +1185,8 @@ export interface components {
             outcome: "win" | "loss" | "draw" | null;
             /** @description Partie ranked réglée par abandon : le second joueur n'a pas terminé avant son échéance */
             forfeit: boolean;
+            /** @description Bonus de victoire ranked crédité à ce joueur ; 0 hors victoire ou tant que l'adversaire n'a pas terminé */
+            winMoney: number;
         };
         ProfileResponse: {
             id: string;

@@ -1,7 +1,8 @@
 import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
+import { Subject } from 'rxjs';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { environment } from 'src/environments/environment';
 import { errorInterceptor } from './error.interceptor';
@@ -14,6 +15,7 @@ describe('errorInterceptor', () => {
 
   beforeEach(() => {
     snackBar = jasmine.createSpyObj<MatSnackBar>('MatSnackBar', ['open']);
+    snackBar.open.and.returnValue({ onAction: () => new Subject<void>() } as unknown as MatSnackBarRef<TextOnlySnackBar>);
     authService = jasmine.createSpyObj<AuthService>('AuthService', ['logOut', 'isConnected']);
     authService.isConnected.and.returnValue(true);
 
@@ -63,6 +65,14 @@ describe('errorInterceptor', () => {
       message: 'Building 3 not available',
     });
     expect(snackBar.open).toHaveBeenCalledWith('Building 3 not available', 'OK', jasmine.any(Object));
+    expect(authService.logOut).not.toHaveBeenCalled();
+  });
+
+  it('propose de recharger un front périmé, une seule fois et sans déconnecter', () => {
+    const outdated = { statusCode: 426, code: 'CLIENT_OUTDATED', message: 'A new version of the game is available' };
+    failRequest('me', 426, outdated);
+    failRequest('me/city', 426, outdated);
+    expect(snackBar.open).toHaveBeenCalledOnceWith('A new version of the game is available', 'Refresh');
     expect(authService.logOut).not.toHaveBeenCalled();
   });
 });

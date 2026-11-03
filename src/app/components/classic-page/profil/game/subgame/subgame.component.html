@@ -17,11 +17,18 @@
     <span class="stat" title="Days survived"
       ><app-icon name="calendar" [size]="14" />{{ modifiedGameHistoryPlayer.day }}</span
     >
+    <!-- « -- » (valeur absente, partie normale) ne passe pas par formatNumber, qui afficherait NaN -->
     <span class="stat def" title="Defense"
-      ><app-icon name="shield" [size]="14" />{{ modifiedGameHistoryPlayer.defense | formatNumber }}</span
+      ><app-icon name="shield" [size]="14" />{{
+        modifiedGameHistoryPlayer.defense === '--' ? '--' : (modifiedGameHistoryPlayer.defense | formatNumber)
+      }}</span
     >
     <span class="stat pts" title="Ranked points"
-      ><app-icon name="ranked" [size]="14" />{{ modifiedGameHistoryPlayer.ranked_points | formatNumber }}</span
+      ><app-icon name="ranked" [size]="14" />{{
+        modifiedGameHistoryPlayer.ranked_points === '--'
+          ? '--'
+          : (modifiedGameHistoryPlayer.ranked_points | formatNumber)
+      }}</span
     >
   </div>
 </div>

@@ -12,7 +12,7 @@
 
     <section class="rewards">
       <h2 class="label">Rewards</h2>
-      <div class="reward-grid">
+      <div class="reward-grid" [class.with-win]="cityService.city().attackRecap.win_money > 0">
         <div class="reward">
           <span class="reward-label">Base</span>
           <span class="reward-value"
@@ -26,11 +26,19 @@
           >
         </div>
         <div class="reward">
-          <span class="reward-label">Bonus</span>
+          <span class="reward-label">Money Maker</span>
           <span class="reward-value"
             ><app-icon name="money" [size]="16" />{{ cityService.city().attackRecap.bonus_money | formatNumber }}</span
           >
         </div>
+        @if (cityService.city().attackRecap.win_money > 0) {
+          <div class="reward win">
+            <span class="reward-label">Victory</span>
+            <span class="reward-value"
+              ><app-icon name="money" [size]="16" />{{ cityService.city().attackRecap.win_money | formatNumber }}</span
+            >
+          </div>
+        }
       </div>
       <div class="total">
         <span>Total</span>

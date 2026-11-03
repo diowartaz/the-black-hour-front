@@ -3,6 +3,7 @@ import { inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, throwError } from 'rxjs';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { CLIENT_OUTDATED_CODE, OutdatedClientNotifier } from 'src/app/shared/utils/client-version';
 import { environment } from 'src/environments/environment';
 
 // Endpoints dont les erreurs attendues sont affichées par le formulaire lui-même
@@ -29,6 +30,7 @@ function errorMessage(error: HttpErrorResponse): string {
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const snackBar = inject(MatSnackBar);
   const authService = inject(AuthService);
+  const outdatedClient = inject(OutdatedClientNotifier);
 
   return next(req).pipe(
     catchError((error: unknown) => {
@@ -39,6 +41,12 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       const path = req.url.slice(environment.API_URL.length);
       const selfHandled = SELF_HANDLED.some((rule) => rule.path === path && rule.status === error.status);
       console.error(`${req.method} ${req.url} -> ${error.status}`, error.error);
+
+      // Build plus ancien que le contrat de l'API : proposer de recharger, sans déconnecter
+      if (error.error?.code === CLIENT_OUTDATED_CODE) {
+        outdatedClient.notify();
+        return throwError(() => error);
+      }
 
       if (!selfHandled) {
         if (error.status === 401 && authService.isConnected()) {

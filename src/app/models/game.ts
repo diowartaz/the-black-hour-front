@@ -69,6 +69,7 @@ export function createDefaultCityModel(): CityModel {
       base_money: 0,
       bonus_money: 0,
       ranked_money: 0,
+      win_money: 0,
       total_money: 0,
       day: 0,
       effects: [],
@@ -133,6 +134,8 @@ export interface AttackRecapModel {
   base_money: number;
   bonus_money: number;
   ranked_money: number;
+  // Bonus de victoire ranked : seulement quand le joueur gagne en terminant second (sinon 0)
+  win_money: number;
   total_money: number;
   day: number;
   // Effets des bâtiments spéciaux après la nuit survécue
@@ -336,6 +339,8 @@ export interface GameHistoryModel {
   outcome: GameOutcome | null;
   /** Partie réglée par l'inactivité d'un des deux joueurs */
   forfeit: boolean;
+  /** Bonus de victoire ranked de player1 ; 0 hors victoire ou tant que l'adversaire n'a pas terminé */
+  win_money: number;
 }
 
 export interface DefaultValuesModel {

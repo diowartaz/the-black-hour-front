@@ -108,6 +108,7 @@ function toAttackRecap(recap: ApiAttackRecap | null): AttackRecapModel {
     base_money: recap.rewards?.baseMoney ?? 0,
     ranked_money: recap.rewards?.rankedMoney ?? 0,
     bonus_money: recap.rewards?.bonusMoney ?? 0,
+    win_money: recap.rewards?.winMoney ?? 0,
     total_money: recap.rewards?.totalMoney ?? 0,
     day: recap.day,
     effects: recap.effects,
@@ -279,6 +280,7 @@ export function toGameHistory(match: ApiMatch, player: { id: string; username: s
       : null,
     outcome: match.outcome,
     forfeit: match.forfeit,
+    win_money: match.winMoney,
   };
 }
 

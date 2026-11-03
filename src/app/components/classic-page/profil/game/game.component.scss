@@ -27,12 +27,22 @@
     align-items: center;
     justify-content: space-between;
     .result {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       font-family: var(--font-display);
       font-weight: 900;
       font-size: 13px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--c);
+    }
+    .win-money {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      letter-spacing: normal;
+      color: var(--yellow);
     }
   }
 }

@@ -2,12 +2,14 @@ import { Component, Input } from '@angular/core';
 import { SubgameComponent } from './subgame/subgame.component';
 
 import { GameHistoryModel, GameOutcome } from 'src/app/models/game';
+import { IconComponent } from 'src/app/shared/components/icon/icon.component';
+import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
 
 const OPPOSITE: Record<GameOutcome, GameOutcome> = { win: 'loss', loss: 'win', draw: 'draw' };
 
 @Component({
   selector: 'app-game',
-  imports: [SubgameComponent],
+  imports: [SubgameComponent, IconComponent, FormatNumberPipe],
   templateUrl: './game.component.html',
   styleUrls: ['./game.component.scss'],
 })

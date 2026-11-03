@@ -9,7 +9,14 @@
       {{ game.ranked ? 'Ranked' : 'Normal' }}
     </span>
     @if (game.outcome !== null) {
-      <span class="result">{{ outcomeLabels[game.outcome] }}{{ game.forfeit ? ' (forfeit)' : '' }}</span>
+      <span class="result"
+        >{{ outcomeLabels[game.outcome] }}{{ game.forfeit ? ' (forfeit)' : '' }}
+        @if (game.win_money > 0) {
+          <span class="win-money" title="Victory bonus"
+            ><app-icon name="money" [size]="14" />+{{ game.win_money | formatNumber }}</span
+          >
+        }
+      </span>
     }
   </div>
   <app-subgame
