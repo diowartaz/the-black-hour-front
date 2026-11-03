@@ -1,10 +1,10 @@
-<app-classic-page [title]="'Deck'" [subtitle]="'Plans drawn in every game'" [glow]="'var(--cyan)'">
+<app-classic-page [title]="'deck.title' | t" [subtitle]="'deck.subtitle' | t" [glow]="'var(--cyan)'">
   <ng-container icon><app-icon name="cards" [size]="32" /></ng-container>
   <ng-container content>
     <section class="neon-card deck">
       <div class="deck-head">
         <div class="deck-title">
-          <h2>My deck</h2>
+          <h2>{{ 'deck.myDeck' | t }}</h2>
           <span class="neon-chip" [style.--c]="draft().length === size() ? 'var(--green)' : 'var(--orange)'"
             >{{ draft().length }}/{{ size() }}</span
           >
@@ -14,10 +14,10 @@
             type="button"
             class="outline-btn"
             [disabled]="!canAutocomplete()"
-            title="Fill the empty slots: rarest plans first, keeping resources balanced"
+            [title]="'deck.autocompleteHint' | t"
             (click)="autocomplete()"
           >
-            <app-icon name="sparkle" [size]="14" />Autocomplete
+            <app-icon name="sparkle" [size]="14" />{{ 'deck.autocomplete' | t }}
           </button>
           <button
             type="button"
@@ -26,7 +26,7 @@
             [disabled]="draft().length === 0"
             (click)="clear()"
           >
-            <app-icon name="trash" [size]="14" />Clear
+            <app-icon name="trash" [size]="14" />{{ 'deck.clear' | t }}
           </button>
         </div>
       </div>
@@ -36,7 +36,7 @@
           <div class="slot-wrap" (pointerenter)="showPreview(building.id, $event)" (pointerleave)="hidePreview($event)">
             <span class="slot" [style.--c]="building.rarity | rarityToColor">
               <app-building-emblem [id]="building.id" [size]="26" />
-              <span class="slot-name">{{ building.name }}</span>
+              <span class="slot-name">{{ building | catalogName }}</span>
             </span>
             <span class="slot-actions">
               <button
@@ -44,7 +44,7 @@
                 class="slot-action slot-info"
                 [style.--c]="building.rarity | rarityToColor"
                 [attr.aria-expanded]="previewId() === building.id"
-                [attr.aria-label]="'Show details of ' + building.name"
+                [attr.aria-label]="'deck.showDetails' | t: { name: (building | catalogName) }"
                 (click)="togglePreview(building.id, $event)"
               >
                 <app-icon name="info" [size]="14" />
@@ -52,8 +52,8 @@
               <button
                 type="button"
                 class="slot-action slot-remove"
-                [attr.aria-label]="'Remove ' + building.name"
-                title="Remove from deck"
+                [attr.aria-label]="'deck.remove' | t: { name: (building | catalogName) }"
+                [title]="'deck.removeFromDeck' | t"
                 (click)="toggle(building.id)"
               >
                 <app-icon name="trash" [size]="14" />
@@ -78,19 +78,19 @@
           </div>
         }
         @for (slot of emptySlots(); track $index) {
-          <span class="slot empty">empty</span>
+          <span class="slot empty">{{ 'deck.empty' | t }}</span>
         }
       </div>
 
-      <h3 class="label">Resources needed (digs give 20% of each)</h3>
+      <h3 class="label">{{ 'deck.resourcesNeeded' | t }}</h3>
       <app-resource-shares [buildings]="draftBuildings()" />
     </section>
 
     <section class="collection">
       <div class="collection-head">
-        <h2>Collection {{ ownedCount() }}/{{ cityService.catalogBuildings().length }}</h2>
+        <h2>{{ 'deck.collection' | t: { owned: ownedCount(), total: cityService.catalogBuildings().length } }}</h2>
         <button type="button" class="outline-btn" (click)="goToShop()">
-          <app-icon name="sparkle" [size]="16" />Get more plans
+          <app-icon name="sparkle" [size]="16" />{{ 'deck.getMore' | t }}
         </button>
       </div>
       <app-plan-filters
@@ -108,7 +108,7 @@
             [checked]="upgradableOnly()"
             (change)="upgradableOnly.set($any($event.target).checked)"
           />
-          Upgradable only
+          {{ 'deck.upgradableOnly' | t }}
         </label>
       </app-plan-filters>
 
@@ -135,30 +135,34 @@
             >
               <span class="card-actions">
                 @if (owned(building.id) === 0) {
-                  <span class="card-note">Find it in boosters</span>
+                  <span class="card-note">{{ 'deck.findInBoosters' | t }}</span>
                 } @else {
                   <button
                     type="button"
                     class="upgrade-btn"
                     [class.ready]="canUpgrade(building)"
-                    [attr.aria-label]="'Upgrade ' + building.name"
+                    [attr.aria-label]="'deck.upgradeName' | t: { name: (building | catalogName) }"
                     (click)="openUpgrade(building.id, $event)"
                   >
-                    <app-icon name="trend" [size]="13" />Upgrade
+                    <app-icon name="trend" [size]="13" />{{ 'deck.upgrade' | t }}
                   </button>
                   <!-- Add et Remove n'ont pas de gestionnaire : leur clic remonte à la carte, qui bascule le plan -->
                   @if (inDraft(building.id)) {
-                    <button type="button" class="toggle-btn remove" [attr.aria-label]="'Remove ' + building.name">
-                      <app-icon name="trash" [size]="13" />Remove
+                    <button
+                      type="button"
+                      class="toggle-btn remove"
+                      [attr.aria-label]="'deck.remove' | t: { name: (building | catalogName) }"
+                    >
+                      <app-icon name="trash" [size]="13" />{{ 'deck.removeShort' | t }}
                     </button>
                   } @else {
                     <button
                       type="button"
                       class="toggle-btn"
                       [disabled]="draft().length >= size()"
-                      [attr.aria-label]="'Add ' + building.name"
+                      [attr.aria-label]="'deck.addName' | t: { name: (building | catalogName) }"
                     >
-                      <app-icon name="plus" [size]="13" />Add
+                      <app-icon name="plus" [size]="13" />{{ 'deck.add' | t }}
                     </button>
                   }
                 }
@@ -166,7 +170,7 @@
             </app-building-card>
           </div>
         } @empty {
-          <div class="empty-state">No plan matches these filters</div>
+          <div class="empty-state">{{ 'deck.noMatch' | t }}</div>
         }
       </div>
     </section>
@@ -187,17 +191,17 @@
         @for (problem of problems(); track problem) {
           <span class="problem"><app-icon name="info" [size]="14" />{{ problem }}</span>
         } @empty {
-          <span class="unsaved">{{ changes() }} unsaved change{{ changes() === 1 ? '' : 's' }}</span>
+          <span class="unsaved">{{ 'deck.unsaved' | t: { count: changes() } }}</span>
         }
       </span>
-      <button type="button" class="text-btn" (click)="reset()">Cancel</button>
+      <button type="button" class="text-btn" (click)="reset()">{{ 'common.cancel' | t }}</button>
       <button
         type="button"
         class="mini-cta"
         [disabled]="problems().length > 0 || cityService.saveDeckLoading()"
         (click)="save()"
       >
-        <app-icon name="check" [size]="16" />Save
+        <app-icon name="check" [size]="16" />{{ 'deck.save' | t }}
       </button>
     </div>
   }

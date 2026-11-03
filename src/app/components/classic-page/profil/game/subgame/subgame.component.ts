@@ -1,3 +1,4 @@
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
 import { Component, Input, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameHistoryPlayerModel, GameOutcome } from 'src/app/models/game';
@@ -6,7 +7,7 @@ import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
 
 @Component({
   selector: 'app-subgame',
-  imports: [FormatNumberPipe, IconComponent],
+  imports: [TPipe, FormatNumberPipe, IconComponent],
   templateUrl: './subgame.component.html',
   styleUrls: ['./subgame.component.scss'],
 })

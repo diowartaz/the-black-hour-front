@@ -1,3 +1,6 @@
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
+import { LanguageService } from 'src/app/shared/i18n/language.service';
+import { CatalogNamePipe } from 'src/app/shared/i18n/catalog-name.pipe';
 import { Component, computed, inject, linkedSignal, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { BuildingEffectModel, CatalogBuildingModel, ItemModel, Rarity } from 'src/app/models/game';
@@ -26,6 +29,8 @@ import { UpgradeDialogComponent } from './upgrade-dialog/upgrade-dialog.componen
 @Component({
   selector: 'app-deck',
   imports: [
+    TPipe,
+    CatalogNamePipe,
     ClassicPageComponent,
     IconComponent,
     BuildingCardComponent,
@@ -44,6 +49,7 @@ import { UpgradeDialogComponent } from './upgrade-dialog/upgrade-dialog.componen
 })
 export class DeckComponent {
   readonly cityService = inject(CityService);
+  private readonly languageService = inject(LanguageService);
   private readonly router = inject(Router);
 
   // Repart du deck enregistré à chaque fois que celui-ci change (chargement, enregistrement)
@@ -63,7 +69,9 @@ export class DeckComponent {
   // Affichées par rareté décroissante (l'ordre du deck n'a pas d'importance)
   draftBuildings = computed(() => buildingsOf(this.draft(), this.cityService.catalogBuildings()).sort(byRarityDesc));
   emptySlots = computed(() => Array.from({ length: Math.max(0, this.size() - this.draft().length) }));
-  problems = computed(() => deckProblems(this.draft(), this.cityService.collection(), this.rules()));
+  problems = computed(() =>
+    deckProblems(this.draft(), this.cityService.collection(), this.rules(), this.languageService.translator()),
+  );
   // Plans ajoutés et retirés par rapport au deck enregistré
   changes = computed(() => {
     const saved = new Set(this.cityService.deck());
@@ -90,6 +98,7 @@ export class DeckComponent {
         kind: this.kindFilter(),
       },
       (effect) => this.effectText(effect),
+      (building) => this.languageService.translator().catalog('building', building.id, building.name),
     )
       .filter((b) => !this.upgradableOnly() || this.canUpgrade(b))
       .sort((a, b) => Number(this.owned(b.id) > 0) - Number(this.owned(a.id) > 0) || byRarityDesc(a, b)),
@@ -183,6 +192,7 @@ export class DeckComponent {
     return buildingEffectText(rankedEffect(effect, rank, this.rankRules()), {
       rules: this.cityService.defaultValues().effect_rules,
       rankMultiplier: rankMultiplier(rank, this.rankRules()),
+      i18n: this.languageService.translator(),
     });
   }
 

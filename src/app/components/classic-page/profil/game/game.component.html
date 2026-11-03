@@ -6,13 +6,13 @@
 >
   <div class="game-head">
     <span class="neon-chip" [style.--c]="game.ranked ? 'var(--yellow)' : 'var(--cyan)'">
-      {{ game.ranked ? 'Ranked' : 'Normal' }}
+      {{ (game.ranked ? 'game.ranked' : 'game.normal') | t }}
     </span>
     @if (game.outcome !== null) {
       <span class="result"
-        >{{ outcomeLabels[game.outcome] }}{{ game.forfeit ? ' (forfeit)' : '' }}
+        >{{ 'game.' + game.outcome | t }}{{ game.forfeit ? ('game.forfeit' | t) : '' }}
         @if (game.win_money > 0) {
-          <span class="win-money" title="Victory bonus"
+          <span class="win-money" [title]="'game.victoryBonus' | t"
             ><app-icon name="money" [size]="14" />+{{ game.win_money | formatNumber }}</span
           >
         }

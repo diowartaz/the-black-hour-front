@@ -4,6 +4,7 @@ import { CityService } from 'src/app/services/city/city.service';
 import { BuildingCardComponent } from 'src/app/shared/components/building-card/building-card.component';
 import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { RarityToColorPipe } from 'src/app/shared/pipes/rarity-to-color.pipe';
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
 
 // Atterrissage d'un plan après le clic, à garder égal à $impact dans le SCSS
 const IMPACT_MS = 500;
@@ -34,7 +35,7 @@ const IMPACT: Record<string, { shake: number; dust: Record<string, string>[] }> 
 // Révélation des plans d'un booster, un par un : chaque plan tombe sur la table
 @Component({
   selector: 'app-booster-opening',
-  imports: [BuildingCardComponent, IconComponent, RarityToColorPipe],
+  imports: [TPipe, BuildingCardComponent, IconComponent, RarityToColorPipe],
   templateUrl: './booster-opening.component.html',
   styleUrls: ['./booster-opening.component.scss'],
 })

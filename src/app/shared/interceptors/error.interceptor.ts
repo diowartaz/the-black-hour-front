@@ -5,6 +5,9 @@ import { catchError, throwError } from 'rxjs';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { CLIENT_OUTDATED_CODE, OutdatedClientNotifier } from 'src/app/shared/utils/client-version';
 import { environment } from 'src/environments/environment';
+import { LanguageService } from 'src/app/shared/i18n/language.service';
+import { hasTranslation } from 'src/app/shared/i18n/translator';
+import { TranslationKey } from 'src/app/shared/i18n/types';
 
 // Endpoints dont les erreurs attendues sont affichées par le formulaire lui-même
 const SELF_HANDLED: { path: string; status: number }[] = [
@@ -14,16 +17,21 @@ const SELF_HANDLED: { path: string; status: number }[] = [
   { path: 'auth/guest/upgrade', status: 409 },
 ];
 
-function errorMessage(error: HttpErrorResponse): string {
+function errorMessage(error: HttpErrorResponse, languageService: LanguageService): string {
   if (error.status === 0) {
-    return 'Server unreachable, please check your connection';
+    return languageService.t('errors.unreachable');
   }
   if (error.status === 401) {
-    return 'Your session has expired, please log in again';
+    return languageService.t('errors.sessionExpired');
   }
-  // Format de the-black-hour-api : { statusCode, code, message, details? }
+  // Format de the-black-hour-api : { statusCode, code, message, details? }. Le message de l'API, en anglais et plus
+  // précis, est gardé en anglais ; dans une autre langue, on traduit le code
   const backendMessage = error.error?.message;
-  return typeof backendMessage === 'string' ? backendMessage : 'Something went wrong, please try again';
+  const key = `errors.${error.error?.code}`;
+  if (languageService.language() !== 'en' && hasTranslation(key)) {
+    return languageService.t(key as TranslationKey);
+  }
+  return typeof backendMessage === 'string' ? backendMessage : languageService.t('errors.generic');
 }
 
 // Affiche les erreurs HTTP de l'API et déconnecte le joueur si son token est refusé
@@ -31,6 +39,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const snackBar = inject(MatSnackBar);
   const authService = inject(AuthService);
   const outdatedClient = inject(OutdatedClientNotifier);
+  const languageService = inject(LanguageService);
 
   return next(req).pipe(
     catchError((error: unknown) => {
@@ -52,7 +61,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         if (error.status === 401 && authService.isConnected()) {
           authService.logOut();
         }
-        snackBar.open(errorMessage(error), 'OK', { duration: 4000 });
+        snackBar.open(errorMessage(error, languageService), languageService.t('common.ok'), { duration: 4000 });
       }
       return throwError(() => error);
     }),

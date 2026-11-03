@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { LocalDatePipe } from 'src/app/shared/i18n/local-date.pipe';
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -12,11 +12,20 @@ import { GuildService } from 'src/app/services/guild/guild.service';
 import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { ClassicPageComponent } from '../classic-page.component';
 import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
 
 // Fiche publique d'une guilde (/guild/:id), consultable sans en être membre ni connecté
 @Component({
   selector: 'app-guild-view',
-  imports: [FormatNumberPipe, ClassicPageComponent, IconComponent, MatProgressSpinnerModule, RouterLink, DatePipe],
+  imports: [
+    TPipe,
+    FormatNumberPipe,
+    ClassicPageComponent,
+    IconComponent,
+    MatProgressSpinnerModule,
+    RouterLink,
+    LocalDatePipe,
+  ],
   templateUrl: './guild-view.component.html',
   styleUrls: ['./guild-view.component.scss'],
 })

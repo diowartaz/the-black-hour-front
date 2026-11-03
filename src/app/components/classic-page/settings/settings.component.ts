@@ -16,6 +16,8 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { ClassicPageComponent } from '../classic-page.component';
 import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { THEMES, ThemeService } from 'src/app/services/theme/theme.service';
+import { LANGUAGES, LanguageService } from 'src/app/shared/i18n/language.service';
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
 
 interface UpgradeForm {
   email: FormControl<string>;
@@ -35,7 +37,7 @@ const passwordsMatch: ValidatorFn = (group: AbstractControl): ValidationErrors |
 
 @Component({
   selector: 'app-settings',
-  imports: [ClassicPageComponent, IconComponent, ReactiveFormsModule, MatProgressSpinnerModule],
+  imports: [TPipe, ClassicPageComponent, IconComponent, ReactiveFormsModule, MatProgressSpinnerModule],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
 })
@@ -43,6 +45,8 @@ export class SettingsComponent {
   authService = inject(AuthService);
   themeService = inject(ThemeService);
   themes = THEMES;
+  languageService = inject(LanguageService);
+  languages = LANGUAGES;
 
   goBackButton = false;
 
@@ -96,7 +100,7 @@ export class SettingsComponent {
   }
 
   deleteAccount() {
-    const confirmed = window.confirm('Are you sure you want to delete your account?');
+    const confirmed = window.confirm(this.languageService.t('settings.confirmDelete'));
     if (confirmed) {
       this.authService.deleteAccount();
     }

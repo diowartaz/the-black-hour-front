@@ -1,7 +1,7 @@
-<app-classic-page [title]="'Shop'" [subtitle]="'Plans and permanent upgrades'" [glow]="'var(--yellow)'">
+<app-classic-page [title]="'shop.title' | t" [subtitle]="'shop.subtitle' | t" [glow]="'var(--yellow)'">
   <ng-container icon><app-icon name="sparkle" [size]="32" /></ng-container>
   <ng-container content>
-    <div class="tabs" role="tablist" aria-label="Shop section" [class.right]="tab() === 'bonuses'">
+    <div class="tabs" role="tablist" [attr.aria-label]="'shop.section' | t" [class.right]="tab() === 'bonuses'">
       <button
         type="button"
         role="tab"
@@ -10,7 +10,7 @@
         [attr.aria-selected]="tab() === 'boosters'"
         (click)="tab.set('boosters')"
       >
-        <app-icon name="cards" [size]="16" />Boosters
+        <app-icon name="cards" [size]="16" />{{ 'shop.boosters' | t }}
       </button>
       <button
         type="button"
@@ -20,7 +20,7 @@
         [attr.aria-selected]="tab() === 'bonuses'"
         (click)="tab.set('bonuses')"
       >
-        <app-icon name="shield-plus" [size]="16" />Bonuses
+        <app-icon name="shield-plus" [size]="16" />{{ 'shop.bonuses' | t }}
       </button>
     </div>
 
@@ -33,13 +33,21 @@
             <div class="pack back-right"></div>
             <div class="pack front">
               <app-icon name="cards" [size]="42" />
-              <h3>{{ booster.name }}</h3>
-              <span>Booster</span>
+              <h3>{{ booster | catalogName: 'booster' }}</h3>
+              <span>{{ 'shop.booster' | t }}</span>
             </div>
           </div>
           <p class="rule">
-            {{ booster.minCards }} to {{ booster.maxCards }} plans, {{ booster.minCopies }} to
-            {{ booster.maxCopies }} copies each
+            {{
+              'shop.rule'
+                | t
+                  : {
+                      minCards: booster.minCards,
+                      maxCards: booster.maxCards,
+                      minCopies: booster.minCopies,
+                      maxCopies: booster.maxCopies,
+                    }
+            }}
           </p>
           <div class="odds-bar">
             @for (odds of oddsOf(booster); track odds.rarity) {
@@ -48,17 +56,19 @@
           </div>
           <div class="odds-legend">
             @for (odds of oddsOf(booster); track odds.rarity) {
-              <span [style.--c]="odds.rarity | rarityToColor">{{ odds.rarity }} {{ odds.percent }}%</span>
+              <span [style.--c]="odds.rarity | rarityToColor"
+                >{{ 'rarity.' + odds.rarity | t }} {{ odds.percent }}%</span
+              >
             }
           </div>
           <div class="pack-foot">
             <div class="pack-links">
               <button type="button" (click)="goToDeck()">
-                <app-icon name="cards" [size]="16" />Plans
+                <app-icon name="cards" [size]="16" />{{ 'shop.plans' | t }}
                 <b>{{ ownedCount() }}/{{ cityService.catalogBuildings().length }}</b>
               </button>
               <button type="button" (click)="goToMarket()">
-                <app-icon name="money" [size]="16" />Duplicates <b>{{ duplicates() }}</b>
+                <app-icon name="money" [size]="16" />{{ 'shop.duplicates' | t }} <b>{{ duplicates() }}</b>
               </button>
             </div>
             <button
@@ -67,7 +77,7 @@
               [disabled]="cityService.openBoosterLoading() || cityService.stats().money < booster.price"
               (click)="openBooster(booster)"
             >
-              <app-icon name="money" [size]="18" />{{ booster.price | formatNumber }} · Open
+              <app-icon name="money" [size]="18" />{{ booster.price | formatNumber }} · {{ 'shop.open' | t }}
             </button>
           </div>
         </article>
@@ -80,10 +90,10 @@
               <div class="icon-tile"><app-icon [name]="item.value.icon | bonusToIcon" [size]="28" /></div>
               <div class="bonus-text">
                 <div class="bonus-title">
-                  <h3>{{ item.value.name }}</h3>
-                  <span class="lvl">LV {{ item.value.lvl }}/{{ item.value.lvl_max }}</span>
+                  <h3>{{ item.value | catalogName: 'bonus' }}</h3>
+                  <span class="lvl">{{ 'common.lv' | t }} {{ item.value.lvl }}/{{ item.value.lvl_max }}</span>
                 </div>
-                <p>{{ item.value.description }}</p>
+                <p>{{ item.value | catalogName: 'bonusDescription' }}</p>
               </div>
             </div>
             <div class="pips">
@@ -94,7 +104,7 @@
             @if (item.value.lvl < item.value.lvl_max) {
               <div class="bonus-foot">
                 <span class="price-hint" [class.short]="!item.value.enoughMoney">
-                  {{ item.value.enoughMoney ? 'Ready to buy' : 'Not enough coins' }}
+                  {{ (item.value.enoughMoney ? 'shop.readyToBuy' : 'shop.notEnoughCoins') | t }}
                 </span>
                 <button
                   type="button"
@@ -102,11 +112,11 @@
                   (click)="buyItem(item.value.id)"
                   [disabled]="cityService.buyBonusLoading() || !item.value.enoughLvlMax || !item.value.enoughMoney"
                 >
-                  <app-icon name="money" [size]="16" />{{ item.value.nextPrice | formatNumber }} · Buy
+                  <app-icon name="money" [size]="16" />{{ item.value.nextPrice | formatNumber }} · {{ 'shop.buy' | t }}
                 </button>
               </div>
             } @else {
-              <span class="neon-chip maxed" style="--c: var(--green)">Max level</span>
+              <span class="neon-chip maxed" style="--c: var(--green)">{{ 'shop.maxLevel' | t }}</span>
             }
           </article>
         }
@@ -117,7 +127,7 @@
       @if (cityService.lastBoosterCards(); as cards) {
         <app-booster-opening
           [cards]="cards"
-          [boosterName]="booster.name"
+          [boosterName]="booster | catalogName: 'booster'"
           [canOpenAnother]="cityService.stats().money >= booster.price"
           (openAnother)="openBooster(booster)"
           (closed)="closeBooster()"

@@ -1,12 +1,12 @@
 <div class="top-bar">
   @if (authService.isConnected()) {
-    <div class="balance" [attr.aria-label]="money() + ' coins'">
+    <div class="balance" [attr.aria-label]="'common.coinsLabel' | t: { amount: money() }">
       <span class="balance-icon"><app-icon name="money" [size]="18" /></span>
       <span class="balance-amount">{{ money() }}</span>
-      <span class="balance-unit">coins</span>
+      <span class="balance-unit">{{ 'common.coins' | t }}</span>
     </div>
     @if (authService.tempAccount()) {
-      <span class="no-cloud-save">no cloud<br />save</span>
+      <span class="no-cloud-save">{{ 'nav.noCloudSave1' | t }}<br />{{ 'nav.noCloudSave2' | t }}</span>
     }
   }
   <div class="spacer"></div>
@@ -18,7 +18,7 @@
     type="button"
     class="icon-btn more-btn"
     [class.active]="menuOpen() || menuLinkActive()"
-    aria-label="More"
+    [attr.aria-label]="'common.more' | t"
     aria-haspopup="menu"
     [attr.aria-expanded]="menuOpen()"
     cdkOverlayOrigin
@@ -36,7 +36,7 @@
     (detach)="closeMenu()"
   >
     <nav class="more-menu" role="menu">
-      @for (link of links(); track link.label) {
+      @for (link of links(); track link.icon) {
         <a
           class="more-item"
           role="menuitem"
@@ -46,7 +46,7 @@
           (click)="closeMenu()"
         >
           <app-icon [name]="link.icon" />
-          {{ link.label }}
+          {{ link.label | t }}
         </a>
       }
     </nav>

@@ -1,4 +1,4 @@
-<app-classic-page [title]="'Settings'" [glow]="'var(--cyan)'">
+<app-classic-page [title]="'settings.title' | t" [glow]="'var(--cyan)'">
   <ng-container icon><app-icon name="settings" [size]="28" /></ng-container>
   <ng-container content>
     <div class="settings">
@@ -7,10 +7,10 @@
           <header class="auth-head">
             <div class="upgrade-title">
               <app-icon name="user-plus" [size]="26" />
-              <h2 class="neon-title">Save my account</h2>
+              <h2 class="neon-title">{{ 'settings.saveAccount' | t }}</h2>
             </div>
             <p class="upgrade-hint">
-              You are playing as a guest: your progress is lost if you log out. Add an email and a password to keep it.
+              {{ 'settings.guestHint' | t }}
             </p>
           </header>
 
@@ -19,7 +19,13 @@
             [class.invalid]="fieldHasError('email') || authService.upgradeGuestConflict()?.emailAlreadyExists"
           >
             <app-icon name="mail" [size]="20" />
-            <input type="email" required placeholder="Email" autocomplete="email" formControlName="email" />
+            <input
+              type="email"
+              required
+              [placeholder]="'auth.email' | t"
+              autocomplete="email"
+              formControlName="email"
+            />
           </label>
 
           <label
@@ -27,7 +33,12 @@
             [class.invalid]="fieldHasError('username') || authService.upgradeGuestConflict()?.usernameAlreadyExists"
           >
             <app-icon name="user" [size]="20" />
-            <input type="text" placeholder="Username (optional)" autocomplete="username" formControlName="username" />
+            <input
+              type="text"
+              [placeholder]="'auth.usernameOptional' | t"
+              autocomplete="username"
+              formControlName="username"
+            />
           </label>
 
           <label class="neon-field" [class.invalid]="fieldHasError('password')">
@@ -35,7 +46,7 @@
             <input
               type="password"
               required
-              placeholder="Password"
+              [placeholder]="'auth.password' | t"
               autocomplete="new-password"
               formControlName="password"
             />
@@ -46,7 +57,7 @@
             <input
               type="password"
               required
-              placeholder="Confirm password"
+              [placeholder]="'auth.confirmPassword' | t"
               autocomplete="new-password"
               formControlName="confirmPassword"
             />
@@ -55,65 +66,65 @@
           <div class="auth-errors" aria-live="polite">
             @if (fieldHasError('email')) {
               @if (upgradeForm.controls.email.errors?.['required']) {
-                <span>Email is required</span>
+                <span>{{ 'auth.emailRequired' | t }}</span>
               } @else {
-                <span>Email must be valid</span>
+                <span>{{ 'auth.emailInvalid' | t }}</span>
               }
             }
 
             @if (fieldHasError('username')) {
               @if (upgradeForm.controls.username.errors?.['minlength']) {
-                <span>Username: 3 characters minimum</span>
+                <span>{{ 'auth.usernameMin' | t }}</span>
               }
               @if (upgradeForm.controls.username.errors?.['maxlength']) {
-                <span>Username: 15 characters maximum</span>
+                <span>{{ 'auth.usernameMax' | t }}</span>
               }
               @if (upgradeForm.controls.username.errors?.['pattern']) {
-                <span>Username: letters, numbers, "_" and "-" only</span>
+                <span>{{ 'auth.usernamePattern' | t }}</span>
               }
             }
 
             @if (fieldHasError('password')) {
               @if (upgradeForm.controls.password.errors?.['required']) {
-                <span>Password is required</span>
+                <span>{{ 'auth.passwordRequired' | t }}</span>
               }
               @if (upgradeForm.controls.password.errors?.['minlength']) {
-                <span>Password: 8 characters minimum</span>
+                <span>{{ 'auth.passwordMin' | t }}</span>
               }
               @if (upgradeForm.controls.password.errors?.['maxlength']) {
-                <span>Password: 72 characters maximum</span>
+                <span>{{ 'auth.passwordMax' | t }}</span>
               }
             }
 
             @if (fieldHasError('confirmPassword')) {
-              <span>Confirm password is required</span>
+              <span>{{ 'auth.confirmRequired' | t }}</span>
             } @else if (passwordsMismatch()) {
-              <span>Password and Confirm password must match</span>
+              <span>{{ 'auth.passwordsMismatch' | t }}</span>
             }
 
             @if (authService.upgradeGuestConflict()?.emailAlreadyExists) {
-              <span>Email already used</span>
+              <span>{{ 'auth.emailUsed' | t }}</span>
             }
             @if (authService.upgradeGuestConflict()?.usernameAlreadyExists) {
-              <span>Username already used</span>
+              <span>{{ 'auth.usernameUsed' | t }}</span>
             }
           </div>
 
           <button type="submit" class="cta cta-pink">
             @if (authService.upgradeGuestLoading()) {
               <mat-spinner diameter="22"></mat-spinner>
-              Saving…
+              {{ 'settings.saving' | t }}
             } @else {
               <app-icon name="user-plus" [size]="20" />
-              Save my account
+              {{ 'settings.saveAccount' | t }}
             }
           </button>
         </form>
       }
 
       <section class="neon-card theme-card">
-        <h3 class="label">Theme</h3>
-        <div class="theme-grid" role="radiogroup" aria-label="Theme">
+        <h3 class="label">{{ 'settings.theme' | t }}</h3>
+        <div class="theme-grid" role="radiogroup" [attr.aria-label]="'settings.theme' | t">
           @for (t of themes; track t.id) {
             <button
               type="button"
@@ -134,11 +145,30 @@
         </div>
       </section>
 
+      <section class="neon-card theme-card">
+        <h3 class="label">{{ 'settings.language' | t }}</h3>
+        <div class="theme-grid" role="radiogroup" [attr.aria-label]="'settings.language' | t">
+          @for (l of languages; track l.id) {
+            <button
+              type="button"
+              role="radio"
+              class="theme-option language-option"
+              [class.active]="languageService.language() === l.id"
+              [attr.aria-checked]="languageService.language() === l.id"
+              [attr.lang]="l.id"
+              (click)="languageService.setLanguage(l.id)"
+            >
+              <span class="theme-name">{{ l.label }}</span>
+            </button>
+          }
+        </div>
+      </section>
+
       <button type="button" class="ghost-btn" (click)="authService.logOut()">
-        <app-icon name="logout" [size]="18" />Log out
+        <app-icon name="logout" [size]="18" />{{ 'settings.logOut' | t }}
       </button>
       <button type="button" class="ghost-btn" style="--c: var(--danger)" (click)="deleteAccount()">
-        <app-icon name="trash" [size]="18" />Delete my account
+        <app-icon name="trash" [size]="18" />{{ 'settings.deleteAccount' | t }}
       </button>
     </div>
   </ng-container>

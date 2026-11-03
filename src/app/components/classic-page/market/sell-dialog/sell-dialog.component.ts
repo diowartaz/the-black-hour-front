@@ -5,11 +5,14 @@ import { MarketService } from 'src/app/services/market/market.service';
 import { BuildingCardComponent } from 'src/app/shared/components/building-card/building-card.component';
 import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
+import { LanguageService } from 'src/app/shared/i18n/language.service';
+import { CatalogNamePipe } from 'src/app/shared/i18n/catalog-name.pipe';
 
 // Mise en vente d'un plan, à l'unité ou en lot : panneau du bas, comme les filtres
 @Component({
   selector: 'app-sell-dialog',
-  imports: [FormatNumberPipe, BuildingCardComponent, IconComponent],
+  imports: [TPipe, CatalogNamePipe, FormatNumberPipe, BuildingCardComponent, IconComponent],
   templateUrl: './sell-dialog.component.html',
   styleUrls: ['./sell-dialog.component.scss'],
   host: {
@@ -19,6 +22,7 @@ import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
 export class SellDialogComponent {
   private readonly cityService = inject(CityService);
   private readonly marketService = inject(MarketService);
+  private readonly languageService = inject(LanguageService);
 
   building = input.required<CatalogBuildingModel>();
   count = input(1);
@@ -46,11 +50,11 @@ export class SellDialogComponent {
   private reference = computed<{ price: number; label: string } | undefined>(() => {
     const lowest = this.lowestPrice();
     if (lowest !== undefined) {
-      return { price: lowest - 1, label: 'Lowest −1' };
+      return { price: lowest - 1, label: this.languageService.t('sell.lowestMinus') };
     }
     const unit = this.lowestPrices()[1];
     return this.isLot() && unit !== undefined
-      ? { price: unit * this.quantity(), label: `${this.quantity()} × lowest` }
+      ? { price: unit * this.quantity(), label: this.languageService.t('sell.timesLowest', { count: this.quantity() }) }
       : undefined;
   });
 
@@ -87,7 +91,11 @@ export class SellDialogComponent {
     return lowest === undefined || (this.validPrice() && this.price()! < lowest);
   });
 
-  offerName = computed(() => (this.isLot() ? `lot of ${this.quantity()}` : 'offer'));
+  offerName = computed(() =>
+    this.isLot()
+      ? this.languageService.t('sell.lot', { count: this.quantity() })
+      : this.languageService.t('sell.offer'),
+  );
 
   unitPrice = computed(() => (this.validPrice() ? Math.round(this.price()! / this.quantity()) : 0));
 

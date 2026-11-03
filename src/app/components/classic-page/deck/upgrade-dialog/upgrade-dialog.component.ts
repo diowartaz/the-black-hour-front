@@ -14,6 +14,9 @@ import {
   rankMultiplier,
   upgradeCopies,
 } from 'src/app/shared/utils/ranks';
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
+import { LanguageService } from 'src/app/shared/i18n/language.service';
+import { CatalogNamePipe } from 'src/app/shared/i18n/catalog-name.pipe';
 
 // Balayage (1 s) puis éclat de la carte (0,5 s) : durées de upgrade-dialog.component.scss
 const ANIMATION_MS = 1500;
@@ -21,7 +24,7 @@ const ANIMATION_MS = 1500;
 // Amélioration d'un plan : panneau du bas, comme la mise en vente. Il reste ouvert pour enchaîner les rangs.
 @Component({
   selector: 'app-upgrade-dialog',
-  imports: [BuildingCardComponent, FormatNumberPipe, IconComponent, RarityToColorPipe],
+  imports: [TPipe, CatalogNamePipe, BuildingCardComponent, FormatNumberPipe, IconComponent, RarityToColorPipe],
   templateUrl: './upgrade-dialog.component.html',
   styleUrls: ['./upgrade-dialog.component.scss'],
   host: {
@@ -30,6 +33,7 @@ const ANIMATION_MS = 1500;
 })
 export class UpgradeDialogComponent implements OnDestroy {
   readonly cityService = inject(CityService);
+  private readonly languageService = inject(LanguageService);
 
   building = input.required<CatalogBuildingModel>();
   inDeck = input(false);
@@ -62,6 +66,7 @@ export class UpgradeDialogComponent implements OnDestroy {
       ? buildingEffectText(rankedEffect(effect, rank, this.rankRules()), {
           rules: this.cityService.defaultValues().effect_rules,
           rankMultiplier: rankMultiplier(rank, this.rankRules()),
+          i18n: this.languageService.translator(),
         })
       : '';
   }

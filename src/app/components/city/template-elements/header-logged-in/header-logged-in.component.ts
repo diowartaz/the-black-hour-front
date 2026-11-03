@@ -8,9 +8,11 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { CityService } from 'src/app/services/city/city.service';
 import { IconComponent, IconName } from 'src/app/shared/components/icon/icon.component';
 import { formatNumber } from 'src/app/shared/utils/format';
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
+import { TranslationKey } from 'src/app/shared/i18n/types';
 
 interface TopBarLink {
-  label: string;
+  label: TranslationKey;
   icon: IconName;
   link: string[];
   queryParams?: Params;
@@ -24,7 +26,7 @@ const MENU_POSITIONS: ConnectedPosition[] = [
 
 @Component({
   selector: 'app-header-logged-in',
-  imports: [RouterLink, RouterLinkActive, IconComponent, CdkConnectedOverlay, CdkOverlayOrigin],
+  imports: [TPipe, RouterLink, RouterLinkActive, IconComponent, CdkConnectedOverlay, CdkOverlayOrigin],
   templateUrl: './header-logged-in.component.html',
   styleUrls: ['./header-logged-in.component.scss'],
   host: {
@@ -40,26 +42,26 @@ export class HeaderLoggedInComponent {
   money = computed(() => formatNumber(this.cityService.stats().money));
 
   links = computed<TopBarLink[]>(() => {
-    const leaderboard: TopBarLink = { label: 'Leaderboard', icon: 'trophy', link: ['/', RoutesEnum.LEADERBOARD] };
-    const guide: TopBarLink = { label: 'Guide', icon: 'bookmark', link: ['/', RoutesEnum.WIKI] };
+    const leaderboard: TopBarLink = { label: 'nav.leaderboard', icon: 'trophy', link: ['/', RoutesEnum.LEADERBOARD] };
+    const guide: TopBarLink = { label: 'nav.guide', icon: 'bookmark', link: ['/', RoutesEnum.WIKI] };
     if (!this.authService.isConnected()) {
       return [leaderboard, guide];
     }
     return [
-      { label: 'Shop', icon: 'sparkle', link: ['/', RoutesEnum.SHOP] },
-      { label: 'Deck', icon: 'cards', link: ['/', RoutesEnum.DECK] },
-      { label: 'Black Market', icon: 'money', link: ['/', RoutesEnum.MARKET] },
-      { label: 'Guild', icon: 'shield', link: ['/', RoutesEnum.GUILD] },
-      { label: 'Invite friends', icon: 'user-plus', link: ['/', RoutesEnum.REFERRAL] },
+      { label: 'nav.shop', icon: 'sparkle', link: ['/', RoutesEnum.SHOP] },
+      { label: 'nav.deck', icon: 'cards', link: ['/', RoutesEnum.DECK] },
+      { label: 'nav.market', icon: 'money', link: ['/', RoutesEnum.MARKET] },
+      { label: 'nav.guild', icon: 'shield', link: ['/', RoutesEnum.GUILD] },
+      { label: 'nav.invite', icon: 'user-plus', link: ['/', RoutesEnum.REFERRAL] },
       {
-        label: 'Profile',
+        label: 'nav.profile',
         icon: 'friends',
         link: ['/', RoutesEnum.PROFIL],
         queryParams: { user_id: this.authService.userId() },
       },
       leaderboard,
       guide,
-      { label: 'Settings', icon: 'settings', link: ['/', RoutesEnum.SETTINGS] },
+      { label: 'nav.settings', icon: 'settings', link: ['/', RoutesEnum.SETTINGS] },
     ];
   });
 

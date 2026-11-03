@@ -1,15 +1,17 @@
 <div class="building" [style.--c]="building.rarity | rarityToColor">
-  <span class="tier" [title]="building.rarity"></span>
+  <span class="tier" [title]="'rarity.' + building.rarity | t"></span>
   <div class="body">
     <div class="row">
       <app-building-emblem [id]="building.id" [size]="26" />
-      <span class="name">{{ building.name }}</span>
+      <span class="name">{{ building | catalogName }}</span>
       @if (building.rank > 0) {
         <app-rank-pips [rank]="building.rank" [max]="cityService.defaultValues().rank_rules.max_rank" />
       }
       @if (building.recycled) {
-        <span class="neon-chip recycled" style="--c: var(--cyan)" title="Back from the draw pile"
-          ><app-icon name="recycle" [size]="12" />+{{ building.lvl_max - building.lvl }} lvl</span
+        <span class="neon-chip recycled" style="--c: var(--cyan)" [title]="'recap.backFromPile' | t"
+          ><app-icon name="recycle" [size]="12" />{{
+            'recap.plusLevels' | t: { count: building.lvl_max - building.lvl }
+          }}</span
         >
       }
       @if (building.effect; as effect) {

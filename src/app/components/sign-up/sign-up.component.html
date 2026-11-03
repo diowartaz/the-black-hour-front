@@ -1,22 +1,34 @@
 <form class="auth-card" [formGroup]="formgroup" (ngSubmit)="signUp()">
   <header class="auth-head">
     <app-icon name="user-plus" [size]="32" />
-    <h1 class="neon-title">Sign up</h1>
+    <h1 class="neon-title">{{ 'auth.signUp' | t }}</h1>
   </header>
 
   <label class="neon-field" [class.invalid]="fieldHasError('email') || emailAlreadyExists()">
     <app-icon name="mail" [size]="20" />
-    <input type="email" required placeholder="Email" autocomplete="email" formControlName="email" />
+    <input type="email" required [placeholder]="'auth.email' | t" autocomplete="email" formControlName="email" />
   </label>
 
   <label class="neon-field" [class.invalid]="fieldHasError('username') || usernameAlreadyExists()">
     <app-icon name="user" [size]="20" />
-    <input type="text" required placeholder="Username" autocomplete="username" formControlName="username" />
+    <input
+      type="text"
+      required
+      [placeholder]="'auth.username' | t"
+      autocomplete="username"
+      formControlName="username"
+    />
   </label>
 
   <label class="neon-field" [class.invalid]="fieldHasError('password')">
     <app-icon name="lock" [size]="20" />
-    <input type="password" required placeholder="Password" autocomplete="new-password" formControlName="password" />
+    <input
+      type="password"
+      required
+      [placeholder]="'auth.password' | t"
+      autocomplete="new-password"
+      formControlName="password"
+    />
   </label>
 
   <label class="neon-field" [class.invalid]="fieldHasError('confirmPassword')">
@@ -24,7 +36,7 @@
     <input
       type="password"
       required
-      placeholder="Confirm password"
+      [placeholder]="'auth.confirmPassword' | t"
       autocomplete="new-password"
       formControlName="confirmPassword"
     />
@@ -34,7 +46,7 @@
     <app-icon name="key" [size]="20" />
     <input
       type="text"
-      placeholder="Sponsor code (optional)"
+      [placeholder]="'auth.sponsorCode' | t"
       autocomplete="off"
       maxlength="32"
       class="referral-input"
@@ -45,67 +57,67 @@
   <div class="auth-errors" aria-live="polite">
     @if (fieldHasError('email')) {
       @if (formgroup.controls.email.errors?.['required']) {
-        <span>Email is required</span>
+        <span>{{ 'auth.emailRequired' | t }}</span>
       }
       @if (formgroup.controls.email.errors?.['pattern']) {
-        <span>Email must be valid</span>
+        <span>{{ 'auth.emailInvalid' | t }}</span>
       }
     }
 
     @if (fieldHasError('username')) {
       @if (formgroup.controls.username.errors?.['required']) {
-        <span>Username is required</span>
+        <span>{{ 'auth.usernameRequired' | t }}</span>
       }
       @if (formgroup.controls.username.errors?.['notValid']) {
-        <span>Username: 3 characters minimum</span>
+        <span>{{ 'auth.usernameMin' | t }}</span>
       }
       @if (formgroup.controls.username.errors?.['max15']) {
-        <span>Username: 15 characters maximum</span>
+        <span>{{ 'auth.usernameMax' | t }}</span>
       }
     }
 
     @if (fieldHasError('password')) {
       @if (formgroup.controls.password.errors?.['required']) {
-        <span>Password is required</span>
+        <span>{{ 'auth.passwordRequired' | t }}</span>
       }
       @if (formgroup.controls.password.errors?.['min8']) {
-        <span>Password: 8 characters minimum</span>
+        <span>{{ 'auth.passwordMin' | t }}</span>
       }
     }
 
     @if (fieldHasError('confirmPassword')) {
       @if (formgroup.controls.confirmPassword.errors?.['required']) {
-        <span>Confirm password is required</span>
+        <span>{{ 'auth.confirmRequired' | t }}</span>
       }
       @if (formgroup.controls.confirmPassword.errors?.['noMatchPassword']) {
-        <span>Password and Confirm password must match</span>
+        <span>{{ 'auth.passwordsMismatch' | t }}</span>
       }
     }
 
     @if (emailAlreadyExists()) {
-      <span>Email already used</span>
+      <span>{{ 'auth.emailUsed' | t }}</span>
     }
 
     @if (usernameAlreadyExists()) {
-      <span>Username already used</span>
+      <span>{{ 'auth.usernameUsed' | t }}</span>
     }
   </div>
 
   <button type="submit" class="cta cta-pink">
     @if (loading()) {
       <mat-spinner diameter="22"></mat-spinner>
-      Signing up…
+      {{ 'auth.signingUp' | t }}
     } @else {
       <app-icon name="user-plus" [size]="20" />
-      Sign up
+      {{ 'auth.signUp' | t }}
     }
   </button>
 
   <div class="auth-links">
-    <button type="button" class="text-btn" (click)="goToSignIn()">Already have an account? Sign in</button>
-    <button type="button" class="text-btn" (click)="authService.signInTemp()">Play as guest</button>
+    <button type="button" class="text-btn" (click)="goToSignIn()">{{ 'auth.haveAccount' | t }}</button>
+    <button type="button" class="text-btn" (click)="authService.signInTemp()">{{ 'common.playAsGuest' | t }}</button>
     <a class="text-btn" href="https://discord.gg/qFnSBa8P9Z" target="_blank" rel="noopener">
-      <app-icon name="friends" [size]="16" />Join the Discord
+      <app-icon name="friends" [size]="16" />{{ 'common.joinDiscord' | t }}
     </a>
   </div>
 </form>

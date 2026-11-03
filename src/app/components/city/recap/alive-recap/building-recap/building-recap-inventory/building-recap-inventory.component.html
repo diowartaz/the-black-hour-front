@@ -3,7 +3,7 @@
     @if (item.value > 0) {
       <span class="cost" [class.ok]="cityService.city().inventory[castKey(item.key)] >= item.value">
         <app-resource-gem [item]="item.key" [size]="10" />
-        <span class="cost-name">{{ item.key }}</span>
+        <span class="cost-name">{{ 'items.' + item.key | t }}</span>
         <span class="cost-qty">{{ cityService.city().inventory[castKey(item.key)] }}/{{ item.value }}</span>
       </span>
     }

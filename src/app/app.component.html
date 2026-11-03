@@ -1,11 +1,9 @@
 <div class="page">
   @if (wakeUpService.serverIsWakingUp()) {
     <dialog #dialog class="dialog-class waking">
-      <span class="waking-line"
-        ><app-icon name="bolt" [size]="18" /> Server is waking up, this may take up to a minute.</span
-      >
+      <span class="waking-line"><app-icon name="bolt" [size]="18" /> {{ 'app.wakingUp' | t }}</span>
       <span class="waking-line">
-        Thank you for your patience!
+        {{ 'app.thanks' | t }}
         <mat-spinner diameter="19"></mat-spinner>
       </span>
     </dialog>

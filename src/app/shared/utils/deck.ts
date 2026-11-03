@@ -1,4 +1,5 @@
 import { BuildingEffectModel, CatalogBuildingModel, ItemModel, Rarity } from 'src/app/models/game';
+import { ENGLISH, Translator } from 'src/app/shared/i18n/translator';
 
 export const ITEMS: ItemModel[] = ['wood', 'metal', 'stone', 'screw', 'patch'];
 
@@ -24,11 +25,13 @@ function normalize(text: string): string {
     .replace(/\p{Diacritic}/gu, '');
 }
 
-// Filtres de la collection et du Black Market ; la recherche porte sur le nom ou le texte de l'effet
+// Filtres de la collection et du Black Market ; la recherche porte sur le nom ou le texte de l'effet,
+// dans la langue affichée
 export function filterPlans(
   buildings: CatalogBuildingModel[],
   filters: PlanFilters,
   effectText: (effect: BuildingEffectModel) => string,
+  nameOf: (building: CatalogBuildingModel) => string = (building) => building.name,
 ): CatalogBuildingModel[] {
   const query = normalize(filters.search.trim());
   return buildings
@@ -37,7 +40,9 @@ export function filterPlans(
     .filter((b) => filters.kind === 'all' || !!b.effect === (filters.kind === 'special'))
     .filter(
       (b) =>
-        !query || normalize(b.name).includes(query) || (!!b.effect && normalize(effectText(b.effect)).includes(query)),
+        !query ||
+        normalize(nameOf(b)).includes(query) ||
+        (!!b.effect && normalize(effectText(b.effect)).includes(query)),
     );
 }
 
@@ -62,15 +67,20 @@ export function buildingsOf(ids: number[], catalog: CatalogBuildingModel[]): Cat
 
 // Raisons pour lesquelles un deck ne peut pas être enregistré (vide si le deck est valide) ;
 // mêmes règles que validateDeck côté API
-export function deckProblems(deck: number[], collection: Record<number, number>, rules: DeckRules): string[] {
+export function deckProblems(
+  deck: number[],
+  collection: Record<number, number>,
+  rules: DeckRules,
+  { t }: Translator = ENGLISH,
+): string[] {
   const problems: string[] = [];
   if (deck.length < rules.size) {
-    problems.push(`${rules.size - deck.length} more plan${rules.size - deck.length > 1 ? 's' : ''} needed`);
+    problems.push(t('deck.moreNeeded', { count: rules.size - deck.length }));
   } else if (deck.length > rules.size) {
-    problems.push(`${deck.length - rules.size} plan${deck.length - rules.size > 1 ? 's' : ''} too many`);
+    problems.push(t('deck.tooMany', { count: deck.length - rules.size }));
   }
   if (deck.some((id) => !collection[id])) {
-    problems.push('Some plans are not in your collection');
+    problems.push(t('deck.notInCollection'));
   }
   return problems;
 }

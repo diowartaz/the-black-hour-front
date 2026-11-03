@@ -1,6 +1,6 @@
 <div class="classic-page">
   <header class="page-header">
-    <button type="button" class="icon-btn" aria-label="Back" (click)="goBack()">
+    <button type="button" class="icon-btn" [attr.aria-label]="'common.back' | t" (click)="goBack()">
       <app-icon name="back" />
     </button>
     <div class="titles">

@@ -2,12 +2,12 @@ import { IconName } from '../components/icon/icon.component';
 
 // Couleurs néon associées aux éléments du jeu (ressources, raretés, compétences)
 
-export const ITEM_THEME: Record<string, { color: string; label: string }> = {
-  metal: { color: 'var(--orange)', label: 'Metal' },
-  patch: { color: 'var(--yellow)', label: 'Patch' },
-  screw: { color: 'var(--cyan)', label: 'Screw' },
-  stone: { color: 'var(--violet-light)', label: 'Stone' },
-  wood: { color: 'var(--green)', label: 'Wood' },
+export const ITEM_THEME: Record<string, { color: string }> = {
+  metal: { color: 'var(--orange)' },
+  patch: { color: 'var(--yellow)' },
+  screw: { color: 'var(--cyan)' },
+  stone: { color: 'var(--violet-light)' },
+  wood: { color: 'var(--green)' },
 };
 
 export const RARITY_COLOR: Record<string, string> = {

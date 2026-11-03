@@ -1,5 +1,5 @@
 <section class="night-log">
-  <h2 class="label">Night log</h2>
+  <h2 class="label">{{ 'recap.nightLog' | t }}</h2>
   @if (lines().length > 0) {
     <ol>
       @for (line of lines(); track line.n) {
@@ -14,6 +14,6 @@
       }
     </ol>
   } @else {
-    <p class="quiet">Quiet night. Nothing else to report.</p>
+    <p class="quiet">{{ 'recap.quietNight' | t }}</p>
   }
 </section>

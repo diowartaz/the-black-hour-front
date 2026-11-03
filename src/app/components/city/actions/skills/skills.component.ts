@@ -3,15 +3,19 @@ import { CityService } from 'src/app/services/city/city.service';
 import { SkillToColorPipe, SkillToIconPipe } from 'src/app/shared/pipes/skill-to-icon.pipe';
 import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { AdvancedSkillModel } from 'src/app/models/game';
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
+import { CatalogNamePipe } from 'src/app/shared/i18n/catalog-name.pipe';
+import { LanguageService } from 'src/app/shared/i18n/language.service';
 
 @Component({
   selector: 'app-skills',
-  imports: [SkillToIconPipe, SkillToColorPipe, IconComponent],
+  imports: [TPipe, CatalogNamePipe, SkillToIconPipe, SkillToColorPipe, IconComponent],
   templateUrl: './skills.component.html',
   styleUrls: ['./skills.component.scss'],
 })
 export class SkillsComponent {
   cityService = inject(CityService);
+  private languageService = inject(LanguageService);
 
   dialogMessage = signal('');
   snackBarOpened = signal(false);
@@ -42,10 +46,10 @@ export class SkillsComponent {
 
   learn(skill: AdvancedSkillModel) {
     if ((this.cityService.cityTimeSeconds() || 0) > skill.expirationCityTime) {
-      this.openSnackBar('Not enough time');
+      this.openSnackBar(this.languageService.t('play.notEnoughTime'));
       return;
     } else if (!skill.enoughLvlMax) {
-      this.openSnackBar('Already at max level');
+      this.openSnackBar(this.languageService.t('play.maxLevel'));
       return;
     }
 

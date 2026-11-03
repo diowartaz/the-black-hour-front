@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { LocalDatePipe } from 'src/app/shared/i18n/local-date.pipe';
 import { Component, computed, inject, signal } from '@angular/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CatalogBuildingModel, ItemModel, MarketListingModel, Rarity } from 'src/app/models/game';
@@ -13,6 +13,10 @@ import { byRarityDesc, filterPlans, PlanKind } from 'src/app/shared/utils/deck';
 import { ClassicPageComponent } from '../classic-page.component';
 import { SellDialogComponent } from './sell-dialog/sell-dialog.component';
 import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
+import { LanguageService } from 'src/app/shared/i18n/language.service';
+import { TranslationKey } from 'src/app/shared/i18n/types';
+import { CatalogNamePipe } from 'src/app/shared/i18n/catalog-name.pipe';
 
 type MarketTab = 'buy' | 'sell';
 type MarketSort = 'rarity' | 'price-asc' | 'price-desc';
@@ -21,8 +25,10 @@ type MarketSort = 'rarity' | 'price-asc' | 'price-desc';
 @Component({
   selector: 'app-market',
   imports: [
+    TPipe,
+    CatalogNamePipe,
     FormatNumberPipe,
-    DatePipe,
+    LocalDatePipe,
     MatProgressSpinnerModule,
     ClassicPageComponent,
     IconComponent,
@@ -37,11 +43,12 @@ type MarketSort = 'rarity' | 'price-asc' | 'price-desc';
 export class MarketComponent {
   readonly cityService = inject(CityService);
   readonly marketService = inject(MarketService);
+  private readonly languageService = inject(LanguageService);
 
-  readonly sorts: { value: MarketSort; label: string }[] = [
-    { value: 'rarity', label: 'Sorted by rarity' },
-    { value: 'price-asc', label: 'Sorted by price: low to high price' },
-    { value: 'price-desc', label: 'Sorted by price: high to low price' },
+  readonly sorts: { value: MarketSort; label: TranslationKey }[] = [
+    { value: 'rarity', label: 'market.sortRarity' },
+    { value: 'price-asc', label: 'market.sortPriceAsc' },
+    { value: 'price-desc', label: 'market.sortPriceDesc' },
   ];
 
   tab = signal<MarketTab>('buy');
@@ -87,7 +94,12 @@ export class MarketComponent {
         item: this.itemFilter(),
         kind: this.kindFilter(),
       },
-      (effect) => buildingEffectText(effect, { rules: this.cityService.defaultValues().effect_rules }),
+      (effect) =>
+        buildingEffectText(effect, {
+          rules: this.cityService.defaultValues().effect_rules,
+          i18n: this.languageService.translator(),
+        }),
+      (building) => this.languageService.translator().catalog('building', building.id, building.name),
     ).filter((b) => !this.deckOnly() || this.inDeck(b.id)),
   );
 
@@ -169,6 +181,12 @@ export class MarketComponent {
 
   inDeck(buildingId: number): boolean {
     return this.cityService.deck().includes(buildingId);
+  }
+
+  // Nom affiché d'un plan du catalogue, dans la langue courante
+  buildingName(buildingId: number): string {
+    const building = this.buildingOf(buildingId);
+    return building ? this.languageService.translator().catalog('building', building.id, building.name) : '';
   }
 
   buildingOf(buildingId: number): CatalogBuildingModel | undefined {

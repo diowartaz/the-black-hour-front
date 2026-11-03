@@ -1,17 +1,17 @@
 @if (snackBarOpened()) {
   <dialog #dialog class="dialog-class">
     <div>{{ dialogMessage() }}</div>
-    <button type="button" class="close-toast" aria-label="Close" (click)="closeSnackBar()">
+    <button type="button" class="close-toast" [attr.aria-label]="'common.close' | t" (click)="closeSnackBar()">
       <app-icon name="close" [size]="18" />
     </button>
   </dialog>
 }
 
 <div class="play-content">
-  <h1 class="neon-title dig-title">Dig for items</h1>
+  <h1 class="neon-title dig-title">{{ 'dig.title' | t }}</h1>
 
   @if (modeToggleEnabled) {
-    <div class="tabs" role="tablist" aria-label="Dig mode" [class.right]="mode() === 'random'">
+    <div class="tabs" role="tablist" [attr.aria-label]="'dig.mode' | t" [class.right]="mode() === 'random'">
       <button
         type="button"
         role="tab"
@@ -20,7 +20,7 @@
         [attr.aria-selected]="mode() === 'pick'"
         (click)="setMode('pick')"
       >
-        Pick
+        {{ 'dig.pick' | t }}
       </button>
       <button
         type="button"
@@ -30,7 +30,7 @@
         [attr.aria-selected]="mode() === 'random'"
         (click)="setMode('random')"
       >
-        🎲 Random
+        🎲 {{ 'dig.random' | t }}
       </button>
     </div>
   }
@@ -43,19 +43,19 @@
             type="button"
             class="offer-card"
             [style.--c]="item | itemToColor"
-            [attr.aria-label]="'Dig and keep ' + item"
+            [attr.aria-label]="'dig.digAndKeep' | t: { item: ('items.' + item | t) }"
             (click)="pick(item)"
             [disabled]="cityService.digLoading()"
             [class.disabled]="!enoughTimeForPick()"
           >
             <app-resource-gem [item]="item" [size]="34" />
-            <span class="name">{{ item }}</span>
-            <span class="stock">stock: {{ cityService.city().inventory[item] }}</span>
+            <span class="name">{{ 'items.' + item | t }}</span>
+            <span class="stock">{{ 'dig.stock' | t: { count: cityService.city().inventory[item] } }}</span>
             <span class="time">{{ digTimeString() }} · → {{ pickEndTimeString() }}</span>
           </button>
         }
       </div>
-      <p class="hint">Dig once and keep the resource you pick</p>
+      <p class="hint">{{ 'dig.pickHint' | t }}</p>
     </section>
   } @else {
     <section class="random" role="tabpanel">
@@ -67,25 +67,25 @@
           [disabled]="cityService.digLoading()"
           [class.disabled]="!enoughTimeForPick()"
         >
-          <span class="dig-main">Dig ×1</span>
+          <span class="dig-main">{{ 'dig.digOnce' | t }}</span>
           @if (enoughTimeForPick()) {
             <span class="dig-sub">{{ digTimeString() }} · → {{ pickEndTimeString() }}</span>
           } @else {
-            <span class="dig-sub">Not enough time</span>
+            <span class="dig-sub">{{ 'play.notEnoughTime' | t }}</span>
           }
         </button>
         @if (maxDigs() > 1) {
           <button type="button" class="cta dig-btn max" (click)="digMax()" [disabled]="cityService.digLoading()">
-            <span class="dig-main">Max ×{{ maxDigs() }}</span>
+            <span class="dig-main">{{ 'dig.digMax' | t: { count: maxDigs() } }}</span>
             <span class="dig-sub">{{ maxDigsTimeString() }} · → {{ maxDigsEndTimeString() }}</span>
           </button>
         }
       </div>
       @if (digOffer().length === 2) {
         <p class="hint">
-          1st: {{ digOffer()[0] }} or {{ digOffer()[1] }}, at random
+          {{ 'dig.firstRandom' | t: { a: ('items.' + digOffer()[0] | t), b: ('items.' + digOffer()[1] | t) } }}
           @if (maxDigs() > 1) {
-            <br />Next ones: any resource
+            <br />{{ 'dig.nextOnes' | t }}
           }
         </p>
       }
@@ -93,7 +93,7 @@
   }
 
   <section class="inventory">
-    <span class="label">Inventory</span>
+    <span class="label">{{ 'dig.inventory' | t }}</span>
     <div class="inventory-grid">
       @for (item of cityService.city().inventory | keyvalue; track item.key) {
         <div class="item" [style.--c]="item.key | itemToColor">
@@ -102,7 +102,7 @@
           }
           <app-resource-gem [item]="item.key" [size]="28" />
           <span class="nb">{{ item.value }}</span>
-          <span class="name">{{ item.key }}</span>
+          <span class="name">{{ 'items.' + item.key | t }}</span>
         </div>
       }
     </div>

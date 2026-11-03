@@ -1,5 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { ITEM_THEME } from '../../utils/theme';
+import { LanguageService } from 'src/app/shared/i18n/language.service';
+import { TranslationKey } from 'src/app/shared/i18n/types';
 
 // Losange lumineux représentant une ressource
 @Component({
@@ -30,5 +32,6 @@ export class ResourceGemComponent {
   size = input(10);
 
   color = computed(() => ITEM_THEME[this.item()]?.color ?? 'var(--text-mute)');
-  label = computed(() => ITEM_THEME[this.item()]?.label ?? this.item());
+  private languageService = inject(LanguageService);
+  label = computed(() => this.languageService.t(`items.${this.item()}` as TranslationKey));
 }

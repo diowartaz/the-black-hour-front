@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
 import { blipPosition, radarLayout } from 'src/app/shared/utils/recap-radar';
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
 
 // Rayon du radar dans le viewBox (-120 -120 240 240)
 const R = 110;
@@ -9,7 +10,7 @@ const R = 110;
 // Radar du récap d'attaque : la ville au centre, le cercle de défense, les zombies qui approchent
 @Component({
   selector: 'app-recap-radar',
-  imports: [IconComponent, FormatNumberPipe],
+  imports: [TPipe, IconComponent, FormatNumberPipe],
   templateUrl: './recap-radar.component.html',
   styleUrls: ['./recap-radar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

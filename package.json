@@ -9,7 +9,8 @@
     "prettier": "prettier --write .",
     "lint": "ng lint --fix",
     "test": "ng test --watch=false --browsers=ChromeHeadless",
-    "api:types": "npx openapi-typescript@7 ../the-black-hour-api/openapi.json -o src/app/models/api.ts"
+    "api:types": "npx openapi-typescript@7 ../the-black-hour-api/openapi.json -o src/app/models/api.ts",
+    "i18n:check": "node --no-warnings scripts/check-i18n.mjs"
   },
   "private": true,
   "dependencies": {

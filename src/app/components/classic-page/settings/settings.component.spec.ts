@@ -83,7 +83,9 @@ describe('SettingsComponent', () => {
   });
 
   it('change le thème appliqué à la page', async () => {
-    const buttons = (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>('.theme-option');
+    const buttons = (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>(
+      '.theme-option:not(.language-option)',
+    );
     expect(buttons.length).toBe(component.themes.length);
 
     buttons[2].click();
@@ -92,6 +94,20 @@ describe('SettingsComponent', () => {
     expect(buttons[2].classList).toContain('active');
 
     component.themeService.setTheme('neon');
+    await fixture.whenStable();
+  });
+
+  it('passe l’interface en français sans recharger la page', async () => {
+    const page = fixture.nativeElement as HTMLElement;
+    const buttons = page.querySelectorAll<HTMLButtonElement>('.language-option');
+    expect(buttons.length).toBe(component.languages.length);
+
+    buttons[1].click();
+    await fixture.whenStable();
+    expect(page.querySelector('h1')?.textContent).toContain('Paramètres');
+    expect(buttons[1].classList).toContain('active');
+
+    component.languageService.setLanguage('en');
     await fixture.whenStable();
   });
 });

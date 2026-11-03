@@ -57,11 +57,15 @@
   color: var(--text-dim);
 }
 
+// Même largeur côte à côte, sinon l'un sous l'autre (« Vendre un exemplaire » ne tient pas en demi-largeur à 300 px)
 .sheet-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   > * {
-    flex: 1;
+    flex: 1 1 0;
+    min-width: max-content;
+    white-space: nowrap;
     height: 42px;
     // .ghost-btn impose un min-height plus grand
     min-height: 0;

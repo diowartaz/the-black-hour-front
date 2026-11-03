@@ -3,13 +3,13 @@
     <input
       type="search"
       class="search"
-      placeholder="Search name or effect"
-      aria-label="Search plans"
+      [placeholder]="'filters.searchPlaceholder' | t"
+      [attr.aria-label]="'filters.searchLabel' | t"
       [value]="search()"
       (input)="search.set($any($event.target).value)"
     />
     <button type="button" class="open-btn" aria-haspopup="dialog" (click)="open.set(true)">
-      <app-icon name="sliders" [size]="16" />Filters
+      <app-icon name="sliders" [size]="16" />{{ 'filters.filters' | t }}
       @if (activeCount()) {
         <span class="badge">{{ activeCount() }}</span>
       }
@@ -19,16 +19,16 @@
 </div>
 
 @if (kind() !== 'all' || rarity() !== 'all' || item() !== 'all') {
-  <div class="filters" role="group" aria-label="Active filters">
+  <div class="filters" role="group" [attr.aria-label]="'filters.active' | t">
     @if (kind() !== 'all') {
       <button
         type="button"
         class="filter active"
         [style.--c]="kind() === 'special' ? 'var(--yellow)' : null"
-        [attr.aria-label]="'Remove filter ' + kind()"
+        [attr.aria-label]="'filters.remove' | t: { name: ('filters.' + kind() | t) }"
         (click)="kind.set('all')"
       >
-        {{ kind() }}<app-icon name="close" [size]="12" />
+        {{ 'filters.' + kind() | t }}<app-icon name="close" [size]="12" />
       </button>
     }
     @if (rarity() !== 'all') {
@@ -36,20 +36,20 @@
         type="button"
         class="filter active"
         [style.--c]="rarity() | rarityToColor"
-        [attr.aria-label]="'Remove filter ' + rarity()"
+        [attr.aria-label]="'filters.remove' | t: { name: ('rarity.' + rarity() | t) }"
         (click)="rarity.set('all')"
       >
-        {{ rarity() }}<app-icon name="close" [size]="12" />
+        {{ 'rarity.' + rarity() | t }}<app-icon name="close" [size]="12" />
       </button>
     }
     @if (item() !== 'all') {
       <button
         type="button"
         class="filter active"
-        [attr.aria-label]="'Remove filter ' + item()"
+        [attr.aria-label]="'filters.remove' | t: { name: ('items.' + item() | t) }"
         (click)="item.set('all')"
       >
-        {{ item() }}<app-icon name="close" [size]="12" />
+        {{ 'items.' + item() | t }}<app-icon name="close" [size]="12" />
       </button>
     }
   </div>
@@ -57,17 +57,23 @@
 
 @if (open()) {
   <div class="backdrop" (click)="open.set(false)">
-    <div class="sheet" role="dialog" aria-modal="true" aria-label="Filters" (click)="$event.stopPropagation()">
+    <div
+      class="sheet"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="'filters.filters' | t"
+      (click)="$event.stopPropagation()"
+    >
       <div class="sheet-head">
-        <h2>Filters</h2>
-        <button type="button" class="close" aria-label="Close" (click)="open.set(false)">
+        <h2>{{ 'filters.filters' | t }}</h2>
+        <button type="button" class="close" [attr.aria-label]="'common.close' | t" (click)="open.set(false)">
           <app-icon name="close" [size]="20" />
         </button>
       </div>
 
       <section>
-        <h3>Kind</h3>
-        <div class="filters" role="group" aria-label="Filter by kind">
+        <h3>{{ 'filters.kind' | t }}</h3>
+        <div class="filters" role="group" [attr.aria-label]="'filters.byKind' | t">
           @for (option of kinds; track option) {
             <button
               type="button"
@@ -77,15 +83,15 @@
               [attr.aria-pressed]="kind() === option"
               (click)="toggle(kind, option)"
             >
-              {{ option }}
+              {{ 'filters.' + option | t }}
             </button>
           }
         </div>
       </section>
 
       <section>
-        <h3>Rarity</h3>
-        <div class="filters" role="group" aria-label="Filter by rarity">
+        <h3>{{ 'filters.rarity' | t }}</h3>
+        <div class="filters" role="group" [attr.aria-label]="'filters.byRarity' | t">
           @for (option of rarities; track option) {
             <button
               type="button"
@@ -95,15 +101,15 @@
               [attr.aria-pressed]="rarity() === option"
               (click)="toggle(rarity, option)"
             >
-              {{ option }}
+              {{ 'rarity.' + option | t }}
             </button>
           }
         </div>
       </section>
 
       <section>
-        <h3>Resource</h3>
-        <div class="filters" role="group" aria-label="Filter by resource">
+        <h3>{{ 'filters.resource' | t }}</h3>
+        <div class="filters" role="group" [attr.aria-label]="'filters.byResource' | t">
           @for (option of items; track option) {
             <button
               type="button"
@@ -113,7 +119,7 @@
               (click)="toggle(item, option)"
             >
               <app-resource-gem [item]="option" [size]="10" aria-hidden="true" />
-              {{ option }}
+              {{ 'items.' + option | t }}
             </button>
           }
         </div>
@@ -122,9 +128,9 @@
       <ng-content />
 
       <div class="sheet-actions">
-        <button type="button" class="reset" (click)="reset()">Reset</button>
+        <button type="button" class="reset" (click)="reset()">{{ 'filters.reset' | t }}</button>
         <button type="button" class="show" (click)="open.set(false)">
-          Show {{ count() }} plan{{ count() === 1 ? '' : 's' }}
+          {{ 'filters.show' | t: { count: count() } }}
         </button>
       </div>
     </div>

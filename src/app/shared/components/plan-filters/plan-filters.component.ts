@@ -4,13 +4,14 @@ import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { ResourceGemComponent } from 'src/app/shared/components/resource-gem/resource-gem.component';
 import { RarityToColorPipe } from 'src/app/shared/pipes/rarity-to-color.pipe';
 import { ITEMS, PLAN_KINDS, PlanKind, RARITIES_DESC } from 'src/app/shared/utils/deck';
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
 
 // Recherche et filtres de plans, communs à la collection et au Black Market.
 // Les filtres sont dans un panneau du bas ; le contenu projeté y ajoute les options propres à la page,
 // sauf celui marqué [filtersEnd], affiché sur la ligne de la recherche
 @Component({
   selector: 'app-plan-filters',
-  imports: [IconComponent, RarityToColorPipe, ResourceGemComponent],
+  imports: [TPipe, IconComponent, RarityToColorPipe, ResourceGemComponent],
   templateUrl: './plan-filters.component.html',
   styleUrls: ['./plan-filters.component.scss'],
   host: {

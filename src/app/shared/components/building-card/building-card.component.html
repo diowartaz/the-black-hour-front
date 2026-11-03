@@ -10,13 +10,13 @@
   }
   <div class="head">
     <app-building-emblem [id]="building().id" [size]="compact() ? 24 : 30" />
-    <span class="name">{{ building().name }}</span>
+    <span class="name">{{ building() | catalogName }}</span>
     @if (locked()) {
       <app-icon name="lock" [size]="14" />
     } @else if (count() > 1) {
       <span class="count">+{{ count() - 1 }}</span>
     } @else if (count() === 0) {
-      <span class="count">New</span>
+      <span class="count">{{ 'card.new' | t }}</span>
     }
   </div>
   @if (rank() > 0 || showRank()) {
@@ -30,7 +30,7 @@
     } @else {
       <span class="def"><app-icon name="shield" [size]="13" />{{ defense() | formatNumber }}</span>
     }
-    <span><app-icon name="trend" [size]="13" />{{ building().lvl_max }} lvl</span>
+    <span><app-icon name="trend" [size]="13" />{{ 'card.lvl' | t: { count: building().lvl_max } }}</span>
     <span><app-icon name="clock" [size]="13" />{{ time() }}</span>
   </div>
   @if (costsOnTop()) {
@@ -51,7 +51,7 @@
         <span class="cost"><app-resource-gem [item]="item.key" [size]="9" />{{ item.value }}</span>
       }
     } @empty {
-      <span class="free">No resources</span>
+      <span class="free">{{ 'card.noResources' | t }}</span>
     }
   </div>
 </ng-template>

@@ -1,6 +1,6 @@
 <app-classic-page
-  [title]="'Leaderboard'"
-  [subtitle]="ranked() ? 'All players · Ranked points' : 'All players · Days survived'"
+  [title]="'leaderboard.title' | t"
+  [subtitle]="(ranked() ? 'leaderboard.subtitleRanked' : 'leaderboard.subtitleNormal') | t"
 >
   <ng-container icon><app-icon name="trophy" [size]="28" /></ng-container>
   <ng-container content>
@@ -12,7 +12,7 @@
         [class.active]="ranked()"
         (click)="changeRanked(true)"
       >
-        Ranked
+        {{ 'leaderboard.ranked' | t }}
       </button>
       <button
         type="button"
@@ -21,7 +21,7 @@
         [class.active]="!ranked()"
         (click)="changeRanked(false)"
       >
-        Normal
+        {{ 'leaderboard.normal' | t }}
       </button>
     </div>
 
@@ -32,7 +32,7 @@
             type="button"
             class="step"
             [class]="'step place-' + user.rank"
-            [attr.aria-label]="'See the profile of ' + user.username"
+            [attr.aria-label]="'leaderboard.seeProfile' | t: { name: user.username }"
             (click)="goToProfil(user.user_id)"
           >
             @if (user.rank === 1) {
@@ -73,9 +73,10 @@
         @if (loaded() && !leaderboardService.pageLoading() && leaderboard().length === 0) {
           <p class="empty">
             @if (total() === 0) {
-              No ranked players yet.
+              {{ 'leaderboard.noRanked' | t }}
             } @else {
-              This page is empty. <button type="button" class="link" (click)="goToPage(1)">Back to the top</button>
+              {{ 'leaderboard.emptyPage' | t }}
+              <button type="button" class="link" (click)="goToPage(1)">{{ 'leaderboard.backToTop' | t }}</button>
             }
           </p>
         }
@@ -83,10 +84,10 @@
     </div>
 
     @if (lastPage() > 1) {
-      <nav class="pager" aria-label="Leaderboard pages">
+      <nav class="pager" [attr.aria-label]="'leaderboard.pages' | t">
         <button
           type="button"
-          aria-label="Previous page"
+          [attr.aria-label]="'leaderboard.previous' | t"
           [disabled]="currentPage() <= 1"
           (click)="goToPage(currentPage() - 1)"
         >
@@ -108,7 +109,7 @@
         }
         <button
           type="button"
-          aria-label="Next page"
+          [attr.aria-label]="'leaderboard.next' | t"
           [disabled]="currentPage() >= lastPage()"
           (click)="goToPage(currentPage() + 1)"
         >
@@ -122,16 +123,18 @@
     <div footer class="my-rank">
       @if (myPosition()?.rank; as rank) {
         <span class="rank">#{{ rank }}</span>
-        <span class="name">You</span>
+        <span class="name">{{ 'leaderboard.you' | t }}</span>
         @if (me(); as me) {
           <span class="score">{{ scoreOf(me) }}</span>
         } @else {
-          <button type="button" class="jump" (click)="goToPage(myPosition()?.page)">Go to my rank</button>
+          <button type="button" class="jump" (click)="goToPage(myPosition()?.page)">
+            {{ 'leaderboard.goToMyRank' | t }}
+          </button>
         }
       } @else {
         <span class="rank">#—</span>
-        <span class="name">You</span>
-        <span class="hint">Not ranked yet</span>
+        <span class="name">{{ 'leaderboard.you' | t }}</span>
+        <span class="hint">{{ 'leaderboard.notRanked' | t }}</span>
       }
     </div>
   }

@@ -1,3 +1,4 @@
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
 import { Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { RoutesEnum } from 'src/app/models/router';
@@ -10,7 +11,7 @@ import { buildingsOf, rarityCounts } from 'src/app/shared/utils/deck';
 
 @Component({
   selector: 'app-create-city',
-  imports: [FeatureListComponent, IconComponent, ResourceSharesComponent, RarityToColorPipe],
+  imports: [TPipe, FeatureListComponent, IconComponent, ResourceSharesComponent, RarityToColorPipe],
   templateUrl: './create-city.component.html',
   styleUrls: ['./create-city.component.scss'],
 })

@@ -1,21 +1,23 @@
-<app-classic-page [title]="'Invite friends'" [subtitle]="'Referral'" [glow]="'var(--green)'">
+<app-classic-page [title]="'referral.title' | t" [subtitle]="'referral.subtitle' | t" [glow]="'var(--green)'">
   <ng-container icon><app-icon name="user-plus" [size]="28" /></ng-container>
   <ng-container content>
     @if (referral(); as referral) {
       <div class="referral">
         <section class="neon-card">
-          <h3 class="label">Your invite code</h3>
+          <h3 class="label">{{ 'referral.yourCode' | t }}</h3>
           <p class="hint">
-            Each friend who picks you as sponsor earns you <strong>{{ dividendPercent() }}%</strong> of their
-            end-of-game coins, forever. They get <strong>{{ referral.welcomeGift | formatNumber }} coins</strong> when
-            they pick their first sponsor.
+            {{ 'referral.hint1' | t }}
+            <strong>{{ 'referral.hintPct' | t: { value: dividendPercent() } }}</strong>
+            {{ 'referral.hint2' | t }}
+            <strong>{{ 'referral.hintGift' | t: { amount: (referral.welcomeGift | formatNumber) } }}</strong>
+            {{ 'referral.hint3' | t }}
           </p>
-          <div class="code" aria-label="Your invite code">{{ referral.code }}</div>
-          <input class="link" type="text" readonly [value]="link()" aria-label="Invite link" />
+          <div class="code" [attr.aria-label]="'referral.yourCode' | t">{{ referral.code }}</div>
+          <input class="link" type="text" readonly [value]="link()" [attr.aria-label]="'referral.inviteLink' | t" />
           <div class="actions">
             <button type="button" class="cta" (click)="copyLink()">
               <app-icon [name]="copied() ? 'check' : 'friends'" [size]="18" />
-              {{ copied() ? 'Link copied' : 'Copy invite link' }}
+              {{ (copied() ? 'referral.linkCopied' : 'referral.copyLink') | t }}
             </button>
             <button
               type="button"
@@ -23,18 +25,18 @@
               [disabled]="referralService.regenerateCodeLoading()"
               (click)="regenerateCode()"
             >
-              <app-icon name="refresh" [size]="18" />New code
+              <app-icon name="refresh" [size]="18" />{{ 'referral.newCode' | t }}
             </button>
           </div>
         </section>
 
         <section class="neon-card">
           <div class="section-head">
-            <h3 class="label">Your referees</h3>
+            <h3 class="label">{{ 'referral.yourReferees' | t }}</h3>
             <span class="neon-chip">{{ referral.referees.length }}/{{ referral.maxReferees }}</span>
           </div>
           @if (referral.referees.length === 0) {
-            <p class="hint">No referees yet: share your invite link.</p>
+            <p class="hint">{{ 'referral.noReferees' | t }}</p>
           } @else {
             <ul class="referees">
               @for (referee of referral.referees; track referee.playerId) {
@@ -42,14 +44,14 @@
                   <button type="button" class="text-btn name" (click)="goToProfil(referee.playerId)">
                     {{ referee.username }}
                   </button>
-                  <span class="since">since {{ referee.since | date: 'mediumDate' }}</span>
+                  <span class="since">{{ 'referral.since' | t: { date: (referee.since | localDate) } }}</span>
                   <span class="earnings">
                     +{{ referee.earnings | formatNumber }}<app-icon name="money" [size]="14" />
                   </span>
                   <button
                     type="button"
                     class="icon-btn remove"
-                    [attr.aria-label]="'Remove ' + referee.username"
+                    [attr.aria-label]="'referral.removeName' | t: { name: referee.username }"
                     [disabled]="referralService.removeRefereeLoading()"
                     (click)="removeReferee(referee)"
                   >
@@ -59,36 +61,41 @@
               }
             </ul>
             <p class="total">
-              Total earned: <strong>{{ totalEarnings() | formatNumber }}</strong> <app-icon name="money" [size]="14" />
+              {{ 'referral.totalEarned' | t }} <strong>{{ totalEarnings() | formatNumber }}</strong>
+              <app-icon name="money" [size]="14" />
             </p>
           }
         </section>
 
         <section class="neon-card">
-          <h3 class="label">Your sponsor</h3>
+          <h3 class="label">{{ 'referral.yourSponsor' | t }}</h3>
           @if (referral.sponsor; as sponsor) {
             <p class="sponsor">
               <button type="button" class="text-btn name" (click)="goToProfil(sponsor.playerId)">
                 {{ sponsor.username }}
               </button>
-              <span class="since">since {{ sponsor.since | date: 'mediumDate' }}</span>
+              <span class="since">{{ 'referral.since' | t: { date: (sponsor.since | localDate) } }}</span>
             </p>
             @if (referralService.lastGift() > 0) {
-              <p class="gift">+{{ referralService.lastGift() | formatNumber }} coins received!</p>
+              <p class="gift">
+                {{ 'referral.giftReceived' | t: { amount: (referralService.lastGift() | formatNumber) } }}
+              </p>
             }
           } @else {
             <p class="hint">
               @if (!referral.welcomeGiftReceived) {
-                Enter a friend's code to get <strong>{{ referral.welcomeGift | formatNumber }} coins</strong>.
+                {{ 'referral.enterCode' | t }}
+                <strong>{{ 'referral.hintGift' | t: { amount: (referral.welcomeGift | formatNumber) } }}</strong
+                >.
               }
-              Your sponsor's account must be older than yours, and you can't change sponsor afterwards.
+              {{ 'referral.sponsorRules' | t }}
             </p>
             <form class="sponsor-form" [formGroup]="sponsorForm" (ngSubmit)="setSponsor()">
               <label class="neon-field" [class.invalid]="sponsorCode.touched && sponsorCode.invalid">
                 <app-icon name="key" [size]="20" />
                 <input
                   type="text"
-                  placeholder="Sponsor code"
+                  [placeholder]="'referral.sponsorCode' | t"
                   autocomplete="off"
                   maxlength="32"
                   formControlName="code"
@@ -100,7 +107,7 @@
                 } @else {
                   <app-icon name="check" [size]="20" />
                 }
-                Confirm
+                {{ 'referral.confirm' | t }}
               </button>
             </form>
           }

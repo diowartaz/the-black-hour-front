@@ -9,10 +9,14 @@ import { RankPipsComponent } from 'src/app/shared/components/rank-pips/rank-pips
 import { RarityToColorPipe } from 'src/app/shared/pipes/rarity-to-color.pipe';
 import { BuildingRecapInventoryComponent } from './building-recap-inventory/building-recap-inventory.component';
 import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
+import { CatalogNamePipe } from 'src/app/shared/i18n/catalog-name.pipe';
 
 @Component({
   selector: 'app-building-recap',
   imports: [
+    TPipe,
+    CatalogNamePipe,
     FormatNumberPipe,
     RarityToColorPipe,
     IconComponent,

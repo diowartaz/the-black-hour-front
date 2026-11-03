@@ -9,6 +9,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { RoutesEnum } from '../../models/router';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
 
 interface SignInForm {
   login: FormControl<string>;
@@ -17,7 +18,7 @@ interface SignInForm {
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, MatProgressSpinnerModule, IconComponent],
+  imports: [TPipe, ReactiveFormsModule, MatProgressSpinnerModule, IconComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })

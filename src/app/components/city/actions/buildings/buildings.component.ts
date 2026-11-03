@@ -8,10 +8,15 @@ import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { ResourceGemComponent } from 'src/app/shared/components/resource-gem/resource-gem.component';
 import { RarityToColorPipe } from 'src/app/shared/pipes/rarity-to-color.pipe';
 import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
+import { CatalogNamePipe } from 'src/app/shared/i18n/catalog-name.pipe';
+import { LanguageService } from 'src/app/shared/i18n/language.service';
 
 @Component({
   selector: 'app-buildings',
   imports: [
+    TPipe,
+    CatalogNamePipe,
     FormatNumberPipe,
     KeyValuePipe,
     IconComponent,
@@ -25,6 +30,7 @@ import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
 })
 export class BuildingsComponent {
   cityService = inject(CityService);
+  private languageService = inject(LanguageService);
   dialogMessage = signal('');
   snackBarOpened = signal(false);
   private snackBarTimeout: ReturnType<typeof setTimeout> | undefined;
@@ -49,13 +55,13 @@ export class BuildingsComponent {
 
   build(building: AdvancedBuildingModel) {
     if (!building.enoughRessources) {
-      this.openSnackBar('Not enough ressources');
+      this.openSnackBar(this.languageService.t('play.notEnoughResources'));
       return;
     } else if (this.isLate(building)) {
-      this.openSnackBar('Not enough time');
+      this.openSnackBar(this.languageService.t('play.notEnoughTime'));
       return;
     } else if (!building.enoughLvlMax) {
-      this.openSnackBar('Already at max level');
+      this.openSnackBar(this.languageService.t('play.maxLevel'));
       return;
     }
 

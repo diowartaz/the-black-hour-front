@@ -1,3 +1,5 @@
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
+import { CatalogNamePipe } from 'src/app/shared/i18n/catalog-name.pipe';
 import { KeyValuePipe, NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { CatalogBuildingModel } from 'src/app/models/game';
@@ -16,6 +18,8 @@ import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
 @Component({
   selector: 'app-building-card',
   imports: [
+    TPipe,
+    CatalogNamePipe,
     FormatNumberPipe,
     KeyValuePipe,
     NgTemplateOutlet,

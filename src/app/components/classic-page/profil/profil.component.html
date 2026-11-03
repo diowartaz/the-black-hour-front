@@ -1,5 +1,5 @@
 @if (profil(); as profil) {
-  <app-classic-page [title]="'Profile'" [glow]="'var(--violet)'">
+  <app-classic-page [title]="'profile.title' | t" [glow]="'var(--violet)'">
     <ng-container content>
       <section class="hero">
         <div class="avatar-ring">
@@ -12,12 +12,15 @@
           </a>
         }
         <div class="chips">
-          <span class="neon-chip" style="--c: var(--violet-pale)">Level {{ level().lvl }}</span>
-          <span class="neon-chip" style="--c: var(--yellow)">Rank #{{ profil.rank ?? '—' }}</span>
+          <span class="neon-chip" style="--c: var(--violet-pale)">{{ 'profile.level' | t: { lvl: level().lvl } }}</span>
+          <span class="neon-chip" style="--c: var(--yellow)">{{
+            'profile.rankChip' | t: { rank: profil.rank ?? '—' }
+          }}</span>
         </div>
         <div class="xp">
           <div class="xp-head label">
-            <span>XP</span><span>{{ level().xpString }}</span>
+            <span>{{ 'profile.xp' | t }}</span
+            ><span>{{ level().xpString }}</span>
           </div>
           <div class="bar"><span class="fill" [style.width.%]="level().ratio"></span></div>
         </div>
@@ -28,26 +31,28 @@
           <div class="stat-tile" style="--c: var(--yellow)">
             <div class="icon-tile"><app-icon name="trophy" [size]="22" /></div>
             <div class="tile-text">
-              <span class="stat-label">Rank</span><span class="stat-value">#{{ profil.rank ?? '—' }}</span>
+              <span class="stat-label">{{ 'profile.rank' | t }}</span
+              ><span class="stat-value">#{{ profil.rank ?? '—' }}</span>
             </div>
           </div>
           <div class="stat-tile" style="--c: var(--cyan)">
             <div class="icon-tile"><app-icon name="ranked" [size]="22" /></div>
             <div class="tile-text">
-              <span class="stat-label">Ranked points</span
+              <span class="stat-label">{{ 'profile.rankedPoints' | t }}</span
               ><span class="stat-value">{{ profil.ranked_points | formatNumber }}</span>
             </div>
           </div>
           <div class="stat-tile" style="--c: var(--pink)">
             <div class="icon-tile"><app-icon name="calendar" [size]="22" /></div>
             <div class="tile-text">
-              <span class="stat-label">Best days</span><span class="stat-value">{{ profil.personal_best_day }}</span>
+              <span class="stat-label">{{ 'profile.bestDays' | t }}</span
+              ><span class="stat-value">{{ profil.personal_best_day }}</span>
             </div>
           </div>
           <div class="stat-tile" style="--c: var(--danger)">
             <div class="icon-tile"><app-icon name="zombie" [size]="22" /></div>
             <div class="tile-text">
-              <span class="stat-label">Zombies</span
+              <span class="stat-label">{{ 'profile.zombies' | t }}</span
               ><span class="stat-value">{{ profil.personal_best_zb | formatNumber }}</span>
             </div>
           </div>
@@ -55,41 +60,41 @@
       </div>
 
       <section class="today">
-        <h3 class="label">Today</h3>
+        <h3 class="label">{{ 'profile.today' | t }}</h3>
         <div class="tiles">
           <div class="stat-tile" style="--c: var(--green)">
             <div class="icon-tile"><app-icon name="money" [size]="22" /></div>
             <div class="tile-text">
-              <span class="stat-label">Earned today</span>
+              <span class="stat-label">{{ 'profile.earnedToday' | t }}</span>
               <span class="stat-value">{{ profil.today.coins | formatNumber }}</span>
             </div>
           </div>
           <div class="stat-tile" style="--c: var(--yellow)">
             <div class="icon-tile"><app-icon name="shield" [size]="22" /></div>
             <div class="tile-text">
-              <span class="stat-label">Guild pot share</span>
+              <span class="stat-label">{{ 'profile.guildShare' | t }}</span>
               <span class="stat-value">+{{ profil.today.contribution | formatNumber }}</span>
             </div>
           </div>
         </div>
         <p class="hint">
-          {{ profil.today.games }} {{ profil.today.games === 1 ? 'game' : 'games' }} finished today.
+          {{ 'profile.gamesToday' | t: { count: profil.today.games } }}
           @if (profil.guild; as guild) {
-            The share goes to {{ guild.name }}'s pot, paid out after midnight (Paris time).
+            {{ 'profile.shareGoesTo' | t: { guild: guild.name } }}
           } @else {
-            Without a guild at midnight (Paris time), the share is lost.
+            {{ 'profile.shareLost' | t }}
           }
         </p>
       </section>
 
       <section class="history">
-        <h3 class="label">Match history</h3>
+        <h3 class="label">{{ 'profile.matchHistory' | t }}</h3>
         @for (game of matchHistory(); track $index) {
           <app-game [game]="game"></app-game>
         } @empty {
           <div class="empty-state">
             <app-icon name="shield" [size]="26" />
-            <span>No completed run yet. Survive your first nights to fill your record.</span>
+            <span>{{ 'profile.noRun' | t }}</span>
           </div>
         }
       </section>

@@ -6,10 +6,12 @@ import { PLAY_ROUTES, PlayRoute, readPlayRoute, RoutesEnum } from 'src/app/model
 import { CityService } from 'src/app/services/city/city.service';
 import { IconComponent, IconName } from 'src/app/shared/components/icon/icon.component';
 import { StorageKey, writeStorage } from 'src/app/shared/utils/storage';
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
+import { TranslationKey } from 'src/app/shared/i18n/types';
 
 @Component({
   selector: 'app-city-footer',
-  imports: [IconComponent],
+  imports: [TPipe, IconComponent],
   templateUrl: './city-footer.component.html',
   styleUrls: ['./city-footer.component.scss'],
 })
@@ -30,10 +32,10 @@ export class CityFooterComponent {
     return PLAY_ROUTES.includes(segment) ? segment : readPlayRoute();
   });
 
-  readonly tabs: { route: PlayRoute; label: string; icon: IconName; color: string }[] = [
-    { route: 'dig', label: 'Dig', icon: 'dig', color: 'var(--yellow)' },
-    { route: 'learn', label: 'Learn', icon: 'book', color: 'var(--cyan)' },
-    { route: 'build', label: 'Build', icon: 'build', color: 'var(--orange)' },
+  readonly tabs: { route: PlayRoute; label: TranslationKey; icon: IconName; color: string }[] = [
+    { route: 'dig', label: 'footer.dig', icon: 'dig', color: 'var(--yellow)' },
+    { route: 'learn', label: 'footer.learn', icon: 'book', color: 'var(--cyan)' },
+    { route: 'build', label: 'footer.build', icon: 'build', color: 'var(--orange)' },
   ];
 
   changeContent(content: PlayRoute) {

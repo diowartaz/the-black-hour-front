@@ -12,6 +12,7 @@ npm run lint       # ng lint --fix
 npm run prettier   # formatage
 npm test           # Karma/Jasmine en ChromeHeadless, une seule passe
 npm run api:types  # régénère src/app/models/api.ts depuis ../the-black-hour-api/openapi.json
+npm run i18n:check # vérifie que les clés de traduction des templates existent
 ```
 
 - Un seul fichier de test : `npx ng test --watch=false --browsers=ChromeHeadless --include=src/app/components/create-city/create-city.component.spec.ts`.
@@ -31,6 +32,11 @@ npm run api:types  # régénère src/app/models/api.ts depuis ../the-black-hour-
 - Écrans chargés à la demande (`loadComponent`) ; templates en control flow `@if`/`@for` ; pas de `CommonModule`, importer `NgClass`/`NgStyle`/`KeyValuePipe` au besoin.
 - Sélecteurs de composants préfixés `app-` ; `any` autorisé par ESLint.
 - Rangs de cartes : `shared/utils/ranks.ts` reprend les calculs de l'API. `app-building-card` montre un exemplaire de base sans son input `rank` (Black Market). En partie, `BuildingModel.rank`, sa défense et son effet viennent du serveur, déjà à la valeur du rang : ne pas réappliquer le rang.
+- Traductions (anglais, français) dans `shared/i18n/` : aucun texte joueur en dur.
+  - Template : `{{ 'zone.cle' | t }}`, avec paramètres `{{ 'deck.unsaved' | t: { count: n } }}` (pluriel par `_one` / `_other`). Attributs : `[placeholder]="'auth.email' | t"`, `[attr.aria-label]="..."`. Le pipe est impur : il suit la langue sans recharger.
+  - TypeScript : `languageService.t('cle')` (clé typée), dans un `computed` pour suivre la langue ; fonctions pures de `shared/utils` : paramètre `Translator` (`languageService.translator()`), anglais par défaut pour les specs.
+  - Noms du catalogue renvoyés par l'API (en anglais) : pipe `catalogName` ou `translator().catalog(kind, id, nom)`, traductions par id dans `catalog.fr.ts`. Erreurs de l'API : traduites par leur `code` (`errors.<CODE>`) dans `errorInterceptor`. Dates : pipe `localDate`.
+  - `fr.ts` doit avoir les mêmes clés que `en.ts` (erreur de compilation sinon) ; `npm run i18n:check` vérifie que les clés littérales des templates existent. Les specs tournent en anglais (`beforeEach` global de `language.service.spec.ts`).
 - L'URL de l'API vient de `src/environments/environment*.ts`.
 - Gestionnaire de paquets : npm uniquement (`package-lock.json`).
 - Git : pas de branches pour le moment, tout se fait directement sur `rework` (branche principale).

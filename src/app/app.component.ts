@@ -10,10 +10,11 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { IconComponent } from './shared/components/icon/icon.component';
 import { ThemeService } from './services/theme/theme.service';
 import { ReturnUrlService } from './services/navigation/return-url.service';
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
 
 @Component({
   selector: 'app-root',
-  imports: [CityHeaderComponent, HeaderLoggedInComponent, RouterOutlet, MatProgressSpinner, IconComponent],
+  imports: [TPipe, CityHeaderComponent, HeaderLoggedInComponent, RouterOutlet, MatProgressSpinner, IconComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })

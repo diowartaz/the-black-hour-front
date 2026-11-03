@@ -1,3 +1,4 @@
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -15,7 +16,15 @@ import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
 
 @Component({
   selector: 'app-profil',
-  imports: [FormatNumberPipe, GameComponent, MatProgressSpinnerModule, ClassicPageComponent, IconComponent, RouterLink],
+  imports: [
+    TPipe,
+    FormatNumberPipe,
+    GameComponent,
+    MatProgressSpinnerModule,
+    ClassicPageComponent,
+    IconComponent,
+    RouterLink,
+  ],
   templateUrl: './profil.component.html',
   styleUrls: ['./profil.component.scss'],
 })

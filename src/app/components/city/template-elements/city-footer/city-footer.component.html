@@ -1,4 +1,4 @@
-<nav class="footer" aria-label="City actions">
+<nav class="footer" [attr.aria-label]="'footer.label' | t">
   @for (tab of tabs; track tab.route) {
     <button
       type="button"
@@ -8,7 +8,7 @@
       (click)="changeContent(tab.route)"
     >
       <app-icon [name]="tab.icon" [size]="24" />
-      <span>{{ tab.label }}</span>
+      <span>{{ tab.label | t }}</span>
     </button>
   }
 </nav>

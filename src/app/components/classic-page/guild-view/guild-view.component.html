@@ -1,5 +1,5 @@
 @if (guild(); as guild) {
-  <app-classic-page [title]="guild.name" [subtitle]="'Guild'" [glow]="'var(--yellow)'">
+  <app-classic-page [title]="guild.name" [subtitle]="'guild.title' | t" [glow]="'var(--yellow)'">
     <ng-container icon><app-icon name="shield" [size]="28" /></ng-container>
     <ng-container content>
       <div class="guild-view">
@@ -7,37 +7,38 @@
           <div class="chips">
             <span class="neon-chip" style="--c: var(--yellow)">
               <app-icon [name]="guild.isPublic ? 'friends' : 'lock'" [size]="14" />
-              {{ guild.isPublic ? 'Public' : 'Invite only' }}
+              {{ (guild.isPublic ? 'guild.public' : 'guild.inviteOnly') | t }}
             </span>
-            <span class="neon-chip">{{ guild.memberCount }}/{{ guild.maxMembers }} members</span>
+            <span class="neon-chip">{{
+              'guild.membersCount' | t: { count: guild.memberCount, max: guild.maxMembers }
+            }}</span>
             <span class="neon-chip" style="--c: var(--violet-pale)">
-              Since {{ guild.createdAt | date: 'mediumDate' }}
+              {{ 'guild.since' | t: { date: (guild.createdAt | localDate) } }}
             </span>
           </div>
           @if (isOwnGuild()) {
-            <a class="cta" [routerLink]="guildRoute"><app-icon name="shield" [size]="18" />Manage your guild</a>
+            <a class="cta" [routerLink]="guildRoute"><app-icon name="shield" [size]="18" />{{ 'guild.manage' | t }}</a>
           } @else if (canJoin()) {
             <button type="button" class="cta" [disabled]="guildService.actionLoading()" (click)="join(guild.id)">
-              <app-icon name="user-plus" [size]="18" />Join
+              <app-icon name="user-plus" [size]="18" />{{ 'guild.join' | t }}
             </button>
           }
         </section>
 
         <section class="neon-card">
-          <h3 class="label">Today's pot</h3>
+          <h3 class="label">{{ 'guild.todayPotTitle' | t }}</h3>
           <p class="pot">
             <strong>{{ guild.pot | formatNumber }}</strong
             ><app-icon name="money" [size]="18" />
-            <span class="hint">per eligible member</span>
+            <span class="hint">{{ 'guild.perEligible' | t }}</span>
           </p>
           <p class="hint">
-            Every finished game adds {{ percent(guild.contributionRate) }}% of its coins to the pot. After midnight
-            (Paris time), each member who finished a game that day receives the whole pot.
+            {{ 'guild.viewHint' | t: { value: percent(guild.contributionRate) } }}
           </p>
         </section>
 
         <section class="neon-card">
-          <h3 class="label">Members</h3>
+          <h3 class="label">{{ 'guild.members' | t }}</h3>
           <ul class="members">
             @for (member of guild.members; track member.playerId) {
               <li>
@@ -48,7 +49,7 @@
                   {{ member.username }}
                 </a>
                 <span class="status" [class.eligible]="member.eligible">
-                  {{ member.eligible ? 'Eligible' : 'No game yet' }}
+                  {{ (member.eligible ? 'guild.eligible' : 'guild.noGameYet') | t }}
                 </span>
                 <span class="contribution">
                   +{{ member.contribution | formatNumber }}<app-icon name="money" [size]="14" />

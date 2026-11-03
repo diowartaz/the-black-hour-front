@@ -5,6 +5,8 @@ import { CityService } from 'src/app/services/city/city.service';
 import { buildingEffectText } from '../../utils/building-effects';
 import { rankMultiplier } from '../../utils/ranks';
 import { IconComponent } from '../icon/icon.component';
+import { LanguageService } from 'src/app/shared/i18n/language.service';
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
 
 // Bulle ouverte dans toute l'application : en ouvrir une ferme la précédente
 const openTooltip = signal<EffectTooltipComponent | null>(null);
@@ -21,7 +23,7 @@ const POSITIONS: ConnectedPosition[] = [
 // sans hériter de leur opacité. Elle se ferme au clic ailleurs ou avec Échap ; le clic ne remonte pas jusqu'à la carte.
 @Component({
   selector: 'app-effect-tooltip',
-  imports: [IconComponent, CdkConnectedOverlay, CdkOverlayOrigin],
+  imports: [TPipe, IconComponent, CdkConnectedOverlay, CdkOverlayOrigin],
   template: `
     <button
       #button
@@ -30,12 +32,12 @@ const POSITIONS: ConnectedPosition[] = [
       cdkOverlayOrigin
       #origin="cdkOverlayOrigin"
       [attr.aria-expanded]="open()"
-      aria-label="Show the building effect"
+      [attr.aria-label]="'effects.showEffect' | t"
       (pointerenter)="show($event)"
       (pointerleave)="hide($event)"
       (click)="toggle($event)"
     >
-      <app-icon name="sparkle" [size]="variant() === 'stat' ? 22 : 13" />Effect
+      <app-icon name="sparkle" [size]="variant() === 'stat' ? 22 : 13" />{{ 'effects.effect' | t }}
     </button>
     <ng-template
       cdkConnectedOverlay
@@ -57,6 +59,7 @@ const POSITIONS: ConnectedPosition[] = [
 })
 export class EffectTooltipComponent implements OnDestroy {
   private cityService = inject(CityService);
+  private languageService = inject(LanguageService);
 
   effect = input.required<BuildingEffectModel>();
   // Jour de la ville en cours : affiche la valeur actuelle des effets qui en dépendent
@@ -77,6 +80,7 @@ export class EffectTooltipComponent implements OnDestroy {
       rules: defaultValues.effect_rules,
       rankMultiplier: rankMultiplier(this.rank(), defaultValues.rank_rules),
       defenseMultiplier: this.withDefenseBonus() ? this.cityService.defenseMultiplier() : 1,
+      i18n: this.languageService.translator(),
     });
   });
   // Ouverte par un clic : reste affichée quand la souris quitte le bouton

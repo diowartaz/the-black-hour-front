@@ -11,29 +11,29 @@
     }
 
     <section class="rewards">
-      <h2 class="label">Rewards</h2>
+      <h2 class="label">{{ 'recap.rewards' | t }}</h2>
       <div class="reward-grid" [class.with-win]="cityService.city().attackRecap.win_money > 0">
         <div class="reward">
-          <span class="reward-label">Base</span>
+          <span class="reward-label">{{ 'recap.base' | t }}</span>
           <span class="reward-value"
             ><app-icon name="money" [size]="16" />{{ cityService.city().attackRecap.base_money | formatNumber }}</span
           >
         </div>
         <div class="reward">
-          <span class="reward-label">Ranked</span>
+          <span class="reward-label">{{ 'recap.ranked' | t }}</span>
           <span class="reward-value"
             ><app-icon name="money" [size]="16" />{{ cityService.city().attackRecap.ranked_money | formatNumber }}</span
           >
         </div>
         <div class="reward">
-          <span class="reward-label">Money Maker</span>
+          <span class="reward-label">{{ 'recap.moneyMaker' | t }}</span>
           <span class="reward-value"
             ><app-icon name="money" [size]="16" />{{ cityService.city().attackRecap.bonus_money | formatNumber }}</span
           >
         </div>
         @if (cityService.city().attackRecap.win_money > 0) {
           <div class="reward win">
-            <span class="reward-label">Victory</span>
+            <span class="reward-label">{{ 'recap.victory' | t }}</span>
             <span class="reward-value"
               ><app-icon name="money" [size]="16" />{{ cityService.city().attackRecap.win_money | formatNumber }}</span
             >
@@ -41,7 +41,7 @@
         }
       </div>
       <div class="total">
-        <span>Total</span>
+        <span>{{ 'recap.total' | t }}</span>
         <span class="total-value"
           ><app-icon name="money" [size]="20" />{{ cityService.city().attackRecap.total_money | formatNumber }}</span
         >
@@ -51,7 +51,7 @@
 
   <div class="footer">
     <button type="button" class="cta" (click)="cityService.deleteCity()">
-      <app-icon name="refresh" [size]="22" />Try again
+      <app-icon name="refresh" [size]="22" />{{ 'recap.tryAgain' | t }}
     </button>
   </div>
 </div>

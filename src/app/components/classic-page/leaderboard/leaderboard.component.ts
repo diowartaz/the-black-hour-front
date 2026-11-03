@@ -1,3 +1,5 @@
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
+import { LanguageService } from 'src/app/shared/i18n/language.service';
 import { Component, computed, effect, inject, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -13,7 +15,7 @@ import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
 
 @Component({
   selector: 'app-leaderboard',
-  imports: [FormatNumberPipe, ClassicPageComponent, IconComponent],
+  imports: [TPipe, FormatNumberPipe, ClassicPageComponent, IconComponent],
   templateUrl: './leaderboard.component.html',
   styleUrls: ['./leaderboard.component.scss'],
 })
@@ -22,6 +24,7 @@ export class LeaderboardComponent {
   private route = inject(ActivatedRoute);
   leaderboardService = inject(LeaderboardService);
   authService = inject(AuthService);
+  private languageService = inject(LanguageService);
 
   // Onglet et page viennent de l'URL (?ranked=true&page=3) : un lien ou un retour arrière restaure la vue
   private queryParams = toSignal(this.route.queryParamMap);
@@ -79,8 +82,11 @@ export class LeaderboardComponent {
 
   scoreOf(user: LeaderboardElement): string {
     return this.ranked()
-      ? `${formatNumber(user.ranked_points)} pts`
-      : `${user.personal_best_day} d · ${formatNumber(user.personal_best_zb)}`;
+      ? this.languageService.t('leaderboard.points', { value: formatNumber(user.ranked_points) })
+      : this.languageService.t('leaderboard.days', {
+          days: user.personal_best_day,
+          zombies: formatNumber(user.personal_best_zb),
+        });
   }
 
   ratioOf(user: LeaderboardElement): number {

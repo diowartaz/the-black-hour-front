@@ -5,10 +5,11 @@ import { RecapRadarComponent } from '../recap-radar/recap-radar.component';
 import { GameComponent } from 'src/app/components/classic-page/profil/game/game.component';
 import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
 
 @Component({
   selector: 'app-death-recap',
-  imports: [FormatNumberPipe, RecapRadarComponent, GameComponent, IconComponent],
+  imports: [TPipe, FormatNumberPipe, RecapRadarComponent, GameComponent, IconComponent],
   templateUrl: './death-recap.component.html',
   styleUrls: ['./death-recap.component.scss'],
 })

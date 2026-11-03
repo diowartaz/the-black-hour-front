@@ -1,10 +1,11 @@
 import { Component, Input, inject } from '@angular/core';
 import { ReturnUrlService } from 'src/app/services/navigation/return-url.service';
 import { IconComponent } from 'src/app/shared/components/icon/icon.component';
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
 
 @Component({
   selector: 'app-classic-page',
-  imports: [IconComponent],
+  imports: [TPipe, IconComponent],
   templateUrl: './classic-page.component.html',
   styleUrls: ['./classic-page.component.scss'],
 })

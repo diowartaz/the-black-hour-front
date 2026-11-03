@@ -1,40 +1,46 @@
 <form class="auth-card" [formGroup]="formgroup" (ngSubmit)="login()">
   <header class="auth-head">
     <app-icon name="key" [size]="32" />
-    <h1 class="neon-title" style="--glow: var(--cyan)">Sign in</h1>
+    <h1 class="neon-title" style="--glow: var(--cyan)">{{ 'auth.signIn' | t }}</h1>
   </header>
 
   <label class="neon-field" [class.invalid]="fieldHasError('login')">
     <app-icon name="mail" [size]="20" />
-    <input required placeholder="Email or username" autocomplete="username" formControlName="login" />
+    <input required [placeholder]="'auth.emailOrUsername' | t" autocomplete="username" formControlName="login" />
   </label>
 
   <label class="neon-field" [class.invalid]="fieldHasError('password')">
     <app-icon name="lock" [size]="20" />
-    <input type="password" required placeholder="Password" autocomplete="current-password" formControlName="password" />
+    <input
+      type="password"
+      required
+      [placeholder]="'auth.password' | t"
+      autocomplete="current-password"
+      formControlName="password"
+    />
   </label>
 
   <div class="auth-errors" aria-live="polite">
     @if (invalidAuthentification()) {
-      <span>Invalid authentication</span>
+      <span>{{ 'auth.invalidAuth' | t }}</span>
     }
   </div>
 
   <button type="submit" class="cta" style="background: var(--grad-learn); color: var(--green-dark)">
     @if (loading()) {
       <mat-spinner diameter="22"></mat-spinner>
-      Signing in…
+      {{ 'auth.signingIn' | t }}
     } @else {
       <app-icon name="arrow-right" [size]="20" />
-      Login
+      {{ 'auth.login' | t }}
     }
   </button>
 
   <div class="auth-links">
-    <button type="button" class="text-btn" (click)="signUp()">No account yet? Sign up</button>
-    <button type="button" class="text-btn" (click)="authService.signInTemp()">Play as guest</button>
+    <button type="button" class="text-btn" (click)="signUp()">{{ 'auth.noAccount' | t }}</button>
+    <button type="button" class="text-btn" (click)="authService.signInTemp()">{{ 'common.playAsGuest' | t }}</button>
     <a class="text-btn" href="https://discord.gg/qFnSBa8P9Z" target="_blank" rel="noopener">
-      <app-icon name="friends" [size]="16" />Join the Discord
+      <app-icon name="friends" [size]="16" />{{ 'common.joinDiscord' | t }}
     </a>
   </div>
 </form>

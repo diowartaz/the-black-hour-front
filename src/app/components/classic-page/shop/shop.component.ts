@@ -1,3 +1,5 @@
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
+import { CatalogNamePipe } from 'src/app/shared/i18n/catalog-name.pipe';
 import { KeyValuePipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
@@ -16,6 +18,8 @@ type ShopTab = 'boosters' | 'bonuses';
 @Component({
   selector: 'app-shop',
   imports: [
+    TPipe,
+    CatalogNamePipe,
     FormatNumberPipe,
     KeyValuePipe,
     ClassicPageComponent,

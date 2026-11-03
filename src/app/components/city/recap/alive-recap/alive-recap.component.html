@@ -11,7 +11,7 @@
 
     @if (nbMaxChoices() > 0) {
       <section class="neon-card">
-        <h2 class="label">Architect's shelter · pick {{ nbMaxChoices() }} of {{ nbChoicesAvailable() }}</h2>
+        <h2 class="label">{{ 'recap.architectPick' | t: { pick: nbMaxChoices(), total: nbChoicesAvailable() } }}</h2>
         @for (building of architectBuildings(); track $index) {
           <label class="pick" [class.selected]="selectedBuildings().has($index)">
             <input
@@ -28,7 +28,7 @@
 
   <div class="footer">
     <button type="button" class="cta" (click)="startDay()">
-      <app-icon name="play" [size]="22" />Start day {{ cityService.city().day }}
+      <app-icon name="play" [size]="22" />{{ 'recap.startDay' | t: { day: cityService.city().day } }}
     </button>
   </div>
 </div>

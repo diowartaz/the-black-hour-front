@@ -3,12 +3,12 @@
     class="sheet"
     role="dialog"
     aria-modal="true"
-    [attr.aria-label]="'Sell ' + building().name"
+    [attr.aria-label]="'market.sellName' | t: { name: (building() | catalogName) }"
     (click)="$event.stopPropagation()"
   >
     <div class="sheet-head">
-      <h2><app-icon name="tag" [size]="18" />Sell</h2>
-      <button type="button" class="close" aria-label="Close" (click)="closed.emit()">
+      <h2><app-icon name="tag" [size]="18" />{{ 'market.sell' | t }}</h2>
+      <button type="button" class="close" [attr.aria-label]="'common.close' | t" (click)="closed.emit()">
         <app-icon name="close" [size]="20" />
       </button>
     </div>
@@ -19,7 +19,7 @@
 
     @if (lots().length > 1) {
       <div class="field">
-        <span class="label" id="sell-quantity">Quantity</span>
+        <span class="label" id="sell-quantity">{{ 'sell.quantity' | t }}</span>
         <div class="lots" role="radiogroup" aria-labelledby="sell-quantity">
           @for (lot of lots(); track lot.size) {
             <button
@@ -31,7 +31,7 @@
               [disabled]="!lot.available"
               (click)="quantity.set(lot.size)"
             >
-              {{ lot.size === 1 ? '1 plan' : 'Lot of ' + lot.size }}
+              {{ (lot.size === 1 ? 'sell.onePlan' : 'sell.lotOf') | t: { count: lot.size } }}
             </button>
           }
         </div>
@@ -39,7 +39,7 @@
     }
 
     <div class="field">
-      <label class="label" for="sell-price">{{ isLot() ? 'Price for the lot' : 'Your price' }}</label>
+      <label class="label" for="sell-price">{{ (isLot() ? 'sell.lotPrice' : 'sell.yourPrice') | t }}</label>
       <div class="price-box">
         <app-icon name="money" [size]="24" />
         <input
@@ -47,14 +47,14 @@
           type="text"
           inputmode="numeric"
           class="price"
-          placeholder="Price"
+          [placeholder]="'sell.price' | t"
           autocomplete="off"
           [value]="price()"
           (input)="setPrice($any($event.target).value)"
         />
       </div>
       @if (isLot() && validPrice()) {
-        <span class="per-plan">≈ {{ unitPrice() | formatNumber }} per plan</span>
+        <span class="per-plan">{{ 'sell.perPlan' | t: { price: (unitPrice() | formatNumber) } }}</span>
       }
     </div>
 
@@ -80,38 +80,38 @@
       <span>
         @if (lowestPrice(); as lowest) {
           @if (!validPrice()) {
-            Lowest {{ offerName() }}: {{ lowest | formatNumber }} coins
+            {{ 'sell.lowest' | t: { offer: offerName(), price: (lowest | formatNumber) } }}
           } @else if (visible()) {
-            Cheapest {{ offerName() }}: buyers will see yours
+            {{ 'sell.cheapest' | t: { offer: offerName() } }}
           } @else {
-            Hidden while {{ lowest | formatNumber }} is cheaper or older
+            {{ 'sell.hidden' | t: { price: (lowest | formatNumber) } }}
           }
         } @else {
-          No other {{ offerName() }}: buyers will see yours
+          {{ 'sell.noOther' | t: { offer: offerName() } }}
         }
       </span>
     </p>
 
     <dl class="receipt">
       <div class="tax">
-        <dt>Tax, paid now</dt>
+        <dt>{{ 'sell.tax' | t }}</dt>
         <dd>−{{ tax() | formatNumber }}</dd>
       </div>
       <div>
-        <dt>Paid when sold</dt>
+        <dt>{{ 'sell.paidWhenSold' | t }}</dt>
         <dd>+{{ (validPrice() ? price()! : 0) | formatNumber }}</dd>
       </div>
       <div class="net">
-        <dt>You keep</dt>
-        <dd>{{ net() | formatNumber }} coins</dd>
+        <dt>{{ 'sell.youKeep' | t }}</dt>
+        <dd>{{ 'sell.coins' | t: { amount: (net() | formatNumber) } }}</dd>
       </div>
     </dl>
 
     <button type="button" class="cta cta-gold" [disabled]="!canList()" (click)="list()">
       @if (validPrice()) {
-        List {{ isLot() ? quantity() + ' ' : '' }}for {{ price()! | formatNumber }}
+        {{ (isLot() ? 'sell.listLot' : 'sell.list') | t: { count: quantity(), price: (price()! | formatNumber) } }}
       } @else {
-        Enter a price
+        {{ 'sell.enterPrice' | t }}
       }
     </button>
   </div>

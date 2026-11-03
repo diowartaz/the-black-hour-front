@@ -172,7 +172,8 @@
 
 .access {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  // Côte à côte si la place le permet, sinon empilés (« Sur invitation » ne tient pas en demi-largeur à 300 px)
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
   gap: 8px;
 
   .ghost-btn {

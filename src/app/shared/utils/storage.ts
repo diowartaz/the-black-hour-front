@@ -5,6 +5,7 @@ export enum StorageKey {
   PLAY_ROUTE = 'play-route',
   DIG_MODE = 'dig-mode',
   THEME = 'theme',
+  LANGUAGE = 'language',
   // Code de parrainage reçu par un lien d'invitation, en attente de l'inscription ou du choix du parrain
   REFERRAL_CODE = 'referral-code',
 }

@@ -2,27 +2,27 @@
   <div class="stats-bar">
     <div class="stats">
       <div class="stat" style="--c: var(--cyan)">
-        <span class="stat-label">Day</span>
+        <span class="stat-label">{{ 'header.day' | t }}</span>
         <span class="stat-value">{{ cityService.city().day }}</span>
       </div>
       <div class="stat" style="--c: var(--pink-light)">
-        <span class="stat-label">Time</span>
+        <span class="stat-label">{{ 'header.time' | t }}</span>
         <span class="stat-value">{{ cityService.cityTimeString() }}</span>
       </div>
       <div class="stat" style="--c: var(--yellow)">
-        <span class="stat-label">Def</span>
+        <span class="stat-label">{{ 'header.def' | t }}</span>
         @let night = cityService.nightDefenseNow();
         <span class="stat-value"
           >{{ cityService.city().defense | formatNumber }}
           @if (night.max > 0) {
-            <span class="night" title="Extra defense for tonight only"
+            <span class="night" [title]="'header.nightDefense' | t"
               >+{{ night.min === night.max ? night.min : night.min + '–' + night.max }}</span
             >
           }
         </span>
       </div>
       <div class="stat" style="--c: var(--danger-light)">
-        <span class="stat-label">Threat</span>
+        <span class="stat-label">{{ 'header.threat' | t }}</span>
         <span
           class="stat-value"
           [class.danger]="cityService.city().nb_zb_next_attack_max > cityService.city().defense + night.min"
@@ -35,25 +35,21 @@
     <button
       type="button"
       class="sleep-btn"
-      aria-label="End the day and sleep"
+      [attr.aria-label]="'header.sleepLabel' | t"
       [class.late]="(cityService.cityTimeSeconds() || 0) > 22 * 60 * 60"
       (click)="cityService.endDay()"
     >
       <app-icon name="moon" [size]="22" />
-      Sleep
+      {{ 'header.sleep' | t }}
     </button>
   </div>
   @let rankedLeft = cityService.rankedTimeLeftMs();
   @if (rankedLeft !== null) {
-    <div
-      class="ranked-timer"
-      [class.danger]="rankedLeft < rankedUrgentMs"
-      title="Finish your game before this delay: past it, the game no longer counts as ranked (forfeit loss if you joined second)"
-    >
+    <div class="ranked-timer" [class.danger]="rankedLeft < rankedUrgentMs" [title]="'header.rankedHint' | t">
       <app-icon name="clock" [size]="16" />
-      <span>Ranked</span>
+      <span>{{ 'header.ranked' | t }}</span>
       <strong>{{ formatCountdown(rankedLeft) }}</strong>
-      <span class="hint">left to finish</span>
+      <span class="hint">{{ 'header.leftToFinish' | t }}</span>
     </div>
   }
 }

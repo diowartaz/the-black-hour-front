@@ -1,4 +1,4 @@
-<app-classic-page [title]="'Guild'" [subtitle]="'Play together'" [glow]="'var(--yellow)'">
+<app-classic-page [title]="'guild.title' | t" [subtitle]="'guild.subtitle' | t" [glow]="'var(--yellow)'">
   <ng-container icon><app-icon name="shield" [size]="28" /></ng-container>
   <ng-container content>
     @if (overview(); as overview) {
@@ -6,7 +6,8 @@
         @if (overview.lastPayout > 0) {
           <p class="payout neon-card">
             <app-icon name="money" [size]="18" />
-            Received today from your guild: <strong>+{{ overview.lastPayout | formatNumber }} coins</strong>
+            {{ 'guild.receivedToday' | t }}
+            <strong>{{ 'guild.plusCoins' | t: { amount: (overview.lastPayout | formatNumber) } }}</strong>
           </p>
         }
 
@@ -19,17 +20,18 @@
               <span class="neon-chip">{{ guild.memberCount }}/{{ guild.maxMembers }}</span>
             </div>
             <p class="hint">
-              Every finished game adds <strong>{{ percent(guild.contributionRate) }}%</strong> of its coins to the guild
-              pot. After midnight (Paris time), each member who finished a game that day receives the whole pot.
+              {{ 'guild.potHintBefore' | t }}
+              <strong>{{ 'guild.percent' | t: { value: percent(guild.contributionRate) } }}</strong>
+              {{ 'guild.potHintAfter' | t }}
             </p>
             <p class="pot">
-              Next payout per eligible member: <strong>{{ guild.pot | formatNumber }}</strong>
+              {{ 'guild.nextPayout' | t }} <strong>{{ guild.pot | formatNumber }}</strong>
               <app-icon name="money" [size]="16" />
             </p>
           </section>
 
           <section class="neon-card">
-            <h3 class="label">Members</h3>
+            <h3 class="label">{{ 'guild.members' | t }}</h3>
             <ul class="members">
               @for (member of guild.members; track member.playerId) {
                 <li class="member">
@@ -40,7 +42,7 @@
                     {{ member.username }}
                   </button>
                   <span class="status" [class.eligible]="member.eligible">
-                    {{ member.eligible ? 'Eligible' : 'No game yet' }}
+                    {{ (member.eligible ? 'guild.eligible' : 'guild.noGameYet') | t }}
                   </span>
                   <span class="contribution">
                     +{{ member.contribution | formatNumber }}<app-icon name="money" [size]="14" />
@@ -49,7 +51,7 @@
                     <button
                       type="button"
                       class="icon-btn kick"
-                      [attr.aria-label]="'Kick ' + member.username"
+                      [attr.aria-label]="'guild.kickName' | t: { name: member.username }"
                       [disabled]="guildService.actionLoading()"
                       (click)="kick(member)"
                     >
@@ -63,8 +65,8 @@
 
           @if (guild.isLeader) {
             <section class="neon-card">
-              <h3 class="label">Leader tools</h3>
-              <div class="access" role="group" aria-label="Guild access">
+              <h3 class="label">{{ 'guild.leaderTools' | t }}</h3>
+              <div class="access" role="group" [attr.aria-label]="'guild.access' | t">
                 <button
                   type="button"
                   class="ghost-btn"
@@ -72,7 +74,7 @@
                   [disabled]="guildService.actionLoading() || guild.isPublic"
                   (click)="guildService.setPublic(true)"
                 >
-                  <app-icon name="friends" [size]="18" />Public
+                  <app-icon name="friends" [size]="18" />{{ 'guild.public' | t }}
                 </button>
                 <button
                   type="button"
@@ -81,7 +83,7 @@
                   [disabled]="guildService.actionLoading() || !guild.isPublic"
                   (click)="guildService.setPublic(false)"
                 >
-                  <app-icon name="lock" [size]="18" />Invite only
+                  <app-icon name="lock" [size]="18" />{{ 'guild.inviteOnly' | t }}
                 </button>
               </div>
               <form class="inline-form" [formGroup]="inviteForm" (ngSubmit)="invite()">
@@ -89,15 +91,17 @@
                   <app-icon name="user-plus" [size]="20" />
                   <input
                     type="text"
-                    placeholder="Username"
+                    [placeholder]="'guild.username' | t"
                     autocomplete="off"
                     maxlength="32"
                     formControlName="username"
                   />
                 </label>
-                <button type="submit" class="cta" [disabled]="guildService.actionLoading()">Invite</button>
+                <button type="submit" class="cta" [disabled]="guildService.actionLoading()">
+                  {{ 'guild.invite' | t }}
+                </button>
               </form>
-              <p class="hint">Invitations last 7 days. Only players without a guild can be invited.</p>
+              <p class="hint">{{ 'guild.inviteHint' | t }}</p>
             </section>
           }
 
@@ -107,14 +111,12 @@
             [disabled]="guildService.actionLoading()"
             (click)="leave(guild.isLeader)"
           >
-            <app-icon name="logout" [size]="18" />{{
-              guild.isLeader ? 'Leave (disbands the guild)' : 'Leave the guild'
-            }}
+            <app-icon name="logout" [size]="18" />{{ (guild.isLeader ? 'guild.leaveDisband' : 'guild.leave') | t }}
           </button>
         } @else {
           @if (overview.invitations.length > 0) {
             <section class="neon-card">
-              <h3 class="label">Invitations</h3>
+              <h3 class="label">{{ 'guild.invitations' | t }}</h3>
               <ul class="members">
                 @for (invitation of overview.invitations; track invitation.id) {
                   <li class="invitation">
@@ -122,8 +124,15 @@
                       invitation.guildName
                     }}</a>
                     <span class="since">
-                      {{ invitation.memberCount }}/{{ invitation.maxMembers }} · until
-                      {{ invitation.expiresAt | date: 'mediumDate' }}
+                      {{
+                        'guild.until'
+                          | t
+                            : {
+                                members: invitation.memberCount,
+                                max: invitation.maxMembers,
+                                date: (invitation.expiresAt | localDate),
+                              }
+                      }}
                     </span>
                     <div class="row-actions">
                       <button
@@ -132,12 +141,12 @@
                         [disabled]="guildService.actionLoading()"
                         (click)="guildService.accept(invitation.id)"
                       >
-                        Join
+                        {{ 'guild.join' | t }}
                       </button>
                       <button
                         type="button"
                         class="icon-btn"
-                        [attr.aria-label]="'Decline ' + invitation.guildName"
+                        [attr.aria-label]="'guild.declineName' | t: { name: invitation.guildName }"
                         [disabled]="guildService.actionLoading()"
                         (click)="guildService.decline(invitation.id)"
                       >
@@ -151,23 +160,23 @@
           }
 
           <section class="neon-card">
-            <h3 class="label">Public guilds</h3>
+            <h3 class="label">{{ 'guild.publicGuilds' | t }}</h3>
             <form class="inline-form" [formGroup]="searchForm" (ngSubmit)="search()">
               <label class="neon-field">
                 <app-icon name="search" [size]="20" />
                 <input
                   type="text"
-                  placeholder="Search a guild"
+                  [placeholder]="'guild.searchPlaceholder' | t"
                   autocomplete="off"
                   [maxlength]="nameMaxLength"
                   formControlName="text"
                 />
               </label>
-              <button type="submit" class="ghost-btn">Search</button>
+              <button type="submit" class="ghost-btn">{{ 'guild.search' | t }}</button>
             </form>
             @if (guildService.openGuilds().length === 0) {
               <p class="hint">
-                {{ guildService.searchLoading() ? 'Searching…' : 'No public guild with free places.' }}
+                {{ (guildService.searchLoading() ? 'guild.searching' : 'guild.noPublicGuild') | t }}
               </p>
             } @else {
               <ul class="members">
@@ -175,10 +184,14 @@
                   <li class="invitation">
                     <a class="text-btn name" [routerLink]="['/', guildRoute, summary.id]">{{ summary.name }}</a>
                     <span class="since">
-                      {{ summary.memberCount }}/{{ summary.maxMembers }} · led by {{ summary.leaderUsername }}
+                      {{
+                        'guild.ledBy'
+                          | t: { members: summary.memberCount, max: summary.maxMembers, leader: summary.leaderUsername }
+                      }}
                     </span>
                     <span class="contribution today-pot">
-                      Today's pot: {{ summary.pot | formatNumber }}<app-icon name="money" [size]="14" />
+                      {{ 'guild.todayPot' | t: { amount: (summary.pot | formatNumber) }
+                      }}<app-icon name="money" [size]="14" />
                     </span>
                     <div class="row-actions">
                       <button
@@ -187,7 +200,7 @@
                         [disabled]="guildService.actionLoading()"
                         (click)="guildService.join(summary.id)"
                       >
-                        Join
+                        {{ 'guild.join' | t }}
                       </button>
                     </div>
                   </li>
@@ -197,8 +210,8 @@
           </section>
 
           <section class="neon-card">
-            <h3 class="label">Create a guild</h3>
-            <p class="hint">You become its leader. The name can't be changed later.</p>
+            <h3 class="label">{{ 'guild.create' | t }}</h3>
+            <p class="hint">{{ 'guild.createHint' | t }}</p>
             <form class="create-form" [formGroup]="createForm" (ngSubmit)="create()">
               <label
                 class="neon-field"
@@ -207,20 +220,20 @@
                 <app-icon name="shield" [size]="20" />
                 <input
                   type="text"
-                  placeholder="Guild name (3 to 24 characters)"
+                  [placeholder]="'guild.namePlaceholder' | t"
                   autocomplete="off"
                   [maxlength]="nameMaxLength"
                   formControlName="name"
                 />
               </label>
-              <div class="access" role="group" aria-label="Guild access">
+              <div class="access" role="group" [attr.aria-label]="'guild.access' | t">
                 <button
                   type="button"
                   class="ghost-btn"
                   [class.selected]="createPublic()"
                   (click)="createPublic.set(true)"
                 >
-                  <app-icon name="friends" [size]="18" />Public
+                  <app-icon name="friends" [size]="18" />{{ 'guild.public' | t }}
                 </button>
                 <button
                   type="button"
@@ -228,7 +241,7 @@
                   [class.selected]="!createPublic()"
                   (click)="createPublic.set(false)"
                 >
-                  <app-icon name="lock" [size]="18" />Invite only
+                  <app-icon name="lock" [size]="18" />{{ 'guild.inviteOnly' | t }}
                 </button>
               </div>
               <button type="submit" class="cta cta-pink" [disabled]="guildService.actionLoading()">
@@ -237,7 +250,7 @@
                 } @else {
                   <app-icon name="plus" [size]="20" />
                 }
-                Create
+                {{ 'guild.createButton' | t }}
               </button>
             </form>
           </section>

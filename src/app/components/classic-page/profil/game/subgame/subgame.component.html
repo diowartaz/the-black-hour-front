@@ -14,16 +14,16 @@
     }
   </div>
   <div class="stats">
-    <span class="stat" title="Days survived"
+    <span class="stat" [title]="'game.daysSurvived' | t"
       ><app-icon name="calendar" [size]="14" />{{ modifiedGameHistoryPlayer.day }}</span
     >
     <!-- « -- » (valeur absente, partie normale) ne passe pas par formatNumber, qui afficherait NaN -->
-    <span class="stat def" title="Defense"
+    <span class="stat def" [title]="'game.defense' | t"
       ><app-icon name="shield" [size]="14" />{{
         modifiedGameHistoryPlayer.defense === '--' ? '--' : (modifiedGameHistoryPlayer.defense | formatNumber)
       }}</span
     >
-    <span class="stat pts" title="Ranked points"
+    <span class="stat pts" [title]="'game.rankedPoints' | t"
       ><app-icon name="ranked" [size]="14" />{{
         modifiedGameHistoryPlayer.ranked_points === '--'
           ? '--'

@@ -1,8 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { LanguageService } from 'src/app/shared/i18n/language.service';
 import { CatalogBuildingModel } from 'src/app/models/game';
 import { ITEMS, resourceShares } from '../../utils/deck';
 import { ITEM_THEME } from '../../utils/theme';
 import { ResourceGemComponent } from '../resource-gem/resource-gem.component';
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
+
+const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
 
 // Au-delà de cette part, une ressource demande nettement plus de fouilles que les autres (20 % chacune)
 const OVERWEIGHT_SHARE = 0.3;
@@ -10,7 +14,7 @@ const OVERWEIGHT_SHARE = 0.3;
 // Besoins en ressources d'un ensemble de plans, comparés aux fouilles équiprobables
 @Component({
   selector: 'app-resource-shares',
-  imports: [ResourceGemComponent],
+  imports: [TPipe, ResourceGemComponent],
   template: `
     <div class="bars">
       @for (share of shares(); track share.item) {
@@ -23,7 +27,7 @@ const OVERWEIGHT_SHARE = 0.3;
       }
     </div>
     @if (heaviest(); as heavy) {
-      <p class="warning">Lots of {{ heavy }}: digs give every resource equally, these plans will take longer.</p>
+      <p class="warning">{{ 'resources.heavy' | t: { items: heavy } }}</p>
     }
   `,
   styles: `
@@ -71,15 +75,17 @@ const OVERWEIGHT_SHARE = 0.3;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResourceSharesComponent {
+  private languageService = inject(LanguageService);
   buildings = input.required<CatalogBuildingModel[]>();
 
   readonly overweight = OVERWEIGHT_SHARE;
   shares = computed(() => {
     const shares = resourceShares(this.buildings());
+    const i18n = this.languageService.translator();
     return ITEMS.map((item) => ({
       item,
       value: shares[item],
-      label: ITEM_THEME[item].label,
+      label: capitalize(i18n.t(`items.${item}`)),
       color: ITEM_THEME[item].color,
     }));
   });
@@ -87,6 +93,6 @@ export class ResourceSharesComponent {
     this.shares()
       .filter((share) => share.value > OVERWEIGHT_SHARE)
       .map((share) => share.label.toLowerCase())
-      .join(' and '),
+      .join(this.languageService.t('resources.and')),
   );
 }

@@ -2,7 +2,7 @@
 
 <div class="actions">
   <button type="button" class="ghost-btn wiki-btn" (click)="router.navigate([RoutesEnum.WIKI])">
-    <app-icon name="bookmark" [size]="18" />Discover the guide
+    <app-icon name="bookmark" [size]="18" />{{ 'home.discoverGuide' | t }}
   </button>
   <button type="button" class="cta cta-pink" (click)="authService.signInTemp()">
     @if (authService.signInTempLoading()) {
@@ -10,9 +10,9 @@
     } @else {
       <app-icon name="gamepad" [size]="22" />
     }
-    Play as guest
+    {{ 'common.playAsGuest' | t }}
   </button>
   <button type="button" class="ghost-btn" (click)="useYourAccount()">
-    <app-icon name="key" [size]="18" />Use my own account
+    <app-icon name="key" [size]="18" />{{ 'home.useAccount' | t }}
   </button>
 </div>

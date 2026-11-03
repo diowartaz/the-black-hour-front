@@ -1,3 +1,4 @@
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
 import { Component, computed, inject } from '@angular/core';
 import { UserState } from 'src/app/models/router';
 import { CityService } from 'src/app/services/city/city.service';
@@ -7,7 +8,7 @@ import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
 
 @Component({
   selector: 'app-city-header',
-  imports: [FormatNumberPipe, IconComponent],
+  imports: [TPipe, FormatNumberPipe, IconComponent],
   templateUrl: './city-header.component.html',
   styleUrls: ['./city-header.component.scss'],
 })

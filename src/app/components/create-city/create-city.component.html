@@ -3,30 +3,32 @@
 <section class="neon-card deck-summary">
   <div class="deck-head">
     <app-icon name="cards" [size]="20" />
-    <h2>Deck · {{ deckBuildings().length }} plans</h2>
+    <h2>{{ 'createCity.deck' | t: { count: deckBuildings().length } }}</h2>
     <div class="deck-rarities">
       @for (entry of deckRarities(); track entry.rarity) {
-        <span class="neon-chip" [style.--c]="entry.rarity | rarityToColor">{{ entry.rarity }} {{ entry.count }}</span>
+        <span class="neon-chip" [style.--c]="entry.rarity | rarityToColor"
+          >{{ 'rarity.' + entry.rarity | t }} {{ entry.count }}</span
+        >
       }
     </div>
   </div>
   <app-resource-shares [buildings]="deckBuildings()" />
   <button type="button" class="ghost-btn" style="--c: var(--cyan)" (click)="router.navigate([RoutesEnum.DECK])">
-    <app-icon name="cards" [size]="18" />Edit deck
+    <app-icon name="cards" [size]="18" />{{ 'createCity.editDeck' | t }}
   </button>
 </section>
 
 <div class="go-to-wiki">
-  <span>First time here?</span>
+  <span>{{ 'createCity.firstTime' | t }}</span>
   <button type="button" class="ghost-btn" style="--c: var(--violet-light)" (click)="router.navigate([RoutesEnum.WIKI])">
-    <app-icon name="bookmark" [size]="18" />Read the guide
+    <app-icon name="bookmark" [size]="18" />{{ 'createCity.readGuide' | t }}
   </button>
 </div>
 <div class="modes">
   <button type="button" class="ghost-btn" (click)="createCity(false)">
-    <app-icon name="play" [size]="18" />Play normal
+    <app-icon name="play" [size]="18" />{{ 'createCity.playNormal' | t }}
   </button>
   <button type="button" class="cta cta-gold ranked" (click)="createCity(true)">
-    <app-icon name="ranked" [size]="20" />Play ranked
+    <app-icon name="ranked" [size]="20" />{{ 'createCity.playRanked' | t }}
   </button>
 </div>

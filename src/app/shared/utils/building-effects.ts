@@ -5,13 +5,12 @@ import {
   EffectRulesModel,
   ItemModel,
 } from 'src/app/models/game';
+import { ENGLISH, Translator } from 'src/app/shared/i18n/translator';
 
 // Une décimale au plus : le rang d'un plan donne des valeurs comme 11.2%
 const percent = (value: number) => `${Math.round(value * 1000) / 10}%`;
 const minutes = (seconds: number) => `${Math.round(seconds / 60)} min`;
 const decimal = (value: number) => Math.round(value * 100) / 100;
-// Effet qui ne peut être qu'entier : le rang d'un plan s'applique au total, arrondi
-const roundedNote = (value: number) => (Number.isInteger(value) ? '' : ' The total is rounded.');
 
 export interface EffectTextOptions {
   // Jour de la ville en cours, pour afficher la valeur actuelle des effets qui en dépendent
@@ -22,6 +21,8 @@ export interface EffectTextOptions {
   rankMultiplier?: number;
   // Bonus de défense du joueur, appliqué à toutes les valeurs de défense (en partie seulement)
   defenseMultiplier?: number;
+  // Langue du texte (LanguageService.translator()), anglais par défaut
+  i18n?: Translator;
 }
 
 // Effets qui donnent de la défense : le bonus de défense du joueur s'y applique
@@ -48,12 +49,14 @@ export function buildingEffectText(effect: BuildingEffectModel, options: EffectT
     rules = createDefaultDefaultValuesModel().effect_rules,
     rankMultiplier = 1,
     defenseMultiplier = 1,
+    i18n = ENGLISH,
   } = options;
-  const text = effectText(effect, day, rules, rankMultiplier, defenseMultiplier);
-  return defenseMultiplier > 1 && DEFENSE_KINDS.has(effect.kind) ? `${text} Your defense bonus is included.` : text;
+  const text = effectText(i18n, effect, day, rules, rankMultiplier, defenseMultiplier);
+  return defenseMultiplier > 1 && DEFENSE_KINDS.has(effect.kind) ? text + i18n.t('effects.defenseBonus') : text;
 }
 
 function effectText(
+  { t }: Translator,
   effect: BuildingEffectModel,
   day: number | undefined,
   rules: EffectRulesModel,
@@ -62,76 +65,97 @@ function effectText(
 ): string {
   const { value } = effect;
   const def = (defense: number) => decimal(defense * defenseMultiplier);
+  // Effet qui ne peut être qu'entier : le rang d'un plan s'applique au total, arrondi
+  const roundedNote = Number.isInteger(value) ? '' : t('effects.rounded');
   switch (effect.kind) {
     case 'nightlyGrowth':
-      return `Each night survived: +${def(value)} permanent defense per level.`;
+      return t('effects.nightlyGrowth', { def: def(value) });
     case 'compoundGrowth':
-      return `Each night survived: +${percent(value * defenseMultiplier)} of your defense as permanent defense per level, up to +${def(rules.vault_max_defense_per_level * rankMultiplier)} per level.`;
+      return t('effects.compoundGrowth', {
+        pct: percent(value * defenseMultiplier),
+        max: def(rules.vault_max_defense_per_level * rankMultiplier),
+      });
     case 'buildDayScaling':
       return (
-        `Each level built gives ${def(value)} × the current day in defense.` +
-        (day ? ` Today: +${def(value * day)} per level.` : '')
+        t('effects.buildDayScaling', { def: def(value) }) +
+        (day ? t('effects.buildDayScalingToday', { today: def(value * day) }) : '')
       );
     case 'skillDefense':
-      return `Each skill level learned gives +${def(value)} defense per level of this building.`;
+      return t('effects.skillDefense', { def: def(value) });
     case 'stockDefense':
-      return `Tonight only: +${def(value)} defense per resource in stock, per level.`;
+      return t('effects.stockDefense', { def: def(value) });
     case 'randomNightDefense':
-      return `Tonight only: random defense between 0 and ${def(value)} per level.`;
+      return t('effects.randomNightDefense', { def: def(value) });
     case 'survivalTrophy':
       return (
-        `Each night survived earns a trophy, then gives +${def(value)} permanent defense per level for every ${rules.trophy_nights_per_point} trophies.` +
-        (day ? ` Tonight: +${def(value * Math.floor(day / rules.trophy_nights_per_point))} per level.` : '')
+        t('effects.survivalTrophy', { def: def(value), nights: rules.trophy_nights_per_point }) +
+        (day
+          ? t('effects.survivalTrophyTonight', {
+              tonight: def(value * Math.floor(day / rules.trophy_nights_per_point)),
+            })
+          : '')
       );
     case 'otherBuildDefense':
-      return `Each level you build on another building gives +${def(value)} defense per level.`;
+      return t('effects.otherBuildDefense', { def: def(value) });
     case 'surplusDefense':
-      return `Each night survived: +${def(value)} permanent defense per level for every ${rules.carrion_surplus_step} defense above the zombies, up to +${def(value * rules.carrion_max_steps)} per level.`;
+      return t('effects.surplusDefense', {
+        def: def(value),
+        step: rules.carrion_surplus_step,
+        max: def(value * rules.carrion_max_steps),
+      });
     case 'stockToDefense':
-      return `Each night survived: uses ${rules.larder_items_per_level} of your most plentiful resource per level, +${def(value)} permanent defense for each.`;
+      return t('effects.stockToDefense', { items: rules.larder_items_per_level, def: def(value) });
     case 'digDefense':
-      return `Each dig gives +${def(value)} permanent defense per level.`;
+      return t('effects.digDefense', { def: def(value) });
     case 'idleNightDefense':
-      return `Tonight only: +${def(value)} defense per level for each full hour left when you go to sleep.`;
+      return t('effects.idleNightDefense', { def: def(value) });
     case 'extraAttackRolls':
-      return `The horde size is rolled ${value} more time per level; the smallest roll is kept.${roundedNote(value)}`;
+      return t('effects.extraAttackRolls', { value }) + roundedNote;
     case 'extraDigItem':
-      return `Each dig has a ${percent(value)} chance per level to bring back one more resource.`;
+      return t('effects.extraDigItem', { pct: percent(value) });
     case 'buildRefund':
-      return `Each build has a ${percent(value)} chance per level to give back one of the resources spent.`;
+      return t('effects.buildRefund', { pct: percent(value) });
     case 'morningItems':
-      return `Each night survived: ${value} random resource per level.`;
+      return t('effects.morningItems', { value });
     case 'digTimeReduction':
-      return `Digging takes ${percent(value)} less time per level.`;
+      return t('effects.digTimeReduction', { pct: percent(value) });
     case 'buildTimeReduction':
-      return `Building takes ${percent(value)} less time per level.`;
+      return t('effects.buildTimeReduction', { pct: percent(value) });
     case 'repeatBuildTimeReduction':
-      return `Building the same building as your previous action takes ${percent(value)} less time per level.`;
+      return t('effects.repeatBuildTimeReduction', { pct: percent(value) });
     case 'earlierWakeUp':
-      return `You wake up ${minutes(value)} earlier per level.`;
+      return t('effects.earlierWakeUp', { min: minutes(value) });
     case 'sleepRecovery':
-      return `Going to sleep early gives back ${percent(value)} more of the remaining time per level, up to ${minutes(rules.dormitory_max_sleep_bonus_per_level * rankMultiplier)} more per level.`;
+      return t('effects.sleepRecovery', {
+        pct: percent(value),
+        max: minutes(rules.dormitory_max_sleep_bonus_per_level * rankMultiplier),
+      });
     case 'extraArchitectOffers':
-      return `The Blueprint Workshop shows ${value} more building per level to choose from.${roundedNote(value)}`;
+      return t('effects.extraArchitectOffers', { value }) + roundedNote;
     case 'skillLevelCap':
-      return `Every skill can be unlocked ${value} level higher per level.${roundedNote(value)}`;
+      return t('effects.skillLevelCap', { value }) + roundedNote;
     case 'nightLearning':
-      return `Each night survived: ${percent(value)} chance per level to learn an unlocked skill level for free.`;
+      return t('effects.nightLearning', { pct: percent(value) });
   }
 }
 
-function itemsText(items: EffectReportModel['itemsGained'], sign: '+' | '−'): string[] {
+function itemsText({ t }: Translator, items: EffectReportModel['itemsGained'], sign: '+' | '−'): string[] {
   return (Object.entries(items) as [ItemModel, number | undefined][])
     .filter(([, quantity]) => quantity)
-    .map(([item, quantity]) => `${sign}${quantity} ${item}`);
+    .map(([item, quantity]) => `${sign}${quantity} ${t(`items.${item}`)}`);
 }
 
 // Résumé de ce qu'un bâtiment spécial a fait : « +4 defense, +1 wood, Digger +1 level »
-export function effectReportText(report: EffectReportModel): string {
+export function effectReportText(report: EffectReportModel, i18n: Translator = ENGLISH): string {
   return [
-    ...(report.defense ? [`+${report.defense} defense`] : []),
-    ...itemsText(report.itemsGained, '+'),
-    ...itemsText(report.itemsSpent, '−'),
-    ...report.skillLevels.map((s) => `${s.name} +${s.levels} level${s.levels > 1 ? 's' : ''}`),
+    ...(report.defense ? [i18n.t('effects.reportDefense', { count: report.defense })] : []),
+    ...itemsText(i18n, report.itemsGained, '+'),
+    ...itemsText(i18n, report.itemsSpent, '−'),
+    ...report.skillLevels.map((s) =>
+      i18n.t('effects.reportSkillLevels', {
+        name: i18n.catalog('skill', s.skillId, s.name),
+        count: s.levels,
+      }),
+    ),
   ].join(', ');
 }

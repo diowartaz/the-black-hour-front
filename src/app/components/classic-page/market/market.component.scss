@@ -112,7 +112,7 @@ app-plan-filters {
 
 .price-row {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) 64px;
+  grid-template-columns: auto minmax(0, 1fr) 72px;
   align-items: center;
   column-gap: 8px;
   min-height: 38px;
@@ -180,6 +180,7 @@ app-plan-filters {
   border: 1px dashed var(--line);
   font-size: 12px;
   font-weight: 700;
+  white-space: nowrap;
   color: var(--text-mute);
   .shown & {
     border-style: solid;

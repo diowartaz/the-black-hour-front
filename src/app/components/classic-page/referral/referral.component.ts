@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { LocalDatePipe } from 'src/app/shared/i18n/local-date.pipe';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -11,16 +11,19 @@ import { IconComponent } from 'src/app/shared/components/icon/icon.component';
 import { invitationLink, normalizeReferralCode, pendingReferralCode } from 'src/app/shared/utils/referral';
 import { ClassicPageComponent } from '../classic-page.component';
 import { FormatNumberPipe } from 'src/app/shared/pipes/format-number.pipe';
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
+import { LanguageService } from 'src/app/shared/i18n/language.service';
 
 @Component({
   selector: 'app-referral',
   imports: [
+    TPipe,
     FormatNumberPipe,
     ClassicPageComponent,
     IconComponent,
     ReactiveFormsModule,
     MatProgressSpinnerModule,
-    DatePipe,
+    LocalDatePipe,
   ],
   templateUrl: './referral.component.html',
   styleUrls: ['./referral.component.scss'],
@@ -29,6 +32,7 @@ export class ReferralComponent implements OnInit {
   referralService = inject(ReferralService);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly languageService = inject(LanguageService);
 
   referral = this.referralService.referral;
   // Prérempli par un lien d'invitation reçu avant d'avoir un compte. Le FormGroup est nécessaire :
@@ -56,25 +60,21 @@ export class ReferralComponent implements OnInit {
       this.copied.set(true);
       setTimeout(() => this.copied.set(false), 2000);
     } catch {
-      this.snackBar.open('Copy failed, select the link to copy it', 'OK', { duration: 4000 });
+      this.snackBar.open(this.languageService.t('errors.copyFailed'), this.languageService.t('common.ok'), {
+        duration: 4000,
+      });
     }
   }
 
   regenerateCode() {
-    const confirmed = window.confirm(
-      'Generate a new code? Your current code and the invite links you already shared will stop working. ' +
-        'Your referees stay with you.',
-    );
+    const confirmed = window.confirm(this.languageService.t('referral.confirmRegenerate'));
     if (confirmed) {
       this.referralService.regenerateCode();
     }
   }
 
   removeReferee(referee: RefereeModel) {
-    const confirmed = window.confirm(
-      `Remove ${referee.username} from your referees? They can join you again with your current code, ` +
-        'unless you generate a new one.',
-    );
+    const confirmed = window.confirm(this.languageService.t('referral.confirmRemove', { name: referee.username }));
     if (confirmed) {
       this.referralService.removeReferee(referee.playerId);
     }

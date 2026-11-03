@@ -3,6 +3,6 @@
     <mat-spinner diameter="48" class="spinner"></mat-spinner>
   } @else {
     <!-- le chargement a échoué (l'erreur est affichée par l'errorInterceptor) -->
-    <button type="button" class="cta" (click)="cityService.loadPlayer()">Retry</button>
+    <button type="button" class="cta" (click)="cityService.loadPlayer()">{{ 'common.retry' | t }}</button>
   }
 </div>

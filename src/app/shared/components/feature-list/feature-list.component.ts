@@ -1,21 +1,23 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { IconComponent, IconName } from '../icon/icon.component';
+import { TranslationKey } from 'src/app/shared/i18n/types';
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
 
 // Titre du jeu et liste des fonctionnalités (accueil, création de ville)
 @Component({
   selector: 'app-feature-list',
-  imports: [IconComponent],
+  imports: [TPipe, IconComponent],
   template: `
     <header class="brand">
       <app-icon name="skull" [size]="44" />
       <h1 class="neon-title">The Black Hour</h1>
-      <span class="label">Survive one more night</span>
+      <span class="label">{{ 'features.tagline' | t }}</span>
     </header>
     <ul class="features">
-      @for (feature of features; track feature.text) {
+      @for (feature of features; track feature.icon) {
         <li [style.--c]="feature.color">
           <span class="icon-tile"><app-icon [name]="feature.icon" [size]="18" /></span>
-          {{ feature.text }}
+          {{ feature.text | t }}
         </li>
       }
     </ul>
@@ -69,13 +71,13 @@ import { IconComponent, IconName } from '../icon/icon.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeatureListComponent {
-  readonly features: { icon: IconName; color: string; text: string }[] = [
-    { icon: 'skull', color: 'var(--pink)', text: 'Try your best to survive' },
-    { icon: 'dig', color: 'var(--yellow)', text: 'Search for resources' },
-    { icon: 'build', color: 'var(--orange)', text: 'Build powerful defenses' },
-    { icon: 'book', color: 'var(--cyan)', text: 'Learn useful skills' },
-    { icon: 'zombie', color: 'var(--danger)', text: 'Defeat zombies every night' },
-    { icon: 'sparkle', color: 'var(--violet-light)', text: 'Accumulate experience and levels' },
-    { icon: 'trophy', color: 'var(--green)', text: 'Conquer the leaderboard!' },
+  readonly features: { icon: IconName; color: string; text: TranslationKey }[] = [
+    { icon: 'skull', color: 'var(--pink)', text: 'features.survive' },
+    { icon: 'dig', color: 'var(--yellow)', text: 'features.search' },
+    { icon: 'build', color: 'var(--orange)', text: 'features.build' },
+    { icon: 'book', color: 'var(--cyan)', text: 'features.learn' },
+    { icon: 'zombie', color: 'var(--danger)', text: 'features.defeat' },
+    { icon: 'sparkle', color: 'var(--violet-light)', text: 'features.experience' },
+    { icon: 'trophy', color: 'var(--green)', text: 'features.leaderboard' },
   ];
 }

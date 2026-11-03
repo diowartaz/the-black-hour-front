@@ -1,3 +1,5 @@
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
+import { LanguageService } from 'src/app/shared/i18n/language.service';
 import { Component, computed, effect, inject, signal, DestroyRef } from '@angular/core';
 import { KeyValuePipe } from '@angular/common';
 import { CityService } from 'src/app/services/city/city.service';
@@ -16,19 +18,18 @@ export const DIG_MODE_TOGGLE_ENABLED = false;
 
 @Component({
   selector: 'app-diggings',
-  imports: [KeyValuePipe, IconComponent, ResourceGemComponent, ItemToColorPipe],
+  imports: [TPipe, KeyValuePipe, IconComponent, ResourceGemComponent, ItemToColorPipe],
   templateUrl: './diggings.component.html',
   styleUrls: ['./diggings.component.scss'],
 })
 export class DiggingsComponent {
   cityService = inject(CityService);
+  private languageService = inject(LanguageService);
 
   dialogMessage = signal('');
   snackBarOpened = signal(false);
   readonly modeToggleEnabled = DIG_MODE_TOGGLE_ENABLED;
-  mode = signal<DigMode>(
-    this.modeToggleEnabled && readStorage(StorageKey.DIG_MODE) === 'random' ? 'random' : 'pick',
-  );
+  mode = signal<DigMode>(this.modeToggleEnabled && readStorage(StorageKey.DIG_MODE) === 'random' ? 'random' : 'pick');
   private snackBarTimeout: ReturnType<typeof setTimeout> | undefined;
   // Nombre de fouilles de la dernière action, pour repérer les ressources en plus de Lucky Digger
   private lastDigCount = 0;
@@ -38,7 +39,7 @@ export class DiggingsComponent {
     effect(() => {
       const found = Object.values(this.cityService.inventoryItemFound()).reduce((a, b) => a + b, 0);
       if (this.lastDigCount > 0 && found > this.lastDigCount) {
-        this.openSnackBar(`Lucky! +${found - this.lastDigCount}`);
+        this.openSnackBar(this.languageService.t('dig.lucky', { count: found - this.lastDigCount }));
       }
     });
   }
@@ -92,7 +93,7 @@ export class DiggingsComponent {
   // Fouille unique : la ressource choisie dans la paire
   pick(item: ItemModel) {
     if (!this.enoughTimeForPick()) {
-      this.openSnackBar('Not enough time');
+      this.openSnackBar(this.languageService.t('play.notEnoughTime'));
       return;
     }
     this.lastDigCount = 1;
@@ -102,7 +103,7 @@ export class DiggingsComponent {
   // Fouille au hasard dans la paire
   digOnce() {
     if (!this.enoughTimeForPick()) {
-      this.openSnackBar('Not enough time');
+      this.openSnackBar(this.languageService.t('play.notEnoughTime'));
       return;
     }
     this.lastDigCount = 1;
@@ -112,7 +113,7 @@ export class DiggingsComponent {
   // Fouilles au hasard jusqu'à l'attaque : la première dans la paire, les suivantes parmi toutes les ressources
   digMax() {
     if (this.maxDigs() < 1) {
-      this.openSnackBar('Not enough time');
+      this.openSnackBar(this.languageService.t('play.notEnoughTime'));
       return;
     }
     this.lastDigCount = this.maxDigs();

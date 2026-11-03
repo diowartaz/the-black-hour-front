@@ -17,6 +17,7 @@ import { RoutesEnum } from '../../models/router';
 import { AuthService, SignUpResult } from 'src/app/services/auth/auth.service';
 import { SignUpParams } from 'src/app/models/auth';
 import { clearPendingReferralCode, normalizeReferralCode, pendingReferralCode } from 'src/app/shared/utils/referral';
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
 
 interface SignUpForm {
   email: FormControl<string>;
@@ -29,7 +30,7 @@ interface SignUpForm {
 @Component({
   selector: 'app-sign-up',
   templateUrl: './sign-up.component.html',
-  imports: [ReactiveFormsModule, MatProgressSpinnerModule, IconComponent],
+  imports: [TPipe, ReactiveFormsModule, MatProgressSpinnerModule, IconComponent],
   styleUrl: './sign-up.component.scss',
 })
 export class SignUpComponent implements OnInit {

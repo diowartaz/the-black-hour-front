@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { nightTime } from 'src/app/shared/utils/recap-radar';
+import { TPipe } from 'src/app/shared/i18n/t.pipe';
 
 // Événement de la nuit, repris sur le radar par son numéro
 export interface NightEvent {
@@ -12,6 +13,7 @@ export interface NightEvent {
 // Journal horodaté de la nuit : effets des bâtiments et découvertes, numérotés comme sur le radar
 @Component({
   selector: 'app-night-log',
+  imports: [TPipe],
   templateUrl: './night-log.component.html',
   styleUrls: ['./night-log.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,16 +1,16 @@
 <div class="radar-recap" [class.breached]="layout().breached">
   <div class="title">
     <span class="neon-chip" style="--c: var(--pink-light)">
-      <app-icon name="calendar" [size]="14" />Night of day {{ night() }}
+      <app-icon name="calendar" [size]="14" />{{ 'recap.nightOfDay' | t: { day: night() } }}
     </span>
-    <h1 class="neon-title">Attack recap</h1>
+    <h1 class="neon-title">{{ 'recap.attackRecap' | t }}</h1>
   </div>
 
   <div class="radar">
     <svg
       viewBox="-120 -120 240 240"
       role="img"
-      [attr.aria-label]="defense() + ' defense against ' + zombies() + ' zombies'"
+      [attr.aria-label]="'recap.radarLabel' | t: { defense: defense(), zombies: zombies() }"
     >
       <circle class="grid" [attr.r]="R" />
       <circle class="grid" [attr.r]="R * 0.75" />
@@ -47,28 +47,32 @@
   </div>
 
   <div class="stats">
-    <span class="def"><app-icon name="shield" [size]="14" />{{ defense() | formatNumber }} defense</span>
-    <span class="zb"><app-icon name="zombie" [size]="14" />{{ zombies() | formatNumber }} zombies</span>
+    <span class="def"
+      ><app-icon name="shield" [size]="14" />{{ 'recap.defense' | t: { value: (defense() | formatNumber) } }}</span
+    >
+    <span class="zb"
+      ><app-icon name="zombie" [size]="14" />{{ 'recap.zombies' | t: { value: (zombies() | formatNumber) } }}</span
+    >
     @if (layout().zombiesPerDot > 1) {
-      <span class="scale">1 dot ≈ {{ layout().zombiesPerDot }}</span>
+      <span class="scale">{{ 'recap.dotScale' | t: { value: layout().zombiesPerDot } }}</span>
     }
   </div>
 
   <div class="result">
     @if (layout().breached) {
-      <span class="result-title">You died!</span>
-      <span class="result-sub"
-        >The horde broke through on day {{ night() }}, {{ -margin() | formatNumber }} zombies too many.</span
-      >
+      <span class="result-title">{{ 'recap.died' | t }}</span>
+      <span class="result-sub">{{
+        'recap.brokeThrough' | t: { day: night(), count: (-margin() | formatNumber) }
+      }}</span>
     } @else {
-      <span class="result-title">You survived!</span>
+      <span class="result-title">{{ 'recap.survived' | t }}</span>
       <span class="result-sub">
         @if (margin() > 0) {
-          The closest zombie stopped {{ margin() | formatNumber }} m from the wall.
+          {{ 'recap.closest' | t: { distance: (margin() | formatNumber) } }}
         } @else {
-          The horde stopped right at the wall.
+          {{ 'recap.atWall' | t }}
         }
-        Day {{ night() + 1 }} begins.
+        {{ 'recap.dayBegins' | t: { day: night() + 1 } }}
       </span>
     }
   </div>

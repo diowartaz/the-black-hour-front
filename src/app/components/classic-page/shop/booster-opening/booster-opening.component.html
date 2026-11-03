@@ -1,6 +1,11 @@
-<div class="backdrop" role="dialog" aria-modal="true" [attr.aria-label]="boosterName() + ' booster'">
+<div
+  class="backdrop"
+  role="dialog"
+  aria-modal="true"
+  [attr.aria-label]="'shop.boosterName' | t: { name: boosterName() }"
+>
   <div #panel class="panel">
-    <h2 class="neon-title" style="--glow: var(--yellow)">{{ boosterName() }} booster</h2>
+    <h2 class="neon-title" style="--glow: var(--yellow)">{{ 'shop.boosterName' | t: { name: boosterName() } }}</h2>
     <div class="cards">
       @for (card of shownCards(); track $index) {
         @let isRevealed = $index < revealed() && !!card.building;
@@ -13,7 +18,7 @@
           @if (card.building) {
             <div class="front">
               @if (card.is_new) {
-                <span class="neon-chip badge" style="--c: var(--green)">New</span>
+                <span class="neon-chip badge" style="--c: var(--green)">{{ 'card.new' | t }}</span>
               }
               <span class="neon-chip copies" style="--c: var(--yellow)" [style.--copies]="card.copies"></span>
               <app-building-card [building]="card.building" [count]="card.count" />
@@ -22,7 +27,7 @@
           <button
             type="button"
             class="hidden-card"
-            aria-label="Reveal the next plan"
+            [attr.aria-label]="'shop.revealNext' | t"
             [attr.inert]="isRevealed ? '' : null"
             (click)="reveal($index)"
           >
@@ -41,7 +46,7 @@
     </div>
     <div class="actions">
       @if (!allRevealed()) {
-        <button type="button" class="ghost-btn" (click)="revealAll()">Reveal all</button>
+        <button type="button" class="ghost-btn" (click)="revealAll()">{{ 'shop.revealAll' | t }}</button>
       } @else {
         <button
           type="button"
@@ -50,9 +55,9 @@
           [disabled]="!canOpenAnother() || cityService.openBoosterLoading()"
           (click)="again()"
         >
-          <app-icon name="refresh" [size]="16" />Open another
+          <app-icon name="refresh" [size]="16" />{{ 'shop.openAnother' | t }}
         </button>
-        <button type="button" class="ghost-btn" (click)="closed.emit()">Done</button>
+        <button type="button" class="ghost-btn" (click)="closed.emit()">{{ 'shop.done' | t }}</button>
       }
     </div>
   </div>
