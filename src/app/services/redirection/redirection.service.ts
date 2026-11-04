@@ -28,8 +28,6 @@ export class RedirectionService {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  private previousState = this.cityService.state();
-
   constructor() {
     effect(() => {
       const connected = this.authService.isConnected();
@@ -49,8 +47,6 @@ export class RedirectionService {
   }
 
   private onChange(connected: boolean, state: UserState): void {
-    const previousState = this.previousState;
-    this.previousState = state;
     const current = this.currentSegment();
 
     if (!connected) {
@@ -68,10 +64,9 @@ export class RedirectionService {
       return;
     }
 
-    // En cours de partie, un changement d'état (fin de journée, mort…) ramène toujours à l'écran du jeu.
-    // Juste après le chargement du joueur, on laisse en place les pages qui ne dépendent pas de l'état.
-    const gameTransition = previousState !== UserState.NOT_LOADED_PLAYER && previousState !== state;
-    if (STATE_LESS_ROUTES.includes(current) && !gameTransition) {
+    // Les pages qui ne dépendent pas de l'état (boutique, deck, guilde…) ne sont jamais quittées d'office :
+    // un changement d'état (fin de journée, mort…) s'applique quand le joueur revient vers l'écran du jeu (stateGuard).
+    if (STATE_LESS_ROUTES.includes(current)) {
       return;
     }
     if (current !== statesToRoutes[state]) {

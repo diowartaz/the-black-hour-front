@@ -47,8 +47,10 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    // Montants alignés en bas même si un libellé passe sur deux lignes
+    justify-content: space-between;
     gap: 2px;
-    padding: 8px 0;
+    padding: 8px 6px;
     border-radius: var(--radius-m);
     background: color-mix(in srgb, var(--yellow) 8%, transparent);
     &.win {
@@ -60,7 +62,9 @@
     .reward-label {
       font-size: 11px;
       font-weight: 700;
-      letter-spacing: 0.1em;
+      line-height: 1.2;
+      letter-spacing: 0.06em;
+      text-align: center;
       text-transform: uppercase;
       color: var(--yellow-light);
     }

@@ -219,7 +219,7 @@ export const FR: Translations = {
     rewards: 'Récompenses',
     base: 'Base',
     ranked: 'Classée',
-    moneyMaker: 'Faiseur d’argent',
+    moneyMaker: 'Spéculateur',
     victory: 'Victoire',
     total: 'Total',
     tryAgain: 'Réessayer',
