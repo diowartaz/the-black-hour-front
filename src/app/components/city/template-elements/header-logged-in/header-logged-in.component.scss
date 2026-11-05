@@ -19,6 +19,12 @@
     border: 1px solid color-mix(in srgb, var(--yellow) 45%, transparent);
     box-shadow: 0 0 16px color-mix(in srgb, var(--yellow) 20%, transparent);
     color: var(--yellow);
+    text-decoration: none;
+    cursor: pointer;
+    transition: box-shadow 0.15s;
+    &:hover {
+      box-shadow: 0 0 22px color-mix(in srgb, var(--yellow) 40%, transparent);
+    }
 
     .balance-icon {
       width: 36px;
@@ -58,6 +64,12 @@
     border: 1px solid var(--danger);
     border-radius: var(--radius-s);
     padding: 3px 6px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s;
+    &:hover {
+      background: color-mix(in srgb, var(--danger) 15%, transparent);
+    }
   }
 
   // Écrans étroits : on resserre pour tout garder sur une ligne

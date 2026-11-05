@@ -38,6 +38,7 @@ export class HeaderLoggedInComponent {
   private readonly router = inject(Router);
   public readonly authService = inject(AuthService);
   readonly menuPositions = MENU_POSITIONS;
+  readonly routes = RoutesEnum;
 
   money = computed(() => formatNumber(this.cityService.stats().money));
 

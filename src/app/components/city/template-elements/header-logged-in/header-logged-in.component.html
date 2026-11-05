@@ -1,12 +1,18 @@
 <div class="top-bar">
   @if (authService.isConnected()) {
-    <div class="balance" [attr.aria-label]="'common.coinsLabel' | t: { amount: money() }">
+    <a
+      class="balance"
+      [routerLink]="['/', routes.SHOP]"
+      [attr.aria-label]="'common.coinsLabel' | t: { amount: money() }"
+    >
       <span class="balance-icon"><app-icon name="money" [size]="18" /></span>
       <span class="balance-amount">{{ money() }}</span>
       <span class="balance-unit">{{ 'common.coins' | t }}</span>
-    </div>
+    </a>
     @if (authService.tempAccount()) {
-      <span class="no-cloud-save">{{ 'nav.noCloudSave1' | t }}<br />{{ 'nav.noCloudSave2' | t }}</span>
+      <a class="no-cloud-save" [routerLink]="['/', routes.SETTINGS]"
+        >{{ 'nav.noCloudSave1' | t }}<br />{{ 'nav.noCloudSave2' | t }}</a
+      >
     }
   }
   <div class="spacer"></div>
